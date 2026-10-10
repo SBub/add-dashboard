@@ -32,14 +32,14 @@ So that the page does not look split into a content area and a darker strip belo
 6. Emulate the dark colour scheme, reload `/projects`, repeat steps 3 to 5, and **Verify** the dark
    `html` colour differs from the light one.
 7. Take a full-page screenshot of `/projects` at 1920x2000 in dark mode.
-8. Navigate to `/` and to the first project link in the sidebar of `/projects`; on each, in the
+8. Navigate to `/`, to `/watch` and to the first project link in the sidebar of `/projects`; on each, in the
    light and in the dark colour scheme, repeat step 3 and **Verify** the `html` colour is not
    `rgba(0, 0, 0, 0)` and equals the `body` colour.
 
 ## Success Criteria
 
 - `html` and `body` paint the same non-transparent colour in both colour schemes on `/`,
-  `/projects` and a project page.
+  `/watch`, `/projects` and a project page.
 - `color-scheme` on `html` names both `light` and `dark`.
 - No page-level element paints a second shade; the sticky header paints the same colour as `body`.
 - 1 screenshot is taken.

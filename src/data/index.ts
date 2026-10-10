@@ -19,7 +19,7 @@
 //   shown runs' costs (never once per run), inside the same cache scope.
 //   getCompletedRuns.
 //
-// The summary page (`/`) reads the adw.daily_summary view (finished runs per
+// The summary page (`/watch`) reads the adw.daily_summary view (finished runs per
 // project per UTC day) in two halves split on today's UTC date, which the page
 // passes in: getSummaryPast (the days before today, server only, from the
 // page's long-lived "use cache" scope, never in the query cache) and
@@ -411,7 +411,7 @@ async function getSummaryProjects(): Promise<{ id: string; slug: string; display
 }
 
 /**
- * The summary page's (`/`) past days: the finished runs per UTC day over the
+ * The summary page's (`/watch`) past days: the finished runs per UTC day over the
  * `days` days strictly before `today` (`YYYY-MM-DD`), for every visible
  * project. Today is never in it; the today card shows it (getSummaryToday).
  *
@@ -469,7 +469,7 @@ export async function getSummaryPast(today: string, days: number): Promise<Summa
 }
 
 /**
- * The summary page's (`/`) today card: the finished runs of the UTC day
+ * The summary page's (`/watch`) today card: the finished runs of the UTC day
  * `today` (`YYYY-MM-DD`) across every visible project, or null when none has
  * finished a run yet. Four reads in parallel (projects, that day's
  * daily_summary rows, its daily_model_summary rows and its

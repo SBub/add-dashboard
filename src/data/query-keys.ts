@@ -28,7 +28,7 @@ export const queryKeys = {
    */
   queue: (slug: string) => ["queue", slug] as const,
   /**
-   * The summary page's (`/`) today card, by UTC day: prefetched by the page's
+   * The summary page's (`/watch`) today card, by UTC day: prefetched by the page's
    * getTodayState, read by TodaySummary. The day is part of the hash, so an
    * entry can never be read for another day.
    */

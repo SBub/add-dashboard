@@ -1,5 +1,5 @@
 // The cache tags that key one project's server-rendered history and the
-// summary page's (`/`) two halves, spelled in exactly one place. The project
+// summary page's (`/watch`) two halves, spelled in exactly one place. The project
 // page's history scope tags itself with historyTag, the summary page's scopes
 // with summaryPastTag and summaryTodayTag; the revalidateHistory server action
 // and the /api/revalidate route handler drop two of them through historyTags
@@ -15,7 +15,7 @@ export function historyTag(slug: string): string {
 }
 
 /**
- * The tag of the summary page's (`/`) past days scope (`getPastDays`). Never
+ * The tag of the summary page's (`/watch`) past days scope (`getPastDays`). Never
  * dropped by a completion: past days are immutable once their UTC day is over,
  * and the scope's lifetime and the date in its key are what move it on.
  */
@@ -24,7 +24,7 @@ export function summaryPastTag(): string {
 }
 
 /**
- * The tag of the summary page's (`/`) today scope (`getTodayState`): today's
+ * The tag of the summary page's (`/watch`) today scope (`getTodayState`): today's
  * day across every project. One tag, not one per day or project: a
  * completion changes today's figures, and one drop must reach the entry.
  */

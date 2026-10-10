@@ -4,8 +4,9 @@ import { HeaderLink } from "@/components/HeaderLink";
 import { HIRE_ACCENT } from "@/lib/accent";
 
 // The header's three links: the brand (BrandLink, rendered by the root layout)
-// leads to the summary at "/", this nav holds the one other section, the
-// project overview ("Watch me build"), and the Work with me button (HireLink,
+// leads to the intro page at "/", this nav holds the one other section, the
+// summary at /watch ("Watch me build", also current on the project overview
+// and project pages), and the Work with me button (HireLink,
 // in the header's right group) leads to /hire. All mark the current section
 // through HeaderLink, the one usePathname reader in the header. Each sits in a
 // plain Suspense whose fallback is the same link inactive, because usePathname
@@ -25,14 +26,14 @@ export function SectionNav() {
     <nav aria-label="Sections" className="flex items-center gap-3 text-sm sm:gap-4">
       <Suspense
         fallback={
-          <Link href="/projects" className={`${SECTION_LINK} ${SECTION_LINK_INACTIVE}`}>
+          <Link href="/watch" className={`${SECTION_LINK} ${SECTION_LINK_INACTIVE}`}>
             Watch me build
           </Link>
         }
       >
         <HeaderLink
-          href="/projects"
-          section="projects"
+          href="/watch"
+          section="watch"
           className={SECTION_LINK}
           activeClassName={SECTION_LINK_ACTIVE}
           inactiveClassName={SECTION_LINK_INACTIVE}
@@ -56,7 +57,7 @@ export function BrandLink() {
     >
       <HeaderLink
         href="/"
-        section="summary"
+        section="home"
         className={BRAND_LINK}
         activeClassName=""
         inactiveClassName=""

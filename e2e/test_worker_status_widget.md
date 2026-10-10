@@ -3,7 +3,7 @@
 Checks that the dashboard sidebar shows whether the ADW queue worker is alive, from the
 `adw.workers` heartbeat: the served HTML carries the clock-free server snapshot next to the run
 rows, the widget reaches a known state against the live database, sits at the bottom of the
-sidebar on desktop and after the project strip on mobile, and is absent on `/`. The hosted
+sidebar on desktop and after the project strip on mobile, and is absent on `/` and on `/watch`. The hosted
 database is read only; this journey never writes.
 
 ## User Story
@@ -31,8 +31,8 @@ So that I know why labelled issues sit in the Queue when nothing picks them up
    bottom of the sidebar.
 6. Resize to 375x667. **Verify** the widget renders after the project strip (its `top` is
    greater than the strip's `bottom`). Take a screenshot.
-7. Navigate to `/`. **Verify** the accessibility snapshot has no `Ready to build`,
-   `Offline` or `Checking status...` text. Judge this from `browser_snapshot`, not a DOM
+7. Navigate to `/`, then to `/watch`. On each, **Verify** the accessibility snapshot has no
+   `Ready to build`, `Offline` or `Checking status...` text. Judge this from `browser_snapshot`, not a DOM
    query: Next keeps the previous route's hidden `Activity` subtree in the document.
 
 ## Success Criteria
@@ -40,5 +40,5 @@ So that I know why labelled issues sit in the Queue when nothing picks them up
 - The served HTML of `/projects` holds `Checking status...` and the run rows.
 - A known state (`Ready to build` or `Offline`) appears within 30 seconds.
 - The widget sits at the sidebar's bottom on desktop and after the project strip on mobile.
-- `/` has no widget.
+- `/` and `/watch` have no widget.
 - 2 screenshots are taken.

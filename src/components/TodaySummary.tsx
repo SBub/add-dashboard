@@ -8,7 +8,7 @@ import { STATUS_COLORS } from "@/lib/status-colors";
 import { SummaryDayCard } from "./SummaryDayCard";
 
 /**
- * The summary page's (`/`) today card: today's finished runs across every
+ * The summary page's (`/watch`) today card: today's finished runs across every
  * project, with a Refresh button that refetches this one query in place. The
  * day arrives as a prop from the server's request-time clock read; this
  * component never computes it and reads no clock. The data is prefetched by

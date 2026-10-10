@@ -4,6 +4,7 @@
 
 - specs/issue-127-adw-2ab91140-sdlc_planner-move-feature-docs.md
 - specs/issue-164-adw-cf1087b2-sdlc_planner-hire-me-page-contact-form.md
+- specs/issue-169-adw-98e70d08-sdlc_planner-who-you-are-home-page.md
 
 ## Overview
 
@@ -94,5 +95,5 @@ server-rendered section that can fail independently goes in
   The project page's Active fallback carries the real Active and Queue
   headings (the page builds them before the boundary), so they are in the
   static shell. `HistorySearchFallback` stays the real box, disabled, not a
-  skeleton, and the error panels are unchanged. The summary page (`/`) and
+  skeleton, and the error panels are unchanged. The summary page (`/watch`) and
   `HeaderLink`'s fallback are not part of this rule.

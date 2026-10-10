@@ -3,6 +3,7 @@
 **Specifications:**
 
 - specs/issue-127-adw-2ab91140-sdlc_planner-move-feature-docs.md
+- specs/issue-169-adw-98e70d08-sdlc_planner-who-you-are-home-page.md
 
 ## Overview
 
@@ -218,7 +219,7 @@ so a screen reader announces changes. The three states are the string enum
 `Reconnecting = "reconnecting"`) exported from the same file; the enum value is
 the rendered label, and the style table is keyed by it. It is rendered only in
 the `(dashboard)` layout, beside `Providers`, so it exists exactly where the
-channel does: leaving the group (to the summary at `/`) unmounts both, and returning
+channel does: leaving the group (to the intro at `/`, the summary at `/watch` or `/hire`) unmounts both, and returning
 remounts both (the closer resets the store to `Connecting`, the next
 `SUBSCRIBED` sets `Live`).
 
@@ -244,10 +245,11 @@ live updates (above) go through the query cache, not this store.
   channel status callback in `src/data/realtime.ts` is its one caller.
 - `ConnectionIndicator` is rendered only in `src/app/(dashboard)/layout.tsx`,
   inside `Providers` (beside the sidebar's `Projects` heading), never in the
-  root layout or in the summary page `src/app/page.tsx`; a route without the
-  channel shows no pill. Do not mount `Providers` or start Realtime on `/`
-  (the summary) to make one appear. `SummaryProviders` is the only provider
-  on `/`, mounted only around the today island.
+  root layout or in the summary page `src/app/watch/page.tsx`; a route without
+  the channel shows no pill. Do not mount `Providers` or start Realtime on
+  `/` (the intro), `/watch` (the summary) or `/hire` to make one appear.
+  `SummaryProviders` is the only provider on `/watch`, mounted only around
+  the today island.
 - Every Realtime write to the query cache goes through a pure, unit-tested
   reducer and `setQueryData`: `applyProjectChange` in
   `src/data/apply-project-change.ts` for `adw.projects` events,

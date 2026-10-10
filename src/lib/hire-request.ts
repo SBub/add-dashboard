@@ -107,3 +107,29 @@ export function hireStatus(params: {
   if (typeof error === "string" && isErrorCode(error)) return { kind: "error", code: error };
   return null;
 }
+
+// The URL slug for each offer. Deliberately not the OFFERS values, so the
+// visible labels, the values the subject carries and the URLs stay
+// independent. Typed by offer, so a new OFFERS entry without a slug is a type
+// error.
+const OFFER_SLUG: Record<Offer, string> = {
+  "Product engineer": "product-engineer",
+  "AI consulting": "ai-consulting",
+};
+
+/**
+ * The offer `?offer=<slug>` preselects on /hire: the mapped offer for a known
+ * slug, else the first option. Only a slug in OFFER_SLUG matches, so
+ * "constructor" or "__proto__" never do, and a repeated param (an array) is
+ * the first option. It only ever returns an OFFERS member, so the raw value is
+ * never echoed.
+ */
+export function hireOfferFromSlug(slug: string | string[] | undefined): Offer {
+  if (typeof slug !== "string") return OFFERS[0];
+  return OFFERS.find((offer) => OFFER_SLUG[offer] === slug) ?? OFFERS[0];
+}
+
+/** The /hire link that preselects `offer`, the inverse of hireOfferFromSlug. */
+export function hireOfferHref(offer: Offer): string {
+  return `/hire?offer=${OFFER_SLUG[offer]}`;
+}

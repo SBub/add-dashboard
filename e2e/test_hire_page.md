@@ -26,7 +26,8 @@ the site
 8. **Verify** the `offer` select is labelled `What brings you here?` and has exactly two options.
    With `browser_evaluate`, return each option's `value` and `text`. **Verify** the first is value
    `Product engineer` with text `I need a product engineer (contract or full-time)`, and the second
-   is value `AI consulting` with text `I want to take work off my own plate`.
+   is value `AI consulting` with text `I want to take work off my own plate`. **Verify** the select's
+   `value` is `Product engineer` (the default with no `?offer=`).
 9. **Verify** the motivation textarea is labelled
    `What's eating your time, or what are you building?`.
 10. With `browser_evaluate`, collect the `bg-fuchsia-*` classes of the `Send` button and of the
@@ -42,9 +43,12 @@ the site
     `We could not verify you are human. Please try again.` shows above the form.
 16. Navigate to `/hire?error=<script>` and **Verify** the plain form shows with no error message,
     and the text `<script>` appears nowhere on the page.
-17. Navigate to `/hire` and take a full-page screenshot at 1920x1080.
-18. Resize to 375x667 and take a full-page screenshot.
-19. **Verify** at 375 that the header shows `Sviatlana Buben`, `Watch me build` and
+17. Navigate to `/hire?offer=ai-consulting` and with `browser_evaluate` **Verify** the select's
+    `value` is `AI consulting`. Navigate to `/hire?offer=<script>` and **Verify** the select's
+    `value` is `Product engineer` and the text `<script>` appears nowhere on the page.
+18. Navigate to `/hire` and take a full-page screenshot at 1920x1080.
+19. Resize to 375x667 and take a full-page screenshot.
+20. **Verify** at 375 that the header shows `Sviatlana Buben`, `Watch me build` and
     `Work with me`, does not show `building in public` (that part of the brand is hidden below
     `sm`), and with `browser_evaluate` that `document.documentElement.scrollWidth <= 375`.
 
@@ -60,6 +64,8 @@ the site
 - An empty motivation is blocked by the browser; nothing is posted.
 - `?sent=1` shows the confirmation in place of the form, `?error=verification` shows its message
   above the form, and an unknown `?error=` shows the plain form without echoing the query.
+- `?offer=ai-consulting` preselects `AI consulting`; no or an unknown `?offer=` preselects
+  `Product engineer` without echoing the query.
 - The header fits at 375px with no horizontal overflow and shows the short brand
   `Sviatlana Buben`.
 - 2 screenshots are taken.

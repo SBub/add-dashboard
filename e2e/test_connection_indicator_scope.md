@@ -1,23 +1,23 @@
 # E2E Test: Connection Indicator Scope
 
 Checks that the Realtime connection indicator exists only on the dashboard routes (`/projects` and
-the project pages), where the channel is opened, that the summary at `/` shows none, that the pill
-reaches `live` again after a round trip through `/`, and that the old `/summary` address redirects
-to `/` without its query string.
+the project pages), where the channel is opened, that the intro page at `/` and the summary at
+`/watch` show none, that the pill reaches `live` again after a round trip through `/watch`, and that
+the old `/summary` address redirects to `/watch` without its query string.
 
 ## User Story
 
 As a person watching ADW runs
 I want the connection indicator to appear only where the dashboard holds a live connection
-So that the summary at `/`, a cached report, never shows a pill stuck at `connecting`
+So that the summary at `/watch`, a cached report, never shows a pill stuck at `connecting`
 
 ## Test Steps
 
-1. Navigate to the `Application URL` (`/`).
+1. Navigate to `/watch` under the `Application URL`.
 2. **Verify** the `What an AI developer workflow gets done` heading (level 1) is present, there is no `navigation` named `Projects`
    (the sidebar) and no element with role `status` in the accessibility snapshot.
 3. Take a screenshot of the summary page.
-4. Click `Watch me build` in the header's `Sections` navigation.
+4. Navigate to `/projects`.
 5. **Verify** the URL is `/projects`, the `Projects` navigation (the sidebar) and the
    `Building now` heading (level 2) are present.
 6. **Verify** an element with role `status` is present and within 15 seconds its text is `live`
@@ -26,8 +26,8 @@ So that the summary at `/`, a cached report, never shows a pill stuck at `connec
 8. Click the first project link in the sidebar's `Projects` navigation and note its `href`.
 9. **Verify** the URL is `/projects/<owner>/<repo>` (the noted `href`) and the `status` element
    reads `live` (wait up to 15 seconds).
-10. Click `Sviatlana Buben, building in public` (the header brand).
-11. **Verify** the URL is `/` and the `What an AI developer workflow gets done` heading is present.
+10. Click `Watch me build` in the header's `Sections` navigation.
+11. **Verify** the URL is `/watch` and the `What an AI developer workflow gets done` heading is present.
 12. **Verify** the accessibility snapshot contains no element with role `status`, and no text
     `connecting`, `live` or `reconnecting` outside the summary content. Judge this from
     `browser_snapshot` (and the screenshot), never from a raw DOM query such as
@@ -35,21 +35,22 @@ So that the summary at `/`, a cached report, never shows a pill stuck at `connec
     route's subtree in the document inside a hidden React `Activity` (`display: none`, effects
     unmounted, so the hidden pill reads `connecting`). That subtree is not rendered, is absent from
     the accessibility snapshot and does not count as present.
-13. Click `Watch me build` in the header's `Sections` navigation, then the same project link as in
-    step 8.
+13. Go back in history (`browser_navigate_back`) to the project page from step 9.
 14. **Verify** the URL is the project page from step 9 and a `status` element is present and within
     15 seconds reads `live` again.
 15. Take a screenshot of the project page.
 16. **Verify** the header's `Sections` navigation contains no `Summary` link.
 17. Navigate directly (full page load) to `/summary?days=7`.
-18. **Verify** the final URL is `/` with no query string, the `What an AI developer workflow gets done` heading is
+18. **Verify** the final URL is `/watch` with no query string, the `What an AI developer workflow gets done` heading is
     present, the page contains no `<select>` (no `combobox` in the snapshot), and the accessibility snapshot contains no
     element with role `status`.
+19. Navigate to `/` (the intro page). **Verify** the accessibility snapshot contains no element with
+    role `status` and no `navigation` named `Projects`.
 
 ## Success Criteria
 
-- The pill is absent on `/`, both after a client navigation and on a full page load.
+- The pill is absent on `/` and on `/watch`, the latter both after a client navigation and on a full page load.
 - The `status` pill reaches `live` on `/projects` and on a project page.
-- The pill reaches `live` again after returning from `/` to a project page.
-- `/summary?days=7` lands on `/` with no query string.
+- The pill reaches `live` again after a round trip from a project page through `/watch`.
+- `/summary?days=7` lands on `/watch` with no query string.
 - 3 screenshots are taken.

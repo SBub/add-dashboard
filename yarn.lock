@@ -1189,6 +1189,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@playwright/mcp@npm:0.0.81":
+  version: 0.0.81
+  resolution: "@playwright/mcp@npm:0.0.81"
+  dependencies:
+    playwright: "npm:1.64.0-alpha-2026-09-14"
+    playwright-core: "npm:1.64.0-alpha-2026-09-14"
+  bin:
+    playwright-mcp: cli.js
+  checksum: 10c0/74485df316b785b1c1c9ee494274de83b235761e992eeb250c8cc0fb4cf38e85aa0bf2368afde567423b99050cb149fcd14c68721fc3ce09e8dc3cba53a27cbe
+  languageName: node
+  linkType: hard
+
 "@rolldown/binding-android-arm-eabi@npm:1.2.12":
   version: 1.2.12
   resolution: "@rolldown/binding-android-arm-eabi@npm:1.2.12"
@@ -2084,6 +2096,7 @@ __metadata:
     "@mdx-js/loader": "npm:3.1.1"
     "@mdx-js/react": "npm:3.1.1"
     "@next/mdx": "npm:16.3.8"
+    "@playwright/mcp": "npm:0.0.81"
     "@supabase/supabase-js": "npm:^2.117.2"
     "@tailwindcss/postcss": "npm:^4"
     "@tanstack/react-query": "npm:^5.104.1"
@@ -5760,6 +5773,26 @@ __metadata:
   version: 4.0.7
   resolution: "picomatch@npm:4.0.7"
   checksum: 10c0/beb6ae02c43ae44e84883b90830196d9046b1726ead292adcf7f57945e0bb0d992d68563d87e03b484b6f3c9a5c6defda7523477f047d7f0e663f126cc01787f
+  languageName: node
+  linkType: hard
+
+"playwright-core@npm:1.64.0-alpha-2026-09-14":
+  version: 1.64.0-alpha-2026-09-14
+  resolution: "playwright-core@npm:1.64.0-alpha-2026-09-14"
+  bin:
+    playwright-core: cli.js
+  checksum: 10c0/060e1260ffe2ee7cf2cca45be7113b5a0673ebd84ce851427c3f09ba2684e220442d062d62841c065a3f25468f32c4b69516bde04e0d9416e2fdac1f738f1314
+  languageName: node
+  linkType: hard
+
+"playwright@npm:1.64.0-alpha-2026-09-14":
+  version: 1.64.0-alpha-2026-09-14
+  resolution: "playwright@npm:1.64.0-alpha-2026-09-14"
+  dependencies:
+    playwright-core: "npm:1.64.0-alpha-2026-09-14"
+  bin:
+    playwright: cli.js
+  checksum: 10c0/925eea07bf161476b0ee3f0719ee7023afe8de870063615a827ea7b9571d1a00dc58f712a5f723298f19acad8fe4bcd139c0b57f70f2725f1ea27017350e2378
   languageName: node
   linkType: hard
 

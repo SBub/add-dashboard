@@ -1,7 +1,8 @@
 // Answers "which header section is this pathname in?" for the root header's
-// three links: the brand (the summary at "/"), "Projects" (/projects and
-// every project page below it) and "Hire me" (/hire). Pure (a string in, a value out), so it is
-// testable without a router and safe to call from anywhere.
+// three links: the brand (the summary at "/"), "Watch me build" (/projects and
+// every project page below it) and "Work with me" (/hire). Pure (a string in,
+// a value out), so it is testable without a router and safe to call from
+// anywhere.
 
 export type HeaderSection = "summary" | "projects" | "hire";
 

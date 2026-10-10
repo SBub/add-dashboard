@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { SectionBoundary } from "@/components/SectionBoundary";
 import { SubmitButton } from "@/components/SubmitButton";
 import { TurnstileScript } from "@/components/TurnstileScript";
-import { HIRE_INTRO, LINKEDIN_URL, OFFERS } from "@/content/hire";
+import { HIRE_INTRO, LINKEDIN_URL, OFFER_LABELS, OFFERS } from "@/content/hire";
 import {
   EMAIL_MAX,
   HIRE_ERROR_MESSAGES,
@@ -14,8 +14,9 @@ import {
 import { sendHireRequest } from "../actions/send-hire-request";
 
 export const metadata: Metadata = {
-  title: "Hire me",
-  description: "Hire the author of ADW for product engineering or AI consulting.",
+  title: "Work with me",
+  description:
+    "Work with Sviatlana Buben: product engineering on contract or full-time, or AI that takes work off your plate.",
 };
 
 type SearchParams = Promise<{ sent?: string | string[]; error?: string | string[] }>;
@@ -32,12 +33,12 @@ function HireForm() {
     <form action={sendHireRequest} className="mt-4 max-w-xl space-y-4">
       <div>
         <label htmlFor="hire-offer" className={LABEL}>
-          What are you hiring for?
+          What brings you here?
         </label>
         <select id="hire-offer" name="offer" required className={FIELD}>
           {OFFERS.map((offer) => (
             <option key={offer} value={offer}>
-              {offer}
+              {OFFER_LABELS[offer]}
             </option>
           ))}
         </select>
@@ -70,7 +71,7 @@ function HireForm() {
       </div>
       <div>
         <label htmlFor="hire-motivation" className={LABEL}>
-          What would you like to work on?
+          What&apos;s eating your time, or what are you building?
         </label>
         <textarea
           id="hire-motivation"
@@ -123,7 +124,7 @@ async function HireStatus({ searchParams }: { searchParams: SearchParams }) {
 export default function HirePage({ searchParams }: { searchParams: SearchParams }) {
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
-      <h1 className="text-2xl font-semibold tracking-tight">Hire me</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Work with me</h1>
       <div className="mt-2 max-w-[70ch] space-y-2 text-base text-neutral-700 dark:text-neutral-300">
         {HIRE_INTRO.map((paragraph) => (
           <p key={paragraph}>{paragraph}</p>

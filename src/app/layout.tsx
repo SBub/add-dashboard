@@ -6,8 +6,9 @@ import { HEADER_LAYER } from "@/lib/layers";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ADW Dashboard",
-  description: "Runs of the AI Developer Workflow toolkit across projects.",
+  title: "Sviatlana Buben, building in public",
+  description:
+    "Sviatlana Buben, product engineer, building her products in public with ADW, her AI developer workflow.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -24,7 +25,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </div>
             <div className="ml-auto flex items-center gap-3">
               <span className="hidden text-xs text-neutral-500 sm:inline dark:text-neutral-400">
-                AI Developer Workflow runs
+                Built with ADW, my AI developer workflow
               </span>
               <HireLink />
             </div>

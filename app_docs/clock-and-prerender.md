@@ -59,7 +59,7 @@ body, and its value goes straight into the pure
 returns the previous snapshot itself when nothing changed, so a poll that finds
 the same state re-renders nothing. The store's `getServerSnapshot` is the
 constant `unknown` state and reads no clock, so the static shell and hydration
-both render "Worker status..." and the first poll after subscribe supplies the
+both render "Checking status..." and the first poll after subscribe supplies the
 real state. It is the first instance of the shape the Rules prescribe for a
 time-dependent label: a client leaf with a `useSyncExternalStore` store whose
 server snapshot is data-free.
@@ -83,7 +83,7 @@ server snapshot is data-free.
   after `getWorkers()` resolves, never in render or a hook body, fed into the
   pure `nextWorkerSnapshot` (`src/lib/worker-state.ts`). Its
   `getServerSnapshot` is the constant `unknown` state and reads no clock, so
-  the shell and hydration render "Worker status...". Do not add a fourth. A
+  the shell and hydration render "Checking status...". Do not add a fourth. A
   future time-dependent label follows the same shape, a
   new client leaf with a `useSyncExternalStore` store whose server snapshot
   does not read the clock (issue #3), never a clock read in `QueueRow`,

@@ -71,10 +71,10 @@ server-rendered section that can fail independently goes in
   panel in `src/components/ErrorPanel.tsx`. `QueryBoundary` sits inside
   `Providers`, where the query it guards has its client. The one exception
   is `HeaderLink`'s `usePathname` reads in `SectionNav.tsx` (the brand,
-  Projects and Hire me links), each in a plain `Suspense`: they read no data
+  Watch me build and Work with me links), each in a plain `Suspense`: they read no data
   and cannot fail, they only suspend during prerender on a project page
   outside `generateStaticParams`. Each fallback is the same link inactive
-  (for Hire me, the button without `aria-current`), never a spinner or an
+  (for Work with me, the button without `aria-current`), never a spinner or an
   empty node. No other
   `Suspense` may be bare.
 - Every loading fallback on the projects side (the sidebar, `/projects`,

@@ -97,7 +97,7 @@ async function getProject(slug: string) {
 
 export async function generateMetadata({ params }: ProjectPageProps): Promise<Metadata> {
   const project = await getProject(projectSlug(await params));
-  return { title: project ? `${project.display_name} | ADW Dashboard` : "Not found" };
+  return { title: project ? `${project.display_name} | Sviatlana Buben` : "Not found" };
 }
 
 /**
@@ -304,7 +304,7 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
   // server component; History's is rendered below, in the static shell.
   const queueHeading = (
     <SectionHeading
-      title="Queue"
+      title="Up next"
       description={
         <>
           First in, first out. The top item starts when the running one finishes. An issue joins
@@ -320,9 +320,9 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
   );
   const activeHeading = (
     <SectionHeading
-      title="Active"
+      title="Building now"
       description="Runs in progress, and runs that failed and are not resolved yet. Each run plans, builds, tests, reviews and documents a change, then opens a pull request. The row updates live as phases complete."
-      detail="A failed run keeps its branch and stays here, not in history, until it is run again."
+      detail="A failed run keeps its branch and stays here, not in Shipped, until it is run again."
     />
   );
 
@@ -400,7 +400,7 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
       <HistoryTransition>
         <section>
           <SectionHeading
-            title="History"
+            title="Shipped"
             description="Completed runs, newest first. A run completes when its pull request was merged by the merge gate: tests green, review without blockers, CI green."
             detail="Completed runs never change, so this list is cached and only refreshed when a new run completes."
             controls={

@@ -32,11 +32,11 @@ see `app_docs/summary.md`). `/projects` is a two-pane screen:
   the worker status widget sits at its bottom, always visible. Below `md` the
   widget follows the strip.
   The widget (`WorkerStatus`) shows whether the toolkit's queue worker is
-  running: "Worker online" (emerald dot) while the freshest heartbeat is under
-  90 s old, "Worker offline" (rose ring) otherwise, each followed by "last
+  running: "Ready to build" (emerald dot) while the freshest heartbeat is under
+  90 s old, "Offline" (rose ring) otherwise, each followed by "last
   beat" and the beat's `Timestamp`, or "never seen" when there is no row.
   Before its first read (the static shell, hydration, the first poll in
-  flight) it reads "Worker status..." with a dashed neutral ring. It never
+  flight) it reads "Checking status..." with a dashed neutral ring. It never
   shows the worker's host, pid or `started_at`.
   Every run and queue state has one colour wherever it appears (queued
   amber, running emerald with a pulsing dot, completed sky, failed rose, a
@@ -223,7 +223,7 @@ see `app_docs/summary.md`). `/projects` is a two-pane screen:
   (`running` online, `failed` offline, `neutral` unknown), not an exemption,
   and has no `role="status"`: the pill is the one status element. Issue class badges are not states and use hues
   outside the palette.
-- The header's Hire me button and the `/hire` Send button take their colour
+- The header's Work with me button and the `/hire` Send button take their colour
   only from `HIRE_ACCENT` in `src/lib/accent.ts` (fuchsia 700, hover 800, the
   `/bug` class hue, not a status hue), so the two always match; never write
   a button's fuchsia fill inline.

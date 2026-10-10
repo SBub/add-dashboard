@@ -20,10 +20,10 @@ So that I know what each run or queued item is doing without opening GitHub
 2. **Verify** an element with role `status` is present and within 15 seconds its text is `live`
    (in development it may read `connecting` once before that; wait and re-snapshot).
 3. Click the first project link in the sidebar's `Projects` navigation.
-4. **Verify** the URL is `/projects/<owner>/<repo>` and the `Active`, `Queue` and `History`
-   headings are present. Prefer a project whose History list has at least one run row; if it has
-   none, go back to step 3 with the next project in the sidebar. If no listed project has a run
-   row, note it and do only the queue checks; if no project has a queued item either, note in the
+4. **Verify** the URL is `/projects/<owner>/<repo>` and the `Building now`, `Up next` and
+   `Shipped` headings are present. Prefer a project whose History list has at least one run row; if
+   it has none, go back to step 3 with the next project in the sidebar. If no listed project has a
+   run row, note it and do only the queue checks; if no project has a queued item either, note in the
    result that the row checks were not applicable, skip to step 9, take the two screenshots and
    pass.
 5. With `browser_evaluate`, build the title

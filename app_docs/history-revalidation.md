@@ -188,7 +188,7 @@ A pre-rendered project page has two kinds of content. The sidebar's
 queue (`getQueueState`) are in the **static shell**: their `"use cache"`
 results are resolved at build time and embedded in the shell as its Resume
 Data Cache. So is the History heading, which the page renders outside any
-boundary, and on `/projects` the `Active` heading. The Active islands (the
+boundary, and on `/projects` the `Building now` heading. The Active islands (the
 sidebar list, `/projects`' list and the project page's Active section) are
 **request-time holes**: they await `getActiveRunsState()`, which awaits
 `connection()`, so the shell carries their skeletons and the rows

@@ -25,7 +25,7 @@ import { Timestamp } from "./Timestamp";
  * does not re-render.
  *
  * The server snapshot is the constant `unknown` state and reads no clock and
- * no data, so the static shell and hydration show "Worker status..." and the
+ * no data, so the static shell and hydration show "Checking status..." and the
  * client prerender is never aborted (a clock read in render would drop the
  * sidebar out of the static HTML under cacheComponents).
  */
@@ -104,7 +104,7 @@ export function WorkerStatus() {
           <span
             className={`inline-flex size-2 shrink-0 rounded-full ${STATUS_COLORS.running.dot}`}
           />
-          <span className={`font-medium ${STATUS_COLORS.running.text}`}>Worker online</span>
+          <span className={`font-medium ${STATUS_COLORS.running.text}`}>Ready to build</span>
         </>
       )}
       {current.state === "offline" && (
@@ -112,7 +112,7 @@ export function WorkerStatus() {
           <span
             className={`inline-flex size-2 shrink-0 rounded-full border ${STATUS_COLORS.failed.border}`}
           />
-          <span className={`font-medium ${STATUS_COLORS.failed.text}`}>Worker offline</span>
+          <span className={`font-medium ${STATUS_COLORS.failed.text}`}>Offline</span>
         </>
       )}
       {current.state === "unknown" ? (
@@ -120,7 +120,7 @@ export function WorkerStatus() {
           <span
             className={`inline-flex size-2 shrink-0 rounded-full border border-dashed ${STATUS_COLORS.neutral.border}`}
           />
-          <span className="text-neutral-500 dark:text-neutral-400">Worker status...</span>
+          <span className="text-neutral-500 dark:text-neutral-400">Checking status...</span>
         </>
       ) : (
         <span className="text-neutral-500 dark:text-neutral-400">

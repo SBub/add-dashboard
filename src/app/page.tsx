@@ -14,7 +14,7 @@ import { summaryPastTag, summaryTodayTag } from "@/lib/history-tags";
 import { SummaryProviders } from "./summary-providers";
 
 export const metadata: Metadata = {
-  title: "ADW Dashboard: what an AI developer workflow gets done",
+  title: "Sviatlana Buben: what an AI developer workflow ships",
 };
 
 /**

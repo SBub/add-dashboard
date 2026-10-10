@@ -21,10 +21,10 @@ export function ClassColumnChart({ counts, day }: ClassColumnChartProps) {
 
   return (
     <ColumnChart
-      title="Work by class"
+      title="What I worked on"
       subtitle="Runs finished that day"
       idPrefix={`runs-by-class-${day}`}
-      summary={`Work by class: ${present.map(({ key, count }) => `${count} ${classLabel(key)}`).join(", ")}`}
+      summary={`What I worked on: ${present.map(({ key, count }) => `${count} ${classLabel(key)}`).join(", ")}`}
       columns={present.map(({ key, count }) => ({
         key,
         value: count,

@@ -17,9 +17,10 @@ The summary at `/` (`src/app/page.tsx`): finished runs per UTC day across projec
 in its own card with a Refresh button: runs
 completed and failed, then three bordered chart
 cards, in one row from 1024px and stacked below, each with a title and a
-muted subtitle: "Work by class" ("Runs finished that day", one
-column per class present), "Tokens by model" ("All tokens, including cache
-reads", one column per model) and "Cost by phase" ("What each pipeline step
+muted subtitle: "What I worked on" ("Runs finished that day", one
+column per class present, counting completed and failed runs, so the title
+does not say shipped), "Tokens by model" ("All tokens, including cache
+reads", one column per model) and "What each step cost" ("What each pipeline step
 cost that day", one column per pipeline phase). The order is fixed every day
 and comes from the data shape, never from the values: `feature`, `chore`,
 `bug`, `patch`, `other` (`classCounts`, which the per-project table's class
@@ -48,7 +49,7 @@ no filters (issue #97).
 **Page copy.** `/` is the landing page, so its static shell opens with the
 `h1` "What an AI developer workflow gets done" and an intro paragraph saying
 what ADW is and that the page is the public ledger of finished runs; the
-document title is "ADW Dashboard: what an AI developer workflow gets done".
+document title is "Sviatlana Buben: what an AI developer workflow ships".
 Both sit in the page body and `metadata`, outside the report hole. The
 reading notes ("Times are UTC. Tokens and cost count runs that published
 metrics.") are a muted line directly under the intro, also in the shell.

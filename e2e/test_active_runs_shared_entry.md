@@ -15,7 +15,7 @@ So that I never see a run in one view and miss it, or count it twice, in another
 1. Navigate to the `Application URL` with the path `/projects`.
 2. **Verify** an element with role `status` is present and within 15 seconds its text is `live`
    (in development it may read `connecting` once before that; wait and re-snapshot).
-3. **Verify** the `Active` heading (level 2) is present in the main pane.
+3. **Verify** the `Building now` heading (level 2) is present in the main pane.
 4. If the main pane shows `No runs in progress.`:
    - **Verify** every project in the sidebar's `Projects` navigation shows `0 running` and
      `0 failed`.
@@ -32,15 +32,16 @@ So that I never see a run in one view and miss it, or count it twice, in another
 9. Click the noted project link in the group heading.
 10. **Verify** the URL is the noted `href`, the project name is the level-1 heading, and the
     `status` element reads `live` (wait up to 15 seconds).
-11. **Verify** the project page's `Active` section lists exactly the `adw_id`s noted in step 6, in
-    the same order.
+11. **Verify** the project page's `Building now` section lists exactly the `adw_id`s noted in
+    step 6, in the same order.
 12. **Verify** the sidebar entry for that project still shows the same `running` and `failed`
     numbers as in step 7.
 13. Take a screenshot of the project page.
 
 ## Success Criteria
 
-- `/projects` shows an `Active` heading and either `No runs in progress.` or one group per project
+- `/projects` shows a `Building now` heading and either `No runs in progress.` or one group per
+  project
   with active runs, each headed by a link to its project page.
 - For every project, the sidebar's `running` and `failed` counts equal the number of that
   project's rows on the overview with that status.

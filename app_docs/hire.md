@@ -1,4 +1,4 @@
-# Hire me page
+# Work with me page
 
 **Specifications:**
 
@@ -6,7 +6,7 @@
 
 ## Overview
 
-`/hire` (`src/app/hire/page.tsx`) is the contact page reached from the header's Hire me button: a heading, an intro, a LinkedIn link and a form that sends one plain-text email to `hire@issebya.com` through Resend after a Cloudflare Turnstile check. It sits outside `(dashboard)`: no sidebar, no `Providers`, no Realtime, no connection pill.
+`/hire` (`src/app/hire/page.tsx`) is the contact page reached from the header's Work with me button: a heading ("Work with me"), an intro, a LinkedIn link and a form that sends one plain-text email to `hire@issebya.com` through Resend after a Cloudflare Turnstile check. It sits outside `(dashboard)`: no sidebar, no `Providers`, no Realtime, no connection pill.
 
 ## How it works
 
@@ -25,10 +25,14 @@ repeated parameter) shows the plain form.
 
 The form posts to the `sendHireRequest` server action. Its fields:
 
-- `offer`: a select over `OFFERS`, required.
+- `offer`: a select over `OFFERS`, required, labelled "What brings you here?".
+  Each option's value is the `OFFERS` entry (`Product engineer`, `AI
+consulting`); its visible text is `OFFER_LABELS[offer]` ("I need a product
+  engineer (contract or full-time)", "I want to take work off my own plate").
 - `email`: required, at most `EMAIL_MAX` (254) characters.
 - `name`: optional, at most `NAME_MAX` (100) characters.
-- `motivation`: required, `MOTIVATION_MIN` (20) to `MOTIVATION_MAX` (4000)
+- `motivation`: labelled "What's eating your time, or what are you
+  building?", required, `MOTIVATION_MIN` (20) to `MOTIVATION_MAX` (4000)
   characters.
 - The Turnstile widget: a `cf-turnstile` div carrying `data-sitekey`,
   rendered by `TurnstileScript` (`src/components/TurnstileScript.tsx`) on
@@ -79,7 +83,7 @@ holds placeholders.
 
 ### Changing the copy
 
-The offers, the intro paragraphs and the LinkedIn URL live only in
+The offers and their labels (`OFFER_LABELS`), the intro paragraphs and the LinkedIn URL live only in
 `src/content/hire.ts`; the error messages are `HIRE_ERROR_MESSAGES` in
 `src/lib/hire-request.ts`.
 
@@ -96,6 +100,9 @@ covered by `src/lib/hire-request.test.ts` and
 
 ## Rules
 
+- Do not change an `OFFERS` value to change what the visitor reads; edit
+  `OFFER_LABELS`. The value is validated, goes in the subject and is what the
+  inbox filters on.
 - Never send without a passed Turnstile check (Siteverify answering
   `success: true`).
 - Never take a recipient from input: the only recipient is `HIRE_RECIPIENT`.

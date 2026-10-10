@@ -13,11 +13,13 @@ The route tree (`/`, `/projects`, `/projects/[owner]/[repo]`, `/hire`, the `/sum
 
 The summary at `/` shows finished runs per UTC day across projects: issue
 classes, total duration, tokens (fresh input, cache read, output) and cost (see
-`app_docs/summary.md`). The header's brand links to `/`, its "Projects" link to
-`/projects`. At the header's right, on every route, the Hire me button
+`app_docs/summary.md`). The header's brand, "Sviatlana Buben, building in
+public" (below `sm` only "Sviatlana Buben", the rest in a `hidden sm:inline`
+span), links to `/`, its "Watch me build" link to `/projects`. At the header's
+right, on every route, the Work with me button
 (`HireLink`) is a solid fuchsia button linking to `/hire`; it carries
 `aria-current="page"` only on `/hire`. The link of the current section carries `aria-current="page"`, and
-"Projects" is emphasised on `/projects` and on every project page. On a project
+"Watch me build" is emphasised on `/projects` and on every project page. On a project
 page added after the deploy (not among the pre-rendered slugs) the shell carries
 the unmarked link and the highlight arrives with the streamed pathname. The old address `/summary` is a permanent redirect to a bare `/`
 (its query string is dropped).
@@ -97,10 +99,10 @@ no `Providers`, no Realtime and no pill (see `app_docs/hire.md`).
 - The header's current section comes only from `headerSection` in
   `src/lib/header-section.ts` (pure, tested in
   `src/lib/header-section.test.ts`; every change to it goes with a test
-  case), read by `HeaderLink`. "Projects" is active on `/projects` and every
+  case), read by `HeaderLink`. "Watch me build" (section key `"projects"`) is active on `/projects` and every
   path below `/projects/` (never `/projectsx`) and takes the brand's text
-  colour; the brand is active on `/` only and keeps its styling; "Hire me" is
-  active on exactly `/hire` (never `/hirex` or `/hire-me`) and keeps its
+  colour; the brand is active on `/` only and keeps its styling; "Work with me"
+  (section key `"hire"`) is active on exactly `/hire` (never `/hirex` or `/hire-me`) and keeps its
   accent. So `headerSection` answers `"summary"`, `"projects"`, `"hire"` or
   null. The active link carries `aria-current="page"`, the others none.
 - `/summary` is a permanent (308) redirect to a bare `/`, answered by the
@@ -111,7 +113,7 @@ no `Providers`, no Realtime and no pill (see `app_docs/hire.md`).
   config redirect's destination, and config redirects run before the
   handler).
   The project overview (sidebar plus every active run, grouped by project) is
-  `/projects`, `src/app/(dashboard)/projects/page.tsx`; its `Active`
+  `/projects`, `src/app/(dashboard)/projects/page.tsx`; its `Building now`
   heading is static in the page, above the `SectionBoundary` of its island; the header's
   `SectionNav` links to `/projects` only and the brand, rendered by
   `BrandLink` from the same file, links to `/`.

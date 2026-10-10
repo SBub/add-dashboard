@@ -138,17 +138,17 @@ lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every c
 ## Review
 
 - Open at `http://localhost:$PORT`: `/` (the summary: heading, intro, note, the today card with a
-  Refresh button above the past day cards with their work-by-class, tokens-by-model and cost-by-phase chart cards, per-project tables; no sidebar, no pill), `/projects` (project sidebar, with the worker status widget at its bottom, plus every active run
-  grouped by project under an `Active` heading, or "No runs in progress." when none) and `/projects/SBub/issebya-homes-ai-system` (header, Active section, Queue
-  section, History section), or the first project the sidebar lists if that slug is 404, and
+  Refresh button above the past day cards with their What I worked on, Tokens by model and What each step cost chart cards, per-project tables; no sidebar, no pill), `/projects` (project sidebar, with the worker status widget at its bottom, plus every active run
+  grouped by project under a `Building now` heading, or "No runs in progress." when none) and `/projects/SBub/issebya-homes-ai-system` (header, Building now, Up next and
+  Shipped sections), or the first project the sidebar lists if that slug is 404, and
   `/hire` (heading, intro, LinkedIn link, the form with the two offers, the Turnstile widget, the
-  fuchsia Send button; no sidebar, no pill). The fuchsia Hire me button is in the header on every
+  fuchsia Send button; no sidebar, no pill). The fuchsia Work with me button is in the header on every
   route. Capture each at desktop 1920x1080 and mobile
   375x667, full page, into `agents/<adw_id>/<agent_name>/review_img/` in the worktree.
 - The sidebar's connection indicator (dashboard routes only; `/` has none) moves from `connecting` to `live` once the Realtime channel
   joins; wait for `live` in a `browser_snapshot` before judging live data, and do not report
   `connecting` as a defect unless the spec is about the indicator.
-- The sidebar's worker widget reads "Worker status..." until its first read and "Worker offline"
+- The sidebar's worker widget reads "Checking status..." until its first read and "Offline"
   whenever the queue worker is not running on the operator's machine. Neither is a defect unless
   the spec is about the widget.
 - The `sendHireRequest` action has no rendered surface beyond the `/hire?sent=1` and

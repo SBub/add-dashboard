@@ -20,10 +20,10 @@ So that a run row reads like a status, not a log line
    list (if any), return its `textContent` and whether it contains a `code` element. **Verify**
    none starts with `adw_` and none contains a `code` element.
 4. Click the first project link in the sidebar's `Projects` navigation.
-5. **Verify** the URL is `/projects/<owner>/<repo>` and the `Active`, `Queue` and `History`
-   headings are present. Prefer a project whose History list has at least one run row; if it has
-   none, go back to step 4 with the next project in the sidebar. If no listed project has a run
-   row, note in the result that the row checks were not applicable, skip to step 8, take the two
+5. **Verify** the URL is `/projects/<owner>/<repo>` and the `Building now`, `Up next` and
+   `Shipped` headings are present. Prefer a project whose History list has at least one run row; if
+   it has none, go back to step 4 with the next project in the sidebar. If no listed project has a
+   run row, note in the result that the row checks were not applicable, skip to step 8, take the two
    screenshots and pass.
 6. With `browser_evaluate`, for every History row return the texts of its `dt` elements.
    **Verify** for every row there is no `dt` whose text is `Final phase` or `Phase`.

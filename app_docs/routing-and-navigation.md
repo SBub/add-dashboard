@@ -4,6 +4,7 @@
 
 - specs/issue-127-adw-2ab91140-sdlc_planner-move-feature-docs.md
 - specs/issue-164-adw-cf1087b2-sdlc_planner-hire-me-page-contact-form.md
+- specs/issue-166-adw-1eacd918-sdlc_planner-relabel-dashboard-for-audiences.md
 
 ## Overview
 

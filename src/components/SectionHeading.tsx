@@ -20,8 +20,10 @@ interface SectionHeadingProps {
  * CSS-only, shown while the button's group is hovered or holds focus, so it
  * needs no client JS. It is always in the DOM, `sr-only` while hidden, and
  * referenced by the button's `aria-describedby`, so screen readers announce
- * it on focus. Its id is derived from the title, deterministic, so server and
- * client markup agree; the titles are unique on the page.
+ * it on focus. Its id is the title slugged (lowercase, whitespace to hyphens:
+ * `aria-describedby` is a space-separated id list, so a space would break it),
+ * deterministic, so server and client markup agree; the titles are unique on
+ * the page.
  *
  * `not-sr-only` resets position, width and padding, so the element it toggles
  * carries none of them: the positioned wrapper sits around it and the surface
@@ -42,7 +44,7 @@ export function SectionHeading({
   controls,
   actions,
 }: SectionHeadingProps) {
-  const detailId = `section-${title.toLowerCase()}-detail`;
+  const detailId = `section-${title.toLowerCase().replace(/\s+/g, "-")}-detail`;
 
   return (
     <div className="mb-3">

@@ -345,8 +345,8 @@ export default async function ProjectPage({ params, searchParams }: ProjectPageP
   // their final position and only the rows are placeholders. The headings are
   // rendered here and again inside the island; only one copy is on screen at
   // a time, but while the island streams its copy waits in a hidden segment
-  // until the swap, so the tooltip ids (section-active-detail,
-  // section-queue-detail) are briefly in the DOM twice, never both visible.
+  // until the swap, so the tooltip ids (section-building-now-detail,
+  // section-up-next-detail) are briefly in the DOM twice, never both visible.
   const activeFallback = (
     <ActiveRunsViewSkeleton
       heading={activeHeading}

@@ -29,7 +29,7 @@ So that I can reach the navigation without scrolling back to the top
 4. Navigate to `/projects`, wait up to 15 seconds for the sidebar's connection pill to read `live`,
    click the first project link in the sidebar and note its `href`.
 5. Scroll to the top and hover `About Building now` (or the first `About <section>` button present).
-   **Verify** `#section-active-detail` (or the hovered section's detail) is visible. Scroll the
+   **Verify** `#section-building-now-detail` (or the hovered section's detail) is visible. Scroll the
    window with `scrollBy` until the button's top is within 8px of the header's bottom, re-hovering
    if the tooltip closed. If the tooltip's box intersects the header's box, **Verify**
    `elementFromPoint` at the centre of the intersection is inside the tooltip; otherwise **Verify**

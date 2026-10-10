@@ -52,7 +52,9 @@ So that I know what each run or queued item is doing without opening GitHub
 8. **Verify** for every modified Active and Queue row that
    `Math.abs(pillTop - firstLineTop) <= 2` and `Math.abs(pillTop - spanTop) <= 2`; for the modified
    History row that no element's text is `completed` (no pill) and, when the `adw_id` is on the
-   first line at 1920x1080, that `Math.abs(adwIdTop - firstLineTop) <= 2`; for the modified Queue row that the marker's top is within
+   first line at 1920x1080, that `Math.abs(adwIdTop - spanTop) <= 2` (both are `leading-6` boxes, so
+   their tops are the top of the first line; do not compare against `firstLineTop`, the glyph box,
+   which sits about 3px lower inside the 24px line); for the modified Queue row that the marker's top is within
    2px of the first line's top, and, with two or more queued rows, that the rail line's bottom is at
    or below the second row's marker centre (the line is unbroken).
 9. **Verify**, when an Active row is present, that a `dd` under its `Branch` label still has

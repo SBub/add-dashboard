@@ -6,6 +6,12 @@ export const OFFERS = ["Product engineer", "AI consulting"] as const;
 
 export type Offer = (typeof OFFERS)[number];
 
+// The value is what the action validates and the subject carries; the label is only the visible text.
+export const OFFER_LABELS: Record<Offer, string> = {
+  "Product engineer": "I need a product engineer (contract or full-time)",
+  "AI consulting": "I want to take work off my own plate",
+};
+
 export const HIRE_INTRO: string[] = [
   "[Placeholder] I build products end to end, from the first sketch to the release, and I built ADW, the autonomous development workflow whose runs this dashboard shows.",
   "[Placeholder] I take on product engineering roles and AI consulting work: designing agent pipelines, putting them into a real codebase and making them reliable enough to trust.",

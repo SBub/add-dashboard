@@ -22,13 +22,13 @@ interface PhaseColumnChartProps {
 export function PhaseColumnChart({ phases, day }: PhaseColumnChartProps) {
   return (
     <ColumnChart
-      title="Cost by phase"
+      title="What each step cost"
       subtitle="What each pipeline step cost that day"
       idPrefix={`cost-by-phase-${day}`}
       summary={
         phases.length === 0
-          ? "Cost by phase: no per-phase usage published."
-          : `Cost by phase: ${phases.map((p) => `${phaseName(p.phase)} ${costLabel(p.cost_usd)}`).join(", ")}`
+          ? "What each step cost: no per-phase usage published."
+          : `What each step cost: ${phases.map((p) => `${phaseName(p.phase)} ${costLabel(p.cost_usd)}`).join(", ")}`
       }
       empty="No per-phase usage published."
       columns={phases.map((p) => ({

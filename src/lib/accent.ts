@@ -1,6 +1,6 @@
 // The one accent colour: the "/bug" class hue (fuchsia, CLASS_BG in
-// src/lib/chart-colors.ts), used by the header's Hire me button and the hire
-// form's Send button, so the two always match. It is a class hue, not a status
+// src/lib/chart-colors.ts), used by the header's Work with me button and the
+// hire form's Send button, so the two always match. It is a class hue, not a status
 // hue. The 500 fill of the chart fails WCAG AA with a white label, so the
 // button uses 700 (hover 800) in both modes. Full literal class strings, so
 // Tailwind sees every one of them.

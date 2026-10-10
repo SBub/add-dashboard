@@ -19,7 +19,7 @@ So that I can copy it without opening GitHub or guessing the truncated part
 2. **Verify** an element with role `status` is present and within 15 seconds its text is `live`
    (in development it may read `connecting` once before that; wait and re-snapshot).
 3. Click the first project link in the sidebar's `Projects` navigation. **Verify** the URL is
-   `/projects/<owner>/<repo>` and the `History` heading is present. If its History list has no run
+   `/projects/<owner>/<repo>` and the `Shipped` heading is present. If its History list has no run
    row, go back and try the next project in the sidebar. If no listed project has a History row,
    note in the result that the card checks were not applicable, take the two screenshots of steps
    10 and 12 and pass.

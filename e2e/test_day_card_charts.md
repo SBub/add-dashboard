@@ -1,11 +1,11 @@
 # E2E Test: Day Card Chart Cards
 
 Checks that every day card on the summary at `/` shows three separate chart cards directly under
-its header, "Work by class", "Tokens by model" and "Cost by phase", in one row on desktop and
-stacked on mobile; that classes, models and phases come in a fixed order; that a bar's value sits
-inside it in white (or just above a bar too short for it); that labels under the bars are text with
-a colour dot; that the tooltips show the token split with cost, the phase usage with time and runs,
-and the class count with its share; and that the per-project table keeps its compact class bars.
+its header, "What I worked on", "Tokens by model" and "What each step cost", in one row on desktop
+and stacked on mobile; that classes, models and phases come in a fixed order; that a bar's value
+sits inside it in white (or just above a bar too short for it); that labels under the bars are text
+with a colour dot; that the tooltips show the token split with cost, the phase usage with time and
+runs, and the class count with its share; and that the per-project table keeps its compact class bars.
 
 ## User Story
 
@@ -19,9 +19,9 @@ which column
 
 1. Navigate to the `Application URL` (`/`). Take the first day card that has runs (the today card
    when it has runs, else the first past card).
-2. **Verify** directly below its header there are three `figure`s, captioned `Work by class` with
+2. **Verify** directly below its header there are three `figure`s, captioned `What I worked on` with
    the subtitle `Runs finished that day`, `Tokens by model` with the subtitle
-   `All tokens, including cache reads`, and `Cost by phase` with the subtitle
+   `All tokens, including cache reads`, and `What each step cost` with the subtitle
    `What each pipeline step cost that day`, in one row at 1920x1080 (with `browser_evaluate`, the
    same `getBoundingClientRect().top` for all three). **Verify** with `browser_evaluate` that each
    `figcaption` holds only text, no decorative marker before the title
@@ -55,12 +55,12 @@ which column
 10. **Verify** the per-project table below still has its compact class bars (an `svg` with an
     `aria-label` starting `Issue classes:` inside the table).
 11. **Verify** the server-rendered HTML (`browser_evaluate` `fetch("/").then((r) => r.text())`)
-    contains `Work by class`, `Tokens by model` and `Cost by phase`.
+    contains `What I worked on`, `Tokens by model` and `What each step cost`.
 12. Take a screenshot at 1920x1080.
 13. Resize to 1024x768 and **Verify** the three cards still share one row (the same `top`) with no
     horizontal page overflow (`document.documentElement.scrollWidth <= window.innerWidth`).
-    **Verify** with `browser_evaluate` that the `Cost by phase` figure's `ul` and every one of its
-    `li`s and name rows (`li > span.mt-2`) lie inside the figure's content box (the figure's
+    **Verify** with `browser_evaluate` that the `What each step cost` figure's `ul` and every one of
+    its `li`s and name rows (`li > span.mt-2`) lie inside the figure's content box (the figure's
     `getBoundingClientRect()` inset by its border and padding: each `left >=` the content left and
     each `right <=` the content right, 0.5px tolerance), and that no two name rows overlap (each
     one's `right <=` the next one's `left`). **Verify** the same bar width and centre-distance check
@@ -68,16 +68,16 @@ which column
 14. Resize to 375x667 and **Verify** the three cards are stacked (each figure's `top` is at or
     below the previous figure's `bottom`) with no horizontal page overflow
     (`document.documentElement.scrollWidth <= window.innerWidth`). **Verify** the same
-    `Cost by phase` containment and no-overlap check as in step 13, and the same bar width and
+    `What each step cost` containment and no-overlap check as in step 13, and the same bar width and
     centre-distance check as in step 7 for every figure with two or more columns.
 15. Take a screenshot at 375x667. The colour scheme follows the OS; note which one the screenshots
     show, no toggle is needed.
 
 ## Success Criteria
 
-- Every day card with runs shows a `Work by class`, a `Tokens by model` and a `Cost by phase`
-  chart card under its header, each with its subtitle, in one row from 1024px and stacked without
-  overflow on mobile.
+- Every day card with runs shows a `What I worked on`, a `Tokens by model` and a
+  `What each step cost` chart card under its header, each with its subtitle, in one row from
+  1024px and stacked without overflow on mobile.
 - Chart card titles have no marker before them and align with their subtitles.
 - Classes are in the order feature, chore, bug, patch, other, models Haiku, Sonnet, Opus, other,
   and phases Plan, Build, Test, Review, Document (never CI); absent entries are omitted.

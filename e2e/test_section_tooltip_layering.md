@@ -20,18 +20,18 @@ So that its text is readable and not covered by the queue's `next` pill
    `Nothing queued.`, try the next project in the sidebar and stop at the first one with a queued
    item. If none has one, note in the result that the queue check is not applicable and continue
    with the Active and History tooltips only.
-4. Hover the button with accessible name `About Queue`. **Verify** the element with id
+4. Hover the button with accessible name `About Up next`. **Verify** the element with id
    `section-queue-detail` is visible.
 5. With `browser_evaluate`, take the bounding box of the tooltip's inner surface (the first child of
    `#section-queue-detail`). For its centre, and, if the box of the `next` pill intersects it, for
    the centre of that intersection, **verify** `document.elementFromPoint(x, y)` is the tooltip
    element or inside it (`tooltip.contains(el)`).
-6. Move the pointer away, then focus `About Queue` with the keyboard (Tab). Repeat the checks of
+6. Move the pointer away, then focus `About Up next` with the keyboard (Tab). Repeat the checks of
    step 5.
-7. Repeat steps 4 to 6 for `About Active` (`section-active-detail`) and `About History`
+7. Repeat steps 4 to 6 for `About Building now` (`section-active-detail`) and `About Shipped`
    (`section-history-detail`).
-8. Hover `About Queue` again and take a screenshot of the project page at 1920x1080.
-9. Resize the browser to 375x667, hover `About Queue` again and take a screenshot.
+8. Hover `About Up next` again and take a screenshot of the project page at 1920x1080.
+9. Resize the browser to 375x667, hover `About Up next` again and take a screenshot.
 
 ## Success Criteria
 

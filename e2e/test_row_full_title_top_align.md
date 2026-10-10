@@ -20,10 +20,10 @@ So that I know what each run or queued item is doing without opening GitHub
 2. **Verify** an element with role `status` is present and within 15 seconds its text is `live`
    (in development it may read `connecting` once before that; wait and re-snapshot).
 3. Click the first project link in the sidebar's `Projects` navigation.
-4. **Verify** the URL is `/projects/<owner>/<repo>` and the `Active`, `Queue` and `History`
-   headings are present. Prefer a project whose History list has at least one run row; if it has
-   none, go back to step 3 with the next project in the sidebar. If no listed project has a run
-   row, note it and do only the queue checks; if no project has a queued item either, note in the
+4. **Verify** the URL is `/projects/<owner>/<repo>` and the `Building now`, `Up next` and
+   `Shipped` headings are present. Prefer a project whose History list has at least one run row; if
+   it has none, go back to step 3 with the next project in the sidebar. If no listed project has a
+   run row, note it and do only the queue checks; if no project has a queued item either, note in the
    result that the row checks were not applicable, skip to step 9, take the two screenshots and
    pass.
 5. With `browser_evaluate`, build the title
@@ -52,7 +52,9 @@ So that I know what each run or queued item is doing without opening GitHub
 8. **Verify** for every modified Active and Queue row that
    `Math.abs(pillTop - firstLineTop) <= 2` and `Math.abs(pillTop - spanTop) <= 2`; for the modified
    History row that no element's text is `completed` (no pill) and, when the `adw_id` is on the
-   first line at 1920x1080, that `Math.abs(adwIdTop - firstLineTop) <= 2`; for the modified Queue row that the marker's top is within
+   first line at 1920x1080, that `Math.abs(adwIdTop - spanTop) <= 2` (both are `leading-6` boxes, so
+   their tops are the top of the first line; do not compare against `firstLineTop`, the glyph box,
+   which sits about 3px lower inside the 24px line); for the modified Queue row that the marker's top is within
    2px of the first line's top, and, with two or more queued rows, that the rail line's bottom is at
    or below the second row's marker centre (the line is unbroken).
 9. **Verify**, when an Active row is present, that a `dd` under its `Branch` label still has

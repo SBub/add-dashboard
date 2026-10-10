@@ -16,7 +16,7 @@ So that the queue reads as a list of what runs next, without repeated labels and
 2. **Verify** an element with role `status` is present and within 15 seconds its text is `live`
    (in development it may read `connecting` once before that; wait and re-snapshot).
 3. Click the first project link in the sidebar's `Projects` navigation.
-4. **Verify** the URL is `/projects/<owner>/<repo>` and the `Queue` heading is present.
+4. **Verify** the URL is `/projects/<owner>/<repo>` and the `Up next` heading is present.
 5. If the Queue section shows `Nothing queued.`, go back to step 3 with the next project in the
    sidebar. Prefer a project with three or more queued items; stop at the first one that has any.
    If no listed project has a queued item, **verify** the dashed `Nothing queued.` panel, note in the

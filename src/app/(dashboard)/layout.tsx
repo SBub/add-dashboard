@@ -81,8 +81,8 @@ export default async function DashboardLayout({ children }: { children: ReactNod
         <aside className="flex shrink-0 flex-col gap-2 md:sticky md:top-[calc(var(--header-height)+1.5rem)] md:h-[calc(100vh-var(--header-height)-3rem)] md:w-72">
           {/* The connection pill lives here, not in the root header, because
               the channel it describes is opened by Providers in this layout.
-              The summary at / has no channel and no pill. It reads no query, so it
-              sits outside the sidebar's boundaries and their fallbacks. */}
+              The summary at /watch, the intro page at / and /hire have no
+              channel and no pill. It reads no query, so it sits outside the sidebar's boundaries and their fallbacks. */}
           <div className="flex shrink-0 items-center justify-between gap-2 px-1">
             <h2 className="text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
               Projects
@@ -112,7 +112,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
             </HydrationBoundary>
           </div>
           {/* The worker widget is here because the (dashboard) layout is the
-              operator's view; / has no sidebar and no widget. It reads no
+              operator's view; /, /watch and /hire have no sidebar and no widget. It reads no
               query (it polls its own store in the browser), so it sits
               outside every boundary and never inside a fallback. On mobile
               it follows the project strip. */}

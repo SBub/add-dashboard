@@ -8,13 +8,13 @@
 // completed, or a completed run is deleted, whether or not anyone is watching.
 // It then drops the same two cache tags the action drops (the project's
 // history scope and the summary page's today scope), so the project's next
-// History render, and the next render of the summary page's (`/`) today
+// History render, and the next render of the summary page's (`/watch`) today
 // card, read the database. Active has no tag: it is read per request. The summary's past days tag is never dropped.
 // See app_docs/history-revalidation.md, "Webhook revalidation".
 //
 // It does nothing else. No database write, no second read beyond resolving
 // the slug, no other side effect: an authenticated caller can make the next
-// render of one project page and of the summary page's (`/`) today card read the database
+// render of one project page and of the summary page's (`/watch`) today card read the database
 // once, and that is all. A private project is ignored before any drop, which
 // is right for the today card too: `/` shows public projects only.
 //

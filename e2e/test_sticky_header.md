@@ -1,7 +1,7 @@
 # E2E Test: Sticky Header
 
 Checks that the root header stays pinned to the top of the viewport while the document scrolls
-under it, on `/` and on a project page, at desktop and mobile widths: the brand and the `Sections`
+under it, on `/watch` and on a project page, at desktop and mobile widths: the brand and the `Sections`
 navigation stay visible, the header is opaque, a section tooltip still draws over it, the desktop
 sidebar sticks below it with its last item reachable, and back/forward keeps restoring the window
 scroll position. The hosted database is read only; this journey never writes.
@@ -14,7 +14,8 @@ So that I can reach the navigation without scrolling back to the top
 
 ## Test Steps
 
-1. Resize the browser to 1280x800 and navigate to `/`.
+1. Resize the browser to 1280x800 and navigate to `/watch` (the intro page at `/` may be too
+   short to scroll).
 2. Scroll to the bottom (`window.scrollTo(0, document.documentElement.scrollHeight)`).
    **Verify** `window.scrollY > 0`,
    `document.querySelector('body > header').getBoundingClientRect().top` is `0`, and the
@@ -39,16 +40,16 @@ So that I can reach the navigation without scrolling back to the top
    **Verify** its last project link's box is inside the sidebar's box and the viewport.
    **Verify** the "Worker" status widget is inside the aside's box and the viewport without
    scrolling. Take a screenshot.
-7. Go back to `/`. **Verify** the scroll position is restored to the bottom (or near it), as before
+7. Go back to `/watch`. **Verify** the scroll position is restored to the bottom (or near it), as before
    this change. Then go forward.
-8. Resize to 375x667 and repeat steps 2 and 3 on `/` (below `sm` the brand reads only
+8. Resize to 375x667 and repeat steps 2 and 3 on `/watch` (below `sm` the brand reads only
    `Sviatlana Buben`), then the header checks of step 6 (header
    `top` is `0`, brand and navigation visible, opaque) on the project page; the sidebar checks do
    not apply below `md`. Take a screenshot of each page.
 
 ## Success Criteria
 
-- The header is pinned at `top: 0` after scrolling on `/` and on a project page, at 1280px and at
+- The header is pinned at `top: 0` after scrolling on `/watch` and on a project page, at 1280px and at
   375px.
 - The header is opaque and paints the same colour as `body`.
 - A section tooltip draws over the header.

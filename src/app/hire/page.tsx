@@ -2,10 +2,11 @@ import type { Metadata } from "next";
 import { SectionBoundary } from "@/components/SectionBoundary";
 import { SubmitButton } from "@/components/SubmitButton";
 import { TurnstileScript } from "@/components/TurnstileScript";
-import { HIRE_INTRO, LINKEDIN_URL, OFFER_LABELS, OFFERS } from "@/content/hire";
+import { HIRE_INTRO, LINKEDIN_URL, type Offer, OFFER_LABELS, OFFERS } from "@/content/hire";
 import {
   EMAIL_MAX,
   HIRE_ERROR_MESSAGES,
+  hireOfferFromSlug,
   hireStatus,
   MOTIVATION_MAX,
   MOTIVATION_MIN,
@@ -19,7 +20,11 @@ export const metadata: Metadata = {
     "Work with Sviatlana Buben: product engineering on contract or full-time, or AI that takes work off your plate.",
 };
 
-type SearchParams = Promise<{ sent?: string | string[]; error?: string | string[] }>;
+type SearchParams = Promise<{
+  sent?: string | string[];
+  error?: string | string[];
+  offer?: string | string[];
+}>;
 
 const LABEL = "block text-sm font-medium";
 const FIELD =
@@ -27,15 +32,16 @@ const FIELD =
 
 // The form. It posts to the server action, which redirects back here with
 // ?sent=1 or ?error=<code>; the browser's own validation mirrors the server's
-// bounds, which are the ones that count.
-function HireForm() {
+// bounds, which are the ones that count. `defaultOffer` preselects the select
+// from ?offer=; it is always an OFFERS member, never the raw query value.
+function HireForm({ defaultOffer }: { defaultOffer: Offer }) {
   return (
     <form action={sendHireRequest} className="mt-4 max-w-xl space-y-4">
       <div>
         <label htmlFor="hire-offer" className={LABEL}>
           What brings you here?
         </label>
-        <select id="hire-offer" name="offer" required className={FIELD}>
+        <select id="hire-offer" name="offer" required defaultValue={defaultOffer} className={FIELD}>
           {OFFERS.map((offer) => (
             <option key={offer} value={offer}>
               {OFFER_LABELS[offer]}
@@ -95,8 +101,11 @@ function HireForm() {
 
 // The request-time island: awaiting searchParams makes it the hole under its
 // SectionBoundary. A sent request replaces the form; an error sits above it.
+// ?offer=<slug> preselects the form's offer through hireOfferFromSlug.
 async function HireStatus({ searchParams }: { searchParams: SearchParams }) {
-  const status = hireStatus(await searchParams);
+  const params = await searchParams;
+  const status = hireStatus(params);
+  const defaultOffer = hireOfferFromSlug(params.offer);
 
   if (status?.kind === "sent") {
     return (
@@ -113,13 +122,13 @@ async function HireStatus({ searchParams }: { searchParams: SearchParams }) {
           {HIRE_ERROR_MESSAGES[status.code]}
         </p>
       )}
-      <HireForm />
+      <HireForm defaultOffer={defaultOffer} />
     </div>
   );
 }
 
 // Not async: the heading, the intro and the LinkedIn link are the static
-// shell, the status and the form are the hole. Outside (dashboard), like "/":
+// shell, the status and the form are the hole. Outside (dashboard), like "/" and "/watch":
 // no Providers, no Realtime, no sidebar.
 export default function HirePage({ searchParams }: { searchParams: SearchParams }) {
   return (

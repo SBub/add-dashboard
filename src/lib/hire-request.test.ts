@@ -1,6 +1,9 @@
 import { describe, expect, it } from "vitest";
+import { OFFERS } from "@/content/hire";
 import {
   hireBody,
+  hireOfferFromSlug,
+  hireOfferHref,
   hireStatus,
   hireSubject,
   parseHireRequest,
@@ -171,5 +174,44 @@ describe("hireStatus", () => {
     ["no params", {}],
   ])("is null for %s", (_label, params) => {
     expect(hireStatus(params)).toBeNull();
+  });
+});
+
+describe("hireOfferFromSlug", () => {
+  it("maps each slug to its offer", () => {
+    expect(hireOfferFromSlug("product-engineer")).toBe("Product engineer");
+    expect(hireOfferFromSlug("ai-consulting")).toBe("AI consulting");
+  });
+
+  it.each([
+    ["missing", undefined],
+    ["empty", ""],
+    ["unknown", "designer"],
+    ["an option value, not a slug", "Product engineer"],
+    ["differently cased", "PRODUCT-ENGINEER"],
+    ["an inherited key", "constructor"],
+    ["the prototype key", "__proto__"],
+    ["script-like", "<script>"],
+    ["repeated", ["ai-consulting", "product-engineer"]],
+  ])("is the first option for a slug that is %s", (_label, slug) => {
+    const result = hireOfferFromSlug(slug);
+    expect(result).toBe(OFFERS[0]);
+    expect(OFFERS).toContain(result);
+  });
+
+  it("never echoes the raw value", () => {
+    expect(hireOfferFromSlug("<script>")).not.toContain("<script>");
+  });
+});
+
+describe("hireOfferHref", () => {
+  it("links to /hire with each offer's slug", () => {
+    expect(hireOfferHref("Product engineer")).toBe("/hire?offer=product-engineer");
+    expect(hireOfferHref("AI consulting")).toBe("/hire?offer=ai-consulting");
+  });
+
+  it.each(OFFERS)("round-trips %s through the slug", (offer) => {
+    const slug = new URL(hireOfferHref(offer), "http://localhost").searchParams.get("offer");
+    expect(hireOfferFromSlug(slug ?? undefined)).toBe(offer);
   });
 });

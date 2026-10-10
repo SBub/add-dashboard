@@ -3,6 +3,7 @@
 **Specifications:**
 
 - specs/issue-164-adw-cf1087b2-sdlc_planner-hire-me-page-contact-form.md
+- specs/issue-169-adw-98e70d08-sdlc_planner-who-you-are-home-page.md
 
 ## Overview
 
@@ -20,6 +21,14 @@ fallback reads "Loading form...". `?sent=1` replaces the form with a
 thank-you; `?error=<code>` shows the fixed message from
 `HIRE_ERROR_MESSAGES` above the form. Anything else (an unknown code, a
 repeated parameter) shows the plain form.
+
+`HireStatus` also maps `?offer=` through `hireOfferFromSlug` into the offer
+select's `defaultValue`: `product-engineer` to `Product engineer`,
+`ai-consulting` to `AI consulting`, anything else (missing, unknown, an array,
+a prototype key, an `OFFERS` value) the first option. The slugs are
+deliberately not the `OFFERS` values, so the visible labels, the values the
+subject carries and the URLs stay independent. `hireOfferHref` builds the
+links of the doors on `/` (see `app_docs/home.md`).
 
 ### The form
 
@@ -117,4 +126,8 @@ covered by `src/lib/hire-request.test.ts` and
 - No clock reads on the page, in the action or in `src/lib/hire-request.ts`.
 - The page's copy lives only in `src/content/hire.ts`.
 - Every change to `parseHireRequest` goes with a test case in
+  `src/lib/hire-request.test.ts`.
+- Never render the raw `?offer` value; the page only ever uses the `Offer`
+  `hireOfferFromSlug` returns.
+- Every change to the slug table goes with a test case in
   `src/lib/hire-request.test.ts`.

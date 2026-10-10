@@ -5,6 +5,7 @@
 - specs/issue-127-adw-2ab91140-sdlc_planner-move-feature-docs.md
 - specs/issue-158-adw-a58f07d8-sdlc_planner-worker-status-widget.md
 - specs/issue-164-adw-cf1087b2-sdlc_planner-hire-me-page-contact-form.md
+- specs/issue-169-adw-98e70d08-sdlc_planner-who-you-are-home-page.md
 
 ## Overview
 
@@ -119,7 +120,7 @@ HistoryCursor | null }` and `HistoryCursor` is `{ direction: "after" |
 "before"; cursor: string }` (from `src/lib/history-bookmark.ts`)
 - `getQueue(slug): Promise<QueueItem[]>`
 
-The summary page (`/`) reads two more, `getSummaryPast(today, days)` and
+The summary page (`/watch`) reads two more, `getSummaryPast(today, days)` and
 `getSummaryToday(today)` (see `app_docs/summary.md`).
 
 Nothing under `src/app/` or `src/components/` imports from anywhere else for

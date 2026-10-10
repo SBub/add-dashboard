@@ -16,7 +16,7 @@
 // the slug, no other side effect: an authenticated caller can make the next
 // render of one project page and of the summary page's (`/watch`) today card read the database
 // once, and that is all. A private project is ignored before any drop, which
-// is right for the today card too: `/` shows public projects only.
+// is right for the today card too: `/watch` shows public projects only.
 //
 // Runs on the Node.js runtime, which is the default for route handlers in the
 // installed Next (no `runtime` export is needed for node:crypto).

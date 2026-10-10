@@ -6,6 +6,7 @@
 - specs/issue-141-adw-ab53aaef-sdlc_planner-sticky-header.md
 - specs/issue-142-adw-0093e1de-sdlc_planner-friendly-run-phase-labels.md
 - specs/issue-145-adw-6726a682-sdlc_planner-history-card-full-branch.md
+- specs/issue-169-adw-98e70d08-sdlc_planner-who-you-are-home-page.md
 - specs/issue-147-adw-50c77227-sdlc_planner-history-card-pr-link.md
 - specs/issue-152-adw-a6b99270-sdlc_planner-fix-between-phase-complete-label.md
 - specs/issue-158-adw-a58f07d8-sdlc_planner-worker-status-widget.md
@@ -18,8 +19,8 @@ The two-pane `/projects` screen (the sidebar in `src/app/(dashboard)/layout.tsx`
 ## How it works
 
 A public dashboard for runs of the AI Developer Workflow (ADW) toolkit across
-projects, in two sections. `/`, the landing page, is the summary (full width,
-see `app_docs/summary.md`). `/projects` is a two-pane screen:
+projects. `/`, the landing page, is a static intro (see `app_docs/home.md`).
+`/watch` is the summary (full width, see `app_docs/summary.md`). `/projects` is a two-pane screen:
 
 - The left pane is a persistent sidebar listing every project with its
   queued, running, completed and failed counts and the time its last run started. It
@@ -152,7 +153,7 @@ see `app_docs/summary.md`). `/projects` is a two-pane screen:
   holds the search box's local text and calls the router, and
   `HistoryPageLink`, which navigates the History pages inside the shared
   History transition, and `HistoryTransition`, which holds the one
-  `useTransition` the box, the arrows and `HistoryResults` share, `SummaryProviders` in `src/app/summary-providers.tsx`,
+  `useTransition` the box, the arrows and `HistoryResults` share, `SummaryProviders` in `src/app/watch/summary-providers.tsx`,
   the summary page's bare query client, and `TodaySummary`, which reads today's
   card from the query cache and refetches it, `SubmitButton`, which reads its
   form's pending state, and `TurnstileScript`, which renders the Turnstile

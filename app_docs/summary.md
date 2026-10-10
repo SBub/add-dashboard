@@ -4,16 +4,17 @@
 
 - specs/issue-127-adw-2ab91140-sdlc_planner-move-feature-docs.md
 - specs/issue-134-adw-b6fb710c-sdlc_planner-remove-halted-from-summary.md
+- specs/issue-169-adw-98e70d08-sdlc_planner-who-you-are-home-page.md
 
 ## Overview
 
-The summary at `/` (`src/app/page.tsx`): finished runs per UTC day across projects, split into today's card (a React Query entry with a Refresh button) and the past days, each from its own cache scope. The report is shaped in `src/lib/daily-summary.ts` and drawn with inline charts.
+The summary at `/watch` (`src/app/watch/page.tsx`): finished runs per UTC day across projects, split into today's card (a React Query entry with a Refresh button) and the past days, each from its own cache scope. The report is shaped in `src/lib/daily-summary.ts` and drawn with inline charts.
 
 ## How it works
 
 ### Summary
 
-`/` shows what the toolkit finished per UTC day, newest first, today on top
+`/watch` shows what the toolkit finished per UTC day, newest first, today on top
 in its own card with a Refresh button: runs
 completed and failed, then three bordered chart
 cards, in one row from 1024px and stacked below, each with a title and a
@@ -46,7 +47,8 @@ Tokens in, Cache read, Tokens out, Cost) that ends in a Total row with the
 column sums; its Classes column keeps a compact stacked class bar. There are
 no filters (issue #97).
 
-**Page copy.** `/` is the landing page, so its static shell opens with the
+**Page copy.** `/watch` is the summary page (the landing page is the intro at `/`,
+`app_docs/home.md`), and its static shell opens with the
 `h1` "What an AI developer workflow gets done" and an intro paragraph saying
 what ADW is and that the page is the public ledger of finished runs; the
 document title is "Sviatlana Buben: what an AI developer workflow ships".
@@ -105,7 +107,7 @@ table's Total row are `day.totals`, the sum of the table's own rows
 (`dayTotals` in `src/lib/daily-summary.ts`), passed to `ProjectBreakdownTable`
 as a prop. Nothing is a median.
 
-**Cache.** Two `"use cache"` scopes in `src/app/page.tsx`, both called only
+**Cache.** Two `"use cache"` scopes in `src/app/watch/page.tsx`, both called only
 below the island's `await connection()`, so both are request-time holes (see
 "What is prerendered and what is not"). Unlike History, which reads
 `searchParams`, the island has no other request-time read, so the
@@ -122,7 +124,7 @@ expire: 172800 })`. `today` is in the cache key, so every request in one UTC
   `cacheLife({ stale: 60, revalidate: 60, expire: 300 })`, a one-liner around
   `prefetch(queryKeys.summaryToday(today), () => getSummaryToday(today))`. Its
   dehydrated state is hydrated into `SummaryProviders`
-  (`src/app/summary-providers.tsx`, a bare `QueryClientProvider` over
+  (`src/app/watch/summary-providers.tsx`, a bare `QueryClientProvider` over
   `makeQueryClient()`, no Realtime), mounted only around the today island, so
   the today card (`TodaySummary`) is in the server HTML.
 
@@ -144,13 +146,13 @@ the completion. The model and phase rows are read in the same scopes as the day 
 and lifetimes cover them. The 60-second `revalidate`
 of the today scope and the Refresh button bound both. The router cache's
 `staleTimes.dynamic` (300 seconds) is above that `stale`, so a client
-navigation back to `/` within five minutes may show the router-cached today
+navigation back to `/watch` within five minutes may show the router-cached today
 card; Refresh is the remedy. The page has no Realtime listener: it is outside
 `(dashboard)`.
 
 ## Rules
 
-- The summary is the root route `/`, `src/app/page.tsx`, outside
+- The summary is `/watch`, `src/app/watch/page.tsx`, outside
   `(dashboard)`. Its report is split on today's UTC date, read once by the
   `SummaryContent` island through `requestToday` (`await connection()`, then
   the clock) and passed to both
@@ -169,13 +171,13 @@ card; Refresh is the remedy. The page has no Realtime listener: it is outside
     marker and is required (the History rule against it does not apply here).
     One tag per half; never a per-project, per-day or per-window summary tag,
     and never an `expire` under 5 minutes.
-- The `h1` and the intro paragraph of `/` are static copy in the page body
+- The `h1` and the intro paragraph of `/watch` are static copy in the page body
   (the shell), and the title comes from `metadata`; none of them reads the
   report. The reading note about UTC and metrics is a `<p>` in the page body
   directly under the intro, also in the shell, outside the `SectionBoundary`.
   `e2e/test_connection_indicator_scope.md` and `e2e/test_landing_no_filters.md`
   assert the `h1` text, so change them together.
-- `/` has no filters (issue #97): it always shows every public project over
+- `/watch` has no filters (issue #97): it always shows every public project over
   `SUMMARY_DEFAULT_DAYS` days and reads no search parameter.
 - The window is anchored on today's UTC date (`utcDay` of the island's one
   clock read), not on the newest row in `adw.daily_summary`: the past days are

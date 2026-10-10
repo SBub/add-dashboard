@@ -3,6 +3,7 @@
 **Specifications:**
 
 - specs/issue-127-adw-2ab91140-sdlc_planner-move-feature-docs.md
+- specs/issue-169-adw-98e70d08-sdlc_planner-who-you-are-home-page.md
 
 ## Overview
 
@@ -28,7 +29,7 @@ When a run completes, three things happen in the browser, in this order:
    for a valid slug it calls `updateTag` on each tag of `historyTags(slug)`
    (`src/lib/history-tags.ts`: `history:<slug>` and
    `summary:today`, the same helpers the pages' `cacheTag` calls use), and
-   nothing else. The second tag is the summary page's (`/`) today scope (see
+   nothing else. The second tag is the summary page's (`/watch`) today scope (see
    "Summary"); its past days tag is never dropped. There is no Active tag:
    Active is read per request and never cached on the server.
 3. Only after the action resolves, and only if the route in the address bar is
@@ -71,6 +72,8 @@ completion someone does see. The route handler `src/app/api/revalidate/route.ts`
 closes that gap from the database side: the toolkit's database tells the
 dashboard about every history change, watched or not, and the handler drops
 the same two tags the action drops (`history:<slug>` and `summary:today`).
+Revalidation is by tag, not by path, so the summary's move from `/` to `/watch`
+needed no `revalidatePath`, and none may be added.
 
 **The trigger.** The toolkit owns the database, so the trigger lives in the
 toolkit repository (`adw-toolkit`, `supabase/migrations/*_history_webhook.sql`,
@@ -206,7 +209,7 @@ below). They are the only readers of `searchParams` (for
 marker), so the shell stays the same for every page of History. The build's
 route table shows the project pages as "Partial Prerender" for this reason.
 
-The summary (`/`) is built the same way: its heading, intro and reading note
+The summary (`/watch`) is built the same way: its heading, intro and reading note
 are the static shell, and the report island awaits `connection()` before it
 reads today's UTC date and calls its two `"use cache"` scopes (`getTodayState`,
 tag `summary:today`, and `getPastDays`, tag `summary:past`); it reads no
@@ -283,7 +286,7 @@ Two caveats of the design:
 - The server action is a public endpoint: anyone who can reach the site can
   call it with any string. That is why it validates the slug strictly and does
   nothing but drop two tags; the worst a caller can do is make the next
-  render of one project page, and of the summary's (`/`) today card, read the
+  render of one project page, and of the summary's (`/watch`) today card, read the
   database once.
 - A completion nobody is watching is not moved by the browser. The move is
   triggered by a browser that received the event; if no browser had the
@@ -399,7 +402,7 @@ the `default` cacheLife profile's `stale`.
   write, a parameter beyond the slug, a return value, or a third tag without
   deciding what an anonymous caller can do with it. The second, `summary:today`,
   was decided: an anonymous caller can make the next render of the summary's
-  (`/`) today card read the database once, nothing else. `updateTag`, not
+  (`/watch`) today card read the database once, nothing else. `updateTag`, not
   `revalidateTag(tag, "max")`: the latter is stale-while-revalidate and the
   refresh would be served the old history (see
   `node_modules/next/dist/docs/01-app/03-api-reference/04-functions/updateTag.md`).
@@ -451,3 +454,6 @@ the `default` cacheLife profile's `stale`.
   source"). `no-store` inside a `"use cache"` scope is permitted and leaves
   the scope's output cached and tagged. Check after `yarn build` that
   `.next/cache/fetch-cache` has no Supabase entry.
+- Revalidation is by tag only: never add a `revalidatePath` call. The tags
+  follow the data, not the route, so moving a page (the summary from `/` to
+  `/watch`) changes nothing here.

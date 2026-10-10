@@ -6,10 +6,11 @@
 - specs/issue-164-adw-cf1087b2-sdlc_planner-hire-me-page-contact-form.md
 - specs/issue-166-adw-1eacd918-sdlc_planner-relabel-dashboard-for-audiences.md
 - specs/issue-169-adw-98e70d08-sdlc_planner-who-you-are-home-page.md
+- specs/issue-170-adw-d5ef5a75-sdlc_planner-add-mdx-writing-blog.md
 
 ## Overview
 
-The route tree (`/`, `/watch`, `/projects`, `/projects/[owner]/[repo]`, `/hire`, the `/summary` redirect), the header's links and their current-section marking, and how a project page decides it is not found. Pages live under `src/app/`, the header helpers in `src/components/SectionNav.tsx` and `src/lib/header-section.ts`.
+The route tree (`/`, `/watch`, `/projects`, `/projects/[owner]/[repo]`, `/hire`, `/writing`, `/writing/[slug]`, the `/summary` redirect), the header's links and their current-section marking, and how a project page decides it is not found. Pages live under `src/app/`, the header helpers in `src/components/SectionNav.tsx` and `src/lib/header-section.ts`.
 
 ## How it works
 
@@ -18,7 +19,8 @@ shows finished runs per UTC day across projects: issue classes, total duration,
 tokens (fresh input, cache read, output) and cost (see `app_docs/summary.md`).
 The header's brand, "Sviatlana Buben, building in public" (below `sm` only
 "Sviatlana Buben", the rest in a `hidden sm:inline` span), links to `/`, the
-intro page; its "Watch me build" link goes to `/watch`. At the header's
+intro page; its "Watch me build" link goes to `/watch`, and its "Writing"
+link goes to `/writing` and is emphasised on `/writing` and every post below it. At the header's
 right, on every route, the Work with me button
 (`HireLink`) is a solid fuchsia button linking to `/hire`; it carries
 `aria-current="page"` only on `/hire`. The link of the current section carries `aria-current="page"`, and
@@ -78,6 +80,11 @@ redirect's destination; the handler answers a bare, relative `/watch` and reads
 nothing from the request, so old filtered links land on the plain page.
 `/hire` (`src/app/hire/page.tsx`) likewise sits outside `(dashboard)`, with
 no `Providers`, no Realtime and no pill (see `app_docs/hire.md`).
+`/writing` (`src/app/writing/page.tsx`) and `/writing/[slug]`
+(`src/app/writing/[slug]/page.tsx`) also sit outside `(dashboard)`. They are
+static (prerendered from the post registry), with no `Providers`, no Realtime
+and no pill; an empty production post list yields the placeholder slug `_`,
+which 404s (see `app_docs/writing.md`).
 
 ## Rules
 
@@ -109,8 +116,10 @@ no `Providers`, no Realtime and no pill (see `app_docs/hire.md`).
   (never `/watchx` or `/projectsx`) and takes the brand's text colour; the
   brand (section key `"home"`) is active on exactly `/` and keeps its
   styling; "Work with me" (section key `"hire"`) is active on exactly `/hire`
-  (never `/hirex` or `/hire-me`) and keeps its accent. So `headerSection`
-  answers `"home"`, `"watch"`, `"hire"` or null. The active link carries `aria-current="page"`, the others none.
+  (never `/hirex` or `/hire-me`) and keeps its accent; "Writing" (section key
+  `"writing"`) is active on `/writing`, `/writing/` and every path below
+  `/writing/` (never `/writingx` or `/writing-old`). So `headerSection`
+  answers `"home"`, `"watch"`, `"writing"`, `"hire"` or null. The active link carries `aria-current="page"`, the others none.
 - `/summary` is a permanent (308) redirect to a bare `/watch`, answered by the
   route handler `src/app/summary/route.ts`, which reads nothing from the
   request, so the query string is dropped. It is the only file under
@@ -121,5 +130,5 @@ no `Providers`, no Realtime and no pill (see `app_docs/hire.md`).
   The project overview (sidebar plus every active run, grouped by project) is
   `/projects`, `src/app/(dashboard)/projects/page.tsx`; its `Building now`
   heading is static in the page, above the `SectionBoundary` of its island; the header's
-  `SectionNav` links to `/watch` only and the brand, rendered by
+  `SectionNav` links to `/watch` and `/writing` and the brand, rendered by
   `BrandLink` from the same file, links to `/`.

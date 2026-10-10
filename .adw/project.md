@@ -18,6 +18,7 @@ be kept in step with them and with `README.md`.
 - package manager: Yarn 4.18.1 (Berry, node-modules linker, pinned via `packageManager`, provided by
   corepack). Never `npm`, `npx`, `pnpm` or `bun`; `yarn dlx` only for an unavoidable one-off binary.
 - Node: 24 (`.nvmrc`; `volta` pins 24.21.0).
+- Blog posts: `src/content/posts/<slug>.mdx`, registered in `src/content/posts/index.ts`.
 
 ## Workspaces
 
@@ -84,8 +85,8 @@ E2E code suite: `none` (no `@playwright/test` specs). `e2e/*.md` holds agent-dri
 `e2e/test_row_full_title_top_align.md`, `e2e/test_single_background_color.md`,
 `e2e/test_projects_skeleton_fallbacks.md`, `e2e/test_sticky_header.md`,
 `e2e/test_run_row_phase_label.md`, `e2e/test_history_card_fields.md`,
-`e2e/test_history_page_turn.md`, `e2e/test_worker_status_widget.md`, `e2e/test_hire_page.md` and
-`e2e/test_home_page.md`) that the test
+`e2e/test_history_page_turn.md`, `e2e/test_worker_status_widget.md`, `e2e/test_hire_page.md`,
+`e2e/test_home_page.md` and `e2e/test_writing.md`) that the test
 phase runs through the Playwright MCP server.
 
 lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every commit and
@@ -145,7 +146,9 @@ lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every c
   grouped by project under a `Building now` heading, or "No runs in progress." when none) and `/projects/SBub/issebya-homes-ai-system` (header, Building now, Up next and
   Shipped sections), or the first project the sidebar lists if that slug is 404, and
   `/hire` (heading, intro, LinkedIn link, the form with the two offers, the Turnstile widget, the
-  fuchsia Send button; no sidebar, no pill). The fuchsia Work with me button is in the header on every
+  fuchsia Send button; no sidebar, no pill), `/writing` (heading, intro, the seed post with its
+  audience tag; no sidebar, no pill) and `/writing/hello` (title, date, tag, body, Work with me
+  link). The fuchsia Work with me button is in the header on every
   route. Capture each at desktop 1920x1080 and mobile
   375x667, full page, into `agents/<adw_id>/<agent_name>/review_img/` in the worktree.
 - The sidebar's connection indicator (dashboard routes only; `/`, `/watch` and `/hire` have none) moves from `connecting` to `live` once the Realtime channel

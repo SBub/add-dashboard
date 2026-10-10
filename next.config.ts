@@ -1,3 +1,4 @@
+import createMDX from "@next/mdx";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
@@ -36,4 +37,8 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+// Posts under src/content/posts/ are MDX modules the writing pages import
+// (never routed as files, so no pageExtensions); see app_docs/writing.md.
+const withMDX = createMDX();
+
+export default withMDX(nextConfig);

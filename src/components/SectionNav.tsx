@@ -3,11 +3,12 @@ import { Suspense } from "react";
 import { HeaderLink } from "@/components/HeaderLink";
 import { HIRE_ACCENT } from "@/lib/accent";
 
-// The header's three links: the brand (BrandLink, rendered by the root layout)
-// leads to the intro page at "/", this nav holds the one other section, the
-// summary at /watch ("Watch me build", also current on the project overview
-// and project pages), and the Work with me button (HireLink,
-// in the header's right group) leads to /hire. All mark the current section
+// The header's four links: the brand (BrandLink, rendered by the root layout)
+// leads to the intro page at "/", this nav holds two sections, the summary at
+// /watch ("Watch me build", also current on the project overview and project
+// pages) and the blog at /writing ("Writing", also current on every post), and
+// the Work with me button (HireLink, in the header's right group) leads to
+// /hire. All mark the current section
 // through HeaderLink, the one usePathname reader in the header. Each sits in a
 // plain Suspense whose fallback is the same link inactive, because usePathname
 // suspends during prerender on a project page outside generateStaticParams;
@@ -39,6 +40,23 @@ export function SectionNav() {
           inactiveClassName={SECTION_LINK_INACTIVE}
         >
           Watch me build
+        </HeaderLink>
+      </Suspense>
+      <Suspense
+        fallback={
+          <Link href="/writing" className={`${SECTION_LINK} ${SECTION_LINK_INACTIVE}`}>
+            Writing
+          </Link>
+        }
+      >
+        <HeaderLink
+          href="/writing"
+          section="writing"
+          className={SECTION_LINK}
+          activeClassName={SECTION_LINK_ACTIVE}
+          inactiveClassName={SECTION_LINK_INACTIVE}
+        >
+          Writing
         </HeaderLink>
       </Suspense>
     </nav>

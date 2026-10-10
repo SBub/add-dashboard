@@ -36,6 +36,20 @@ describe("headerSection", () => {
     expect(headerSection("")).toBeNull();
   });
 
+  it("is writing for /writing and every post below it", () => {
+    expect(headerSection("/writing")).toBe("writing");
+    expect(headerSection("/writing/")).toBe("writing");
+    expect(headerSection("/writing/hello")).toBe("writing");
+    expect(headerSection("/writingx")).toBeNull();
+    expect(headerSection("/writing-old")).toBeNull();
+  });
+
+  it("never puts /writing in another section", () => {
+    expect(headerSection("/writing")).not.toBe("watch");
+    expect(headerSection("/writing")).not.toBe("home");
+    expect(headerSection("/writing")).not.toBe("hire");
+  });
+
   it("is hire for /hire only", () => {
     expect(headerSection("/hire")).toBe("hire");
     expect(headerSection("/hire/")).toBe("hire");

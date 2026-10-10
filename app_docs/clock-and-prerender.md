@@ -5,6 +5,7 @@
 - specs/issue-127-adw-2ab91140-sdlc_planner-move-feature-docs.md
 - specs/issue-158-adw-a58f07d8-sdlc_planner-worker-status-widget.md
 - specs/issue-169-adw-98e70d08-sdlc_planner-who-you-are-home-page.md
+- specs/issue-170-adw-d5ef5a75-sdlc_planner-add-mdx-writing-blog.md
 
 ## Overview
 
@@ -53,6 +54,9 @@ day it yields is passed down as an argument (see `app_docs/summary.md`).
 The intro page `/` (`src/app/page.tsx`) reads no clock: it is prerendered
 whole and has no live figure, so moving the summary to `/watch` did not change
 the count of argument-less clock sites (see `app_docs/home.md`).
+`/writing` and its post pages read no clock either (a post's date is its
+`meta.date` through `formatDay`), so the blog leaves the count of clock sites
+unchanged (see `app_docs/writing.md`).
 
 ### The worker store's clock read
 

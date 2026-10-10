@@ -33,7 +33,10 @@ const FIELD =
 // The form. It posts to the server action, which redirects back here with
 // ?sent=1 or ?error=<code>; the browser's own validation mirrors the server's
 // bounds, which are the ones that count. `defaultOffer` preselects the select
-// from ?offer=; it is always an OFFERS member, never the raw query value.
+// from ?offer=; it is always an OFFERS member, never the raw query value. The
+// select is keyed by it: cacheComponents keeps a visited /hire mounted, and a
+// mounted select ignores a new defaultValue, so a second door would otherwise
+// land on the first door's offer.
 function HireForm({ defaultOffer }: { defaultOffer: Offer }) {
   return (
     <form action={sendHireRequest} className="mt-4 max-w-xl space-y-4">
@@ -41,7 +44,14 @@ function HireForm({ defaultOffer }: { defaultOffer: Offer }) {
         <label htmlFor="hire-offer" className={LABEL}>
           What brings you here?
         </label>
-        <select id="hire-offer" name="offer" required defaultValue={defaultOffer} className={FIELD}>
+        <select
+          key={defaultOffer}
+          id="hire-offer"
+          name="offer"
+          required
+          defaultValue={defaultOffer}
+          className={FIELD}
+        >
           {OFFERS.map((offer) => (
             <option key={offer} value={offer}>
               {OFFER_LABELS[offer]}

@@ -206,7 +206,10 @@ phase` and no `Started`.
    (`src/components/HistoryPageLink.tsx`) push the new URL with
    `scroll: false` (each page stays in the browser history) inside the
    shared `HistoryTransition`, and `HistoryResults` dims the list
-   (`aria-busy="true"`) until the new rows arrive. The arrows remain real
+   (`aria-busy="true"`) until the new rows arrive. A page turn
+   (`startPageTurn`) also holds the list at least as tall as it was before
+   the turn, so a shorter page cannot shorten the document and clamp the
+   window's scroll; a search releases the hold. The arrows remain real
    links, so middle-click and open in a new tab use the same URL. `N of M`
    is never in the URL: `N` is one plus the
    count of newer completed runs divided by the page size (rounded up), `M`

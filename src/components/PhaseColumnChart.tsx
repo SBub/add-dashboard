@@ -1,4 +1,4 @@
-import { PHASE_BG } from "@/lib/chart-colors";
+import { PHASE_BG, NEUTRAL_BAR_VALUE } from "@/lib/chart-colors";
 import { tokensLabel } from "@/lib/daily-summary";
 import { costLabel } from "@/lib/run-view";
 import { phaseName } from "@/lib/phase-usage";
@@ -24,6 +24,8 @@ export function PhaseColumnChart({ phases, day }: PhaseColumnChartProps) {
     <ColumnChart
       title="What each step cost"
       subtitle="What each pipeline step cost that day"
+      dots={false}
+      valueClass={NEUTRAL_BAR_VALUE}
       idPrefix={`cost-by-phase-${day}`}
       summary={
         phases.length === 0

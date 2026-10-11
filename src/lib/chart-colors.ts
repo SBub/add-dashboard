@@ -1,8 +1,9 @@
 // The one place an issue class, a model or a pipeline phase gets a chart
-// colour. The class hues are IssueClassBadge's, so a class has one colour
-// across the app; the model and phase hues sit outside the class and the
-// status palettes. Full literal class strings, so Tailwind sees them. Neither
-// classes, models nor phases are states: none of these is a status hue.
+// colour. The class hues are IssueClassBadge's and carry meaning, so a class
+// has one colour across the app. Model and phase bars are one neutral gray:
+// the name under each column identifies it, so colour adds nothing. Full
+// literal class strings, so Tailwind sees them. Neither classes, models nor
+// phases are states: none of these is a status hue.
 import type { ClassKey } from "./daily-summary";
 import type { ModelFamily } from "./model-usage";
 import type { PhaseKey } from "./phase-usage";
@@ -25,19 +26,22 @@ export const CLASS_BG: Record<ClassKey, string> = {
   other: "bg-neutral-300 dark:bg-neutral-600",
 };
 
-/** Model family backgrounds, for CSS columns (ModelColumnChart). */
+/** Model family backgrounds, one neutral gray, for CSS columns (ModelColumnChart). */
 export const MODEL_BG: Record<ModelFamily, string> = {
-  opus: "bg-indigo-500",
-  sonnet: "bg-teal-500",
-  haiku: "bg-orange-400",
-  other: "bg-neutral-300 dark:bg-neutral-600",
+  opus: "bg-neutral-400 dark:bg-neutral-500",
+  sonnet: "bg-neutral-400 dark:bg-neutral-500",
+  haiku: "bg-neutral-400 dark:bg-neutral-500",
+  other: "bg-neutral-400 dark:bg-neutral-500",
 };
 
-/** Pipeline phase backgrounds, for CSS columns (PhaseColumnChart). */
+/** Pipeline phase backgrounds, one neutral gray, for CSS columns (PhaseColumnChart). */
 export const PHASE_BG: Record<PhaseKey, string> = {
-  adw_plan_iso: "bg-cyan-500",
-  adw_build_iso: "bg-blue-500",
-  adw_test_iso: "bg-purple-500",
-  adw_review_iso: "bg-pink-500",
-  adw_document_iso: "bg-yellow-500",
+  adw_plan_iso: "bg-neutral-400 dark:bg-neutral-500",
+  adw_build_iso: "bg-neutral-400 dark:bg-neutral-500",
+  adw_test_iso: "bg-neutral-400 dark:bg-neutral-500",
+  adw_review_iso: "bg-neutral-400 dark:bg-neutral-500",
+  adw_document_iso: "bg-neutral-400 dark:bg-neutral-500",
 };
+
+/** The value text inside a neutral bar; white fails AA on neutral-400. */
+export const NEUTRAL_BAR_VALUE = "text-neutral-950 dark:text-white";

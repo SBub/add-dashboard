@@ -223,7 +223,9 @@ projects. `/`, the landing page, is a static intro (see `app_docs/home.md`).
   the socket, not a run). The worker widget takes its colours from the map
   (`running` online, `failed` offline, `neutral` unknown), not an exemption,
   and has no `role="status"`: the pill is the one status element. Issue class badges are not states and use hues
-  outside the palette.
+  outside the palette. The summary's class chart uses the badge hues; its model
+  and phase chart bars are one neutral gray (`MODEL_BG`, `PHASE_BG` in
+  `src/lib/chart-colors.ts`), their names carrying identity.
 - The header's Work with me button and the `/hire` Send button take their colour
   only from `HIRE_ACCENT` in `src/lib/accent.ts` (fuchsia 700, hover 800, the
   `/bug` class hue, not a status hue), so the two always match; never write

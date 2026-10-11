@@ -268,9 +268,10 @@ open daily log updates through Refresh or the next visit.
   days never enter the query cache. Completions reach the page only through
   the `summary:today` tag in `historyTags(slug)`; the past days tag is never
   dropped.
-- The sidebar's Daily log entry (`DailyLogLink`) is static and reads no query:
-  it sits outside every data boundary, in a plain `Suspense` (for
-  `usePathname`) whose fallback is the same link inactive.
+- The sidebar's Daily log entry (`SidebarEntryLink`, the same component as the
+  Changelog entry below it) is static and reads no query: it sits outside every
+  data boundary, in a plain `Suspense` (for `usePathname`) whose fallback is
+  `SidebarEntryLinkFallback`, the same link inactive.
 - `staleTimes.dynamic` (300 seconds) is above `getTodayState`'s `stale` (60)
   on purpose: the rule tying them is for History, which has no in-place
   refresh. A revisit within five minutes may show the router-cached today

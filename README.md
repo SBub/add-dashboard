@@ -24,6 +24,7 @@ How each feature works, and the rules it follows, is in one doc per feature unde
 - [Work with me page](app_docs/hire.md)
 - [Home page](app_docs/home.md)
 - [Writing](app_docs/writing.md)
+- [Changelog](app_docs/changelog.md)
 
 ## Running it
 

@@ -30,9 +30,10 @@ projects. `/`, the landing page, is a static intro (see `app_docs/home.md`).
   is sticky: it sits `--header-height` + 1.5rem from the top, below the
   sticky root header, and it is a full-height column (its height subtracts the
   header height and both 1.5rem gaps): the project list scrolls inside it and
-  the Daily log entry (`DailyLogLink`, a link to `/projects/log` styled like a
-  project entry and current only there) and the worker status widget sit at
-  its bottom, always visible. Below `md` both follow the strip.
+  the Daily log and Changelog entries (`SidebarEntryLink`, links to
+  `/projects/log` and `/projects/changelog` styled like a project entry; Daily
+  log current only on its page, Changelog on its index and every entry) and
+  the worker status widget sit at its bottom, always visible. Below `md` both follow the strip.
   The widget (`WorkerStatus`) shows whether the toolkit's queue worker is
   running: "Ready to build" (emerald dot) while the freshest heartbeat is under
   90 s old, "Offline" (rose ring) otherwise, each followed by "last
@@ -154,8 +155,8 @@ projects. `/`, the landing page, is a static intro (see `app_docs/home.md`).
   holds the search box's local text and calls the router, and
   `HistoryPageLink`, which navigates the History pages inside the shared
   History transition, and `HistoryTransition`, which holds the one
-  `useTransition` the box, the arrows and `HistoryResults` share, `DailyLogLink`,
-  which reads the pathname to mark the sidebar's Daily log entry, and `TodaySummary`, which reads today's
+  `useTransition` the box, the arrows and `HistoryResults` share, `SidebarEntryLink`,
+  which reads the pathname to mark the sidebar's Daily log and Changelog entries, and `TodaySummary`, which reads today's
   card from the query cache and refetches it, `SubmitButton`, which reads its
   form's pending state, and `TurnstileScript`, which renders the Turnstile
   widget on mount). `HistoryLinks`,

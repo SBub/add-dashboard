@@ -1,4 +1,4 @@
-import { PHASE_BG } from "@/lib/chart-colors";
+import { PHASE_BG, NEUTRAL_BAR_VALUE } from "@/lib/chart-colors";
 import { tokensLabel } from "@/lib/daily-summary";
 import { costLabel } from "@/lib/run-view";
 import { phaseName } from "@/lib/phase-usage";
@@ -14,7 +14,7 @@ interface PhaseColumnChartProps {
 
 /**
  * A day's cost by pipeline phase, one column per phase in sumPhaseUsage's
- * pipeline order (Plan, Build, Test, Review, Document; CI has no cost and is
+ * pipeline order (Plan, Build, Test, Review, Docs; CI has no cost and is
  * omitted), the cost on the bar and the phase name below; hover or focus
  * shows the four-way token split, the total time and the runs. With no phases
  * it keeps its caption and plot height and says so.
@@ -22,13 +22,15 @@ interface PhaseColumnChartProps {
 export function PhaseColumnChart({ phases, day }: PhaseColumnChartProps) {
   return (
     <ColumnChart
-      title="Cost by phase"
+      title="What each step cost"
       subtitle="What each pipeline step cost that day"
+      dots={false}
+      valueClass={NEUTRAL_BAR_VALUE}
       idPrefix={`cost-by-phase-${day}`}
       summary={
         phases.length === 0
-          ? "Cost by phase: no per-phase usage published."
-          : `Cost by phase: ${phases.map((p) => `${phaseName(p.phase)} ${costLabel(p.cost_usd)}`).join(", ")}`
+          ? "What each step cost: no per-phase usage published."
+          : `What each step cost: ${phases.map((p) => `${phaseName(p.phase)} ${costLabel(p.cost_usd)}`).join(", ")}`
       }
       empty="No per-phase usage published."
       columns={phases.map((p) => ({

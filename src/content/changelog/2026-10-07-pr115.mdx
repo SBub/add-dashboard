@@ -1,0 +1,28 @@
+export const meta = {
+  date: "2026-10-07",
+  pr: 115,
+  title: "Charts on each day, quicker home page, all active runs",
+  kind: "release",
+  counts: { features: 4, fixes: 1, chores: 4 },
+  stats: { additions: 5575, deletions: 1386, commits: 33, files: 75, comments: 1 },
+};
+
+Each day on the home page shows two small charts: runs by class and tokens by model. Past days load from cache, and today has its own Refresh button. /projects now lists every run in progress across projects.
+
+## Features
+
+- The Projects link in the header is highlighted on /projects and on every project page ([#99](https://github.com/SBub/adw-dashboard/issues/99), [PR #100](https://github.com/SBub/adw-dashboard/pull/100))
+- The home page shows its frame at once, past days come from cache, and today refreshes on its own ([#101](https://github.com/SBub/adw-dashboard/issues/101), [PR #105](https://github.com/SBub/adw-dashboard/pull/105))
+- Each day card swaps the class bar for two column charts: runs by class and tokens by model ([#103](https://github.com/SBub/adw-dashboard/issues/103), [PR #108](https://github.com/SBub/adw-dashboard/pull/108))
+- Run and queue rows show the full issue title, wrapped, with everything in the row aligned to the top ([#109](https://github.com/SBub/adw-dashboard/issues/109), [PR #113](https://github.com/SBub/adw-dashboard/pull/113))
+
+## Fixes
+
+- Active runs come from one shared list: /projects shows all of them, and each project page shows its own ([#104](https://github.com/SBub/adw-dashboard/issues/104), [PR #111](https://github.com/SBub/adw-dashboard/pull/111))
+
+## Chores
+
+- Synced develop with master after the release; no content change ([PR #98](https://github.com/SBub/adw-dashboard/pull/98))
+- Removed the Project and Window filters from the home page; it always shows every project over the last 30 days ([#97](https://github.com/SBub/adw-dashboard/issues/97), [PR #102](https://github.com/SBub/adw-dashboard/pull/102))
+- Added a GitHub check that runs lint, types, tests and a build on every pull request, and cut Vercel preview builds for pipeline branches ([PR #106](https://github.com/SBub/adw-dashboard/pull/106))
+- Removed "Pick a project in the header to watch runs live." from the home page intro; the header has no project picker ([#107](https://github.com/SBub/adw-dashboard/issues/107), [PR #112](https://github.com/SBub/adw-dashboard/pull/112))

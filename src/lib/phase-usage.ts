@@ -24,10 +24,10 @@ const PHASE_NAMES: Record<PhaseKey, string> = {
   adw_build_iso: "Build",
   adw_test_iso: "Test",
   adw_review_iso: "Review",
-  adw_document_iso: "Document",
+  adw_document_iso: "Docs",
 };
 
-/** The column label of a phase: Plan, Build, Test, Review or Document. */
+/** The column label of a phase: Plan, Build, Test, Review or Docs. */
 export function phaseName(phase: PhaseKey): string {
   return PHASE_NAMES[phase];
 }

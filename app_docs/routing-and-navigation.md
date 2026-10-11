@@ -3,21 +3,34 @@
 **Specifications:**
 
 - specs/issue-127-adw-2ab91140-sdlc_planner-move-feature-docs.md
+- specs/issue-164-adw-cf1087b2-sdlc_planner-hire-me-page-contact-form.md
+- specs/issue-166-adw-1eacd918-sdlc_planner-relabel-dashboard-for-audiences.md
+- specs/issue-169-adw-98e70d08-sdlc_planner-who-you-are-home-page.md
+- specs/issue-170-adw-d5ef5a75-sdlc_planner-add-mdx-writing-blog.md
+- specs/issue-173-adw-3fe1f775-sdlc_planner-production-changelog-backfill.md
 
 ## Overview
 
-The route tree (`/`, `/projects`, `/projects/[owner]/[repo]`, the `/summary` redirect), the header's links and their current-section marking, and how a project page decides it is not found. Pages live under `src/app/`, the header helpers in `src/components/SectionNav.tsx` and `src/lib/header-section.ts`.
+The route tree (`/`, `/projects`, `/projects/log`, `/projects/changelog`, `/projects/changelog/[id]`, `/projects/[owner]/[repo]`, `/hire`, `/writing`, `/writing/[slug]`), the header's links and their current-section marking, and how a project page decides it is not found. Pages live under `src/app/`, the header helpers in `src/components/SectionNav.tsx` and `src/lib/header-section.ts`.
 
 ## How it works
 
-The summary at `/` shows finished runs per UTC day across projects: issue
-classes, total duration, tokens (fresh input, cache read, output) and cost (see
-`app_docs/summary.md`). The header's brand links to `/`, its "Projects" link to
-`/projects`. The link of the current section carries `aria-current="page"`, and
-"Projects" is emphasised on `/projects` and on every project page. On a project
+The static intro page is `/` (see `app_docs/home.md`). The summary, the daily
+log at `/projects/log` (the sidebar's Daily log entry), shows finished runs per UTC day across projects: issue classes, total duration,
+tokens (fresh input, cache read, output) and cost (see `app_docs/summary.md`).
+The header's brand, "Sviatlana Buben, building in public" (below `sm` only
+"Sviatlana Buben", the rest in a `hidden sm:inline` span), links to `/`, the
+intro page; its "Watch me build" link goes to `/projects`, and its "Writing"
+link goes to `/writing` and is emphasised on `/writing` and every post below it. At the header's
+right, on every route, the Work with me button
+(`HireLink`) is a solid fuchsia button linking to `/hire`; it carries
+`aria-current="page"` only on `/hire`. The link of the current section carries `aria-current="page"`, and
+"Watch me build" is emphasised on `/projects`, `/projects/log`, `/projects/changelog` and its
+entries, and every project page. On a project
 page added after the deploy (not among the pre-rendered slugs) the shell carries
-the unmarked link and the highlight arrives with the streamed pathname. The old address `/summary` is a permanent redirect to a bare `/`
-(its query string is dropped).
+the unmarked link and the highlight arrives with the streamed pathname. The
+summary's old addresses `/watch` and `/summary` are gone with no redirect; both
+are 404.
 
 ### Routing
 
@@ -53,19 +66,34 @@ status. That includes a path with one or three segments under `/projects`
 (`/projects/SBub%2Fadw-dashboard`, one segment): the router answers them, no
 slug lookup happens.
 
-The summary is the root route `/` (`src/app/page.tsx`) and sits outside the
-`(dashboard)` group: no project sidebar, no project prefetch, no `Providers`
-and no Realtime channel, so `/` shows no connection pill: the pill is rendered
-by the `(dashboard)` layout beside `Providers`, where the channel is. The
+The intro page `/` is `src/app/page.tsx`: static, prerendered whole, outside
+the `(dashboard)` group: no project sidebar, no project prefetch, no
+`Providers` and no Realtime channel, so `/` shows no connection pill: the pill
+is rendered by the `(dashboard)` layout beside `Providers`, where the channel
+is. The summary is `/projects/log`
+(`src/app/(dashboard)/projects/log/page.tsx`), inside the group, so it has the
+sidebar, the pill and the worker widget. Between the project list and the
+worker widget the sidebar carries two static entries, Daily log then Changelog
+(`SidebarEntryLink`); Daily log links to the summary and is current only on
+`/projects/log`. `log` is a static segment, so it outranks `[owner]` and never clashes
+with a project page, which always has two segments (`/projects/log/x` resolves
+to `[owner]/[repo]` with owner `log` and 404s like any unknown slug). The
+changelog, `/projects/changelog` and `/projects/changelog/[id]`
+(`src/app/(dashboard)/projects/changelog/`), is static, prerendered from the
+registry, inside the group; `changelog` is a static segment that outranks
+`[owner]` as `log` does, and an unknown entry id renders the segment's own
+`not-found.tsx`, not the project not-found (see `app_docs/changelog.md`). The
 project overview (every active run of every project, grouped by project in
 sidebar order, each group headed by a link to its project page, or "No runs in
 progress.") is `src/app/(dashboard)/projects/page.tsx`
-at `/projects`, beside the `projects/[owner]/[repo]` segment. `/summary`, the
-summary's old address, is a permanent (308) redirect to `/` answered by the
-route handler `src/app/summary/route.ts`. It is not a `next.config.ts`
-redirect because Next always merges the request's query string into a config
-redirect's destination; the handler answers a bare, relative `/` and reads
-nothing from the request, so old filtered links land on the plain page.
+at `/projects`, beside the `projects/[owner]/[repo]` segment.
+`/hire` (`src/app/hire/page.tsx`) likewise sits outside `(dashboard)`, with
+no `Providers`, no Realtime and no pill (see `app_docs/hire.md`).
+`/writing` (`src/app/writing/page.tsx`) and `/writing/[slug]`
+(`src/app/writing/[slug]/page.tsx`) also sit outside `(dashboard)`. They are
+static (prerendered from the post registry), with no `Providers`, no Realtime
+and no pill; an empty production post list yields the placeholder slug `_`,
+which 404s (see `app_docs/writing.md`).
 
 ## Rules
 
@@ -92,19 +120,25 @@ nothing from the request, so old filtered links land on the plain page.
 - The header's current section comes only from `headerSection` in
   `src/lib/header-section.ts` (pure, tested in
   `src/lib/header-section.test.ts`; every change to it goes with a test
-  case), read by `HeaderLink`. "Projects" is active on `/projects` and every
-  path below `/projects/` (never `/projectsx`) and takes the brand's text
-  colour; the brand is active on `/` only and keeps its styling. The active
-  link carries `aria-current="page"`, the other none.
-- `/summary` is a permanent (308) redirect to a bare `/`, answered by the
-  route handler `src/app/summary/route.ts`, which reads nothing from the
-  request, so the query string is dropped. It is the only file under
-  `src/app/summary/`; do not add a page there, and do not add a
-  `next.config.ts` redirect for it (Next merges the query string into a
-  config redirect's destination, and config redirects run before the
-  handler).
+  case), read by `HeaderLink`. "Watch me build" (section key `"watch"`) is active on
+  `/projects` and every path below `/projects/`, the daily log
+  `/projects/log` and the changelog `/projects/changelog` included (never `/projectsx`, and never `/watch`, which no
+  longer exists) and takes the brand's text colour; the
+  brand (section key `"home"`) is active on exactly `/` and keeps its
+  styling; "Work with me" (section key `"hire"`) is active on exactly `/hire`
+  (never `/hirex` or `/hire-me`) and keeps its accent; "Writing" (section key
+  `"writing"`) is active on `/writing`, `/writing/` and every path below
+  `/writing/` (never `/writingx` or `/writing-old`). So `headerSection`
+  answers `"home"`, `"watch"`, `"writing"`, `"hire"` or null. The active link carries `aria-current="page"`, the others none.
+- `/watch` and `/summary` are removed with no redirect (owner decision,
+  #182); both are 404. Do not add a redirect for either, in `next.config.ts`
+  or in a route handler.
+- The summary is `/projects/log` and the changelog is `/projects/changelog`,
+  both static segments inside `(dashboard)`. Do not give a project page a
+  one-segment URL; the two-segment project route is what keeps `log` and
+  `changelog` from clashing with a project.
   The project overview (sidebar plus every active run, grouped by project) is
-  `/projects`, `src/app/(dashboard)/projects/page.tsx`; its `Active`
+  `/projects`, `src/app/(dashboard)/projects/page.tsx`; its `Building now`
   heading is static in the page, above the `SectionBoundary` of its island; the header's
-  `SectionNav` links to `/projects` only and the brand, rendered by
+  `SectionNav` links to `/projects` and `/writing` and the brand, rendered by
   `BrandLink` from the same file, links to `/`.

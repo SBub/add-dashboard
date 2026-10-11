@@ -18,12 +18,13 @@ interface HistoryPageLinkProps {
  * One History arrow. A real link, so middle-click, open in a new tab, no-JS
  * and the production prefetch keep working. A plain click (the only kind
  * onNavigate sees) pushes the same URL inside the shared History transition
- * with `scroll: false`, so the window stays put and HistoryResults dims the
- * list until the new rows arrive. It builds no URL.
+ * with `scroll: false` (startPageTurn, which also holds the list's height so a
+ * shorter page cannot clamp the scroll), so the window stays put and
+ * HistoryResults dims the list until the new rows arrive. It builds no URL.
  */
 export function HistoryPageLink({ href, label, className, children }: HistoryPageLinkProps) {
   const router = useRouter();
-  const { startTransition } = useHistoryTransition();
+  const { startPageTurn } = useHistoryTransition();
 
   return (
     <Link
@@ -33,7 +34,7 @@ export function HistoryPageLink({ href, label, className, children }: HistoryPag
       scroll={false}
       onNavigate={(e) => {
         e.preventDefault();
-        startTransition(() => {
+        startPageTurn(() => {
           router.push(href, { scroll: false });
         });
       }}

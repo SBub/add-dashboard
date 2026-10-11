@@ -4,6 +4,8 @@
 
 - specs/issue-127-adw-2ab91140-sdlc_planner-move-feature-docs.md
 - specs/issue-158-adw-a58f07d8-sdlc_planner-worker-status-widget.md
+- specs/issue-169-adw-98e70d08-sdlc_planner-who-you-are-home-page.md
+- specs/issue-170-adw-d5ef5a75-sdlc_planner-add-mdx-writing-blog.md
 
 ## Overview
 
@@ -44,10 +46,17 @@ needs no snapshot, and its cache scope exists for the tag, not for a
 clock-read permission.
 
 There is a second argument-less clock read: `utcDay(Date.now())` in the
-summary page's `requestToday` (`src/app/page.tsx`), which turns the request
+summary page's `requestToday` (`src/app/(dashboard)/projects/log/page.tsx`), which turns the request
 time into today's UTC date. It runs only after `await connection()`, so only at
 request time, never in a prerender pass and never in client render, and the
 day it yields is passed down as an argument (see `app_docs/summary.md`).
+
+The intro page `/` (`src/app/page.tsx`) reads no clock: it is prerendered
+whole and has no live figure, so moving the summary to `/watch` and then to `/projects/log` did not change
+the count of argument-less clock sites (see `app_docs/home.md`).
+`/writing` and its post pages read no clock either (a post's date is its
+`meta.date` through `formatDay`), so the blog leaves the count of clock sites
+unchanged (see `app_docs/writing.md`).
 
 ### The worker store's clock read
 
@@ -59,7 +68,7 @@ body, and its value goes straight into the pure
 returns the previous snapshot itself when nothing changed, so a poll that finds
 the same state re-renders nothing. The store's `getServerSnapshot` is the
 constant `unknown` state and reads no clock, so the static shell and hydration
-both render "Worker status..." and the first poll after subscribe supplies the
+both render "Checking status..." and the first poll after subscribe supplies the
 real state. It is the first instance of the shape the Rules prescribe for a
 time-dependent label: a client leaf with a `useSyncExternalStore` store whose
 server snapshot is data-free.
@@ -74,7 +83,7 @@ server snapshot is data-free.
   after its `await connection()`, so only at request time (in
   the browser it runs as a `queryFn` on a cache miss and in the realtime
   catch-up, where a clock read is fine), and `utcDay(Date.now())` in the
-  summary page's `requestToday` (`src/app/page.tsx`, a plain function, not a
+  summary page's `requestToday` (`src/app/(dashboard)/projects/log/page.tsx`, a plain function, not a
   component body, which `react-hooks/purity` forbids), directly after its
   `await connection()`, so only at request time, never in a prerender pass and
   never in client render. Its day is passed down as an argument; nothing below
@@ -83,7 +92,7 @@ server snapshot is data-free.
   after `getWorkers()` resolves, never in render or a hook body, fed into the
   pure `nextWorkerSnapshot` (`src/lib/worker-state.ts`). Its
   `getServerSnapshot` is the constant `unknown` state and reads no clock, so
-  the shell and hydration render "Worker status...". Do not add a fourth. A
+  the shell and hydration render "Checking status...". Do not add a fourth. A
   future time-dependent label follows the same shape, a
   new client leaf with a `useSyncExternalStore` store whose server snapshot
   does not read the clock (issue #3), never a clock read in `QueueRow`,

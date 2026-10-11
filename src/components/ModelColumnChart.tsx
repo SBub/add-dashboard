@@ -1,4 +1,4 @@
-import { MODEL_BG } from "@/lib/chart-colors";
+import { MODEL_BG, NEUTRAL_BAR_VALUE } from "@/lib/chart-colors";
 import { tokensLabel } from "@/lib/daily-summary";
 import { costLabel } from "@/lib/run-view";
 import { modelFamily, modelShortName } from "@/lib/model-usage";
@@ -23,6 +23,8 @@ export function ModelColumnChart({ models, day }: ModelColumnChartProps) {
     <ColumnChart
       title="Tokens by model"
       subtitle="All tokens, including cache reads"
+      dots={false}
+      valueClass={NEUTRAL_BAR_VALUE}
       idPrefix={`tokens-by-model-${day}`}
       summary={
         models.length === 0

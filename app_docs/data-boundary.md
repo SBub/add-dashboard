@@ -4,6 +4,8 @@
 
 - specs/issue-127-adw-2ab91140-sdlc_planner-move-feature-docs.md
 - specs/issue-158-adw-a58f07d8-sdlc_planner-worker-status-widget.md
+- specs/issue-164-adw-cf1087b2-sdlc_planner-hire-me-page-contact-form.md
+- specs/issue-169-adw-98e70d08-sdlc_planner-who-you-are-home-page.md
 
 ## Overview
 
@@ -118,7 +120,7 @@ HistoryCursor | null }` and `HistoryCursor` is `{ direction: "after" |
 "before"; cursor: string }` (from `src/lib/history-bookmark.ts`)
 - `getQueue(slug): Promise<QueueItem[]>`
 
-The summary page (`/`) reads two more, `getSummaryPast(today, days)` and
+The summary page (`/projects/log`) reads two more, `getSummaryPast(today, days)` and
 `getSummaryToday(today)` (see `app_docs/summary.md`).
 
 Nothing under `src/app/` or `src/components/` imports from anywhere else for
@@ -276,7 +278,9 @@ Next does not read `.env.development` for a production build or `next start`
 (those read `.env.production` and `.env`), which is why the real values go in
 `.env.local` as well: it is loaded in every mode and gitignored. Keep the two
 files identical. `.gitignore` ignores `.env` and `.env.*` and un-ignores
-`.env.example`.
+`.env.example`. The four `/hire` form variables (Turnstile and Resend) are
+described in `app_docs/hire.md`; `SITE_URL`, the public address the page
+metadata is built on (optional, with fallbacks), in `app_docs/writing.md`.
 
 ### The client
 
@@ -368,7 +372,7 @@ on the server no channel is ever subscribed, so no socket is opened there.
   miss, which means a second fetch in the browser. There is no per-project
   runs key. The slug is part of the queue key's hash; the slug is assembled once in the page; pass it as is.
 - `makeQueryClient()` in `src/data/query-client.ts` is the one `QueryClient`
-  factory. Every server prefetch, `Providers` and `SummaryProviders` build from it; do not call
+  factory. Every server prefetch and `Providers` build from it; do not call
   `new QueryClient()` anywhere else, or the dehydrate rule drifts between sides.
 - `prefetch(queryKey, queryFn)` in the same file is the one server prefetch.
   Every `"use cache"` state function (the layout's `getProjectsState`, the
@@ -390,8 +394,13 @@ on the server no channel is ever subscribed, so no socket is opened there.
 - `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` are
   public by design (browser bundle, RLS-limited). The secret / service role
   key must never be added to this repo, to any `.env*` file in it, or to any
-  variable with a `NEXT_PUBLIC_` prefix. `ADW_REVALIDATE_SECRET` is the one
-  server-only variable: it stays without the prefix and is read only in the
-  route handler. `.env.example` is tracked with
+  variable with a `NEXT_PUBLIC_` prefix. Server-only variables never carry
+  the `NEXT_PUBLIC_` prefix: `ADW_REVALIDATE_SECRET` is read only in the
+  route handler (`src/app/api/revalidate/route.ts`); `RESEND_API_KEY`,
+  `RESEND_FROM_EMAIL` and `TURNSTILE_SECRET_KEY` are read only in
+  `src/app/actions/send-hire-request.ts`; `SITE_URL` is read only in the root
+  layout (`src/app/layout.tsx`), through `siteUrl`. `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
+  is public by design (the Turnstile widget needs it in the browser) and is
+  read only in `src/app/hire/page.tsx`. `.env.example` is tracked with
   placeholders; `.env.development` (dev) and `.env.local` (all modes,
   including build and start) hold the real values and are gitignored.

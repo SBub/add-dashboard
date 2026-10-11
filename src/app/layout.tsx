@@ -1,13 +1,26 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
-import { BrandLink, SectionNav } from "@/components/SectionNav";
+import { BrandLink, HireLink, SectionNav } from "@/components/SectionNav";
 import { HEADER_LAYER } from "@/lib/layers";
+import { SITE_NAME, siteUrl } from "@/lib/site-url";
 
 import "./globals.css";
 
+// metadataBase turns every relative metadata URL (og:image, og:url, the
+// canonical link) into an absolute one on the public address. SITE_URL is
+// read once, at build time, when this module is evaluated (see
+// src/lib/site-url.ts for its fallbacks).
 export const metadata: Metadata = {
-  title: "ADW Dashboard",
-  description: "Runs of the AI Developer Workflow toolkit across projects.",
+  metadataBase: new URL(
+    siteUrl({
+      SITE_URL: process.env.SITE_URL,
+      VERCEL_PROJECT_PRODUCTION_URL: process.env.VERCEL_PROJECT_PRODUCTION_URL,
+    }),
+  ),
+  openGraph: { siteName: SITE_NAME },
+  title: "Sviatlana Buben, building in public",
+  description:
+    "Sviatlana Buben, product engineer, building her products in public with ADW, her AI developer workflow.",
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -24,8 +37,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </div>
             <div className="ml-auto flex items-center gap-3">
               <span className="hidden text-xs text-neutral-500 sm:inline dark:text-neutral-400">
-                AI Developer Workflow runs
+                Built with ADW, my AI developer workflow
               </span>
+              <HireLink />
             </div>
           </div>
         </header>

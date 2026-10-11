@@ -1,8 +1,9 @@
 # ADW Dashboard
 
-A public dashboard for runs of the AI Developer Workflow (ADW) toolkit across projects. `/` is the
-summary of finished runs per UTC day across projects. `/projects` is a two-pane screen: a sidebar
-of projects and, for the selected project, its Active runs, its Queue and its History.
+A public dashboard for runs of the AI Developer Workflow (ADW) toolkit across projects. `/` introduces the
+owner and leads to `/hire`; its Watch me build link leads to `/projects`. `/writing` is the blog. `/projects` is a two-pane screen: a sidebar
+of projects and, for the selected project, its Active runs, its Queue and its History. The sidebar's Daily log entry opens
+`/projects/log`, the summary of finished runs per UTC day across projects.
 
 ## Documentation
 
@@ -20,6 +21,10 @@ How each feature works, and the rules it follows, is in one doc per feature unde
 - [Error and loading boundaries](app_docs/error-and-loading-boundaries.md)
 - [Realtime](app_docs/realtime.md)
 - [Summary page](app_docs/summary.md)
+- [Work with me page](app_docs/hire.md)
+- [Home page](app_docs/home.md)
+- [Writing](app_docs/writing.md)
+- [Changelog](app_docs/changelog.md)
 
 ## Running it
 

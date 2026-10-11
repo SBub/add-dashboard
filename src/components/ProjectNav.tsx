@@ -7,6 +7,7 @@ import { getProjects } from "@/data";
 import { activeRunsQuery } from "@/data/active-runs-query";
 import { queryKeys } from "@/data/query-keys";
 import { activeRunCounts } from "@/lib/active-runs";
+import { NAV_ENTRY, NAV_ENTRY_ACTIVE, NAV_ENTRY_INACTIVE } from "@/lib/nav-entry";
 import { STATUS_COLORS, type StatusKey } from "@/lib/status-colors";
 import type { ProjectSummary } from "@/types/adw";
 import { Timestamp } from "./Timestamp";
@@ -45,11 +46,7 @@ function ProjectNavItem({
       <Link
         href={`/projects/${project.slug}`}
         aria-current={selected ? "page" : undefined}
-        className={`block rounded-lg border px-3 py-2.5 transition-colors ${
-          selected
-            ? "border-neutral-900 bg-neutral-100 dark:border-neutral-100 dark:bg-neutral-900"
-            : "border-neutral-200 hover:border-neutral-400 dark:border-neutral-800 dark:hover:border-neutral-600"
-        }`}
+        className={`${NAV_ENTRY} ${selected ? NAV_ENTRY_ACTIVE : NAV_ENTRY_INACTIVE}`}
       >
         <span className="block truncate text-sm font-semibold">{project.display_name}</span>
         <span className="block truncate font-mono text-xs text-neutral-500 dark:text-neutral-400">

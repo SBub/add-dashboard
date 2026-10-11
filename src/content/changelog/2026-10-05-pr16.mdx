@@ -1,0 +1,23 @@
+export const meta = {
+  date: "2026-10-05",
+  pr: 16,
+  title: "European dates, paged history, repository link",
+  kind: "release",
+  counts: { features: 2, fixes: 0, chores: 5 },
+  stats: { additions: 2633, deletions: 378, commits: 30, files: 31, comments: 1 },
+};
+
+Dates now read as DD.MM.YYYY, and a project's History shows three runs per page. The repository name in the project header is the link to GitHub. This is also the first release where ADW built most of the changes from labelled issues.
+
+## Features
+
+- Dates and times show as DD.MM.YYYY HH:MM UTC across the dashboard ([#10](https://github.com/SBub/adw-dashboard/issues/10), [PR #13](https://github.com/SBub/adw-dashboard/pull/13))
+- History shows three completed runs per page, with Newer and Older links ([#17](https://github.com/SBub/adw-dashboard/issues/17), [PR #18](https://github.com/SBub/adw-dashboard/pull/18))
+
+## Chores
+
+- Set the repository up for the ADW toolkit, so it can plan, build and review issues here ([PR #11](https://github.com/SBub/adw-dashboard/pull/11))
+- The repository name in the project header is now the link to GitHub; the separate Repository button and its broken arrow are gone ([#9](https://github.com/SBub/adw-dashboard/issues/9), [PR #12](https://github.com/SBub/adw-dashboard/pull/12))
+- Stopped committing the browser snapshots the review step writes, and removed the three that slipped in ([PR #14](https://github.com/SBub/adw-dashboard/pull/14))
+- The History title shows straight away; only the list and its page links wait for data ([#20](https://github.com/SBub/adw-dashboard/issues/20), [PR #21](https://github.com/SBub/adw-dashboard/pull/21))
+- The project page route now has named owner and repo parts; addresses stay the same ([#22](https://github.com/SBub/adw-dashboard/issues/22), [PR #24](https://github.com/SBub/adw-dashboard/pull/24))

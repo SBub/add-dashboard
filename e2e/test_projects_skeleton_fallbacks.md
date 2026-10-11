@@ -24,9 +24,9 @@ So that the page does not flash nearly empty and then jump when the rows arrive
    **Verify** it contains `aria-busy="true"`, `aria-label="Loading runs"`,
    `aria-label="Loading queue"` and `aria-label="Loading history"` (or `aria-label="Loading pages"`),
    and that it contains none of `Loading runs...`, `Loading queue...`, `Loading history...` or
-   `Loading project...`. **Verify** it still contains the `Active`, `Queue` and `History` headings
-   and, when the project has runs, at least one `<code` holding an `adw_id` (the rows streamed in
-   the same document).
+   `Loading project...`. **Verify** it still contains the `Building now`, `Up next` and `Shipped`
+   headings and, when the project has runs, at least one `<code` holding an `adw_id` (the rows
+   streamed in the same document).
 4. With `browser_run_code_unsafe`, open a CDP session (`page.context().newCDPSession(page)`) and
    send `Network.enable`, then `Network.emulateNetworkConditions` with `offline: false`,
    `latency: 2000`, `downloadThroughput: 50000`, `uploadThroughput: 50000`. In the same call,

@@ -1,0 +1,31 @@
+export const meta = {
+  date: "2026-10-05",
+  pr: 37,
+  title: "Queue section, history search, issue titles on runs",
+  kind: "release",
+  counts: { features: 7, fixes: 1, chores: 4 },
+  stats: { additions: 6584, deletions: 440, commits: 63, files: 66, comments: 1 },
+};
+
+Project pages gain a Queue section that updates live, a search box for History and the issue title on every run row. Each section now says in one line what puts an item there.
+
+## Features
+
+- Run rows show the issue title next to the issue number ([#25](https://github.com/SBub/adw-dashboard/issues/25), [PR #33](https://github.com/SBub/adw-dashboard/pull/33))
+- The sidebar shows how many issues are queued for each project ([#30](https://github.com/SBub/adw-dashboard/issues/30), [PR #35](https://github.com/SBub/adw-dashboard/pull/35))
+- A Queue section on the project page lists queued issues in order and updates live ([#31](https://github.com/SBub/adw-dashboard/issues/31), [PR #39](https://github.com/SBub/adw-dashboard/pull/39))
+- Search History by issue title, issue number, branch or run id; the search sits in the address, so a link keeps it ([#38](https://github.com/SBub/adw-dashboard/issues/38), [PR #41](https://github.com/SBub/adw-dashboard/pull/41))
+- History pages turn with left and right arrows and show which page you are on, as "N of M" ([#40](https://github.com/SBub/adw-dashboard/issues/40), [PR #44](https://github.com/SBub/adw-dashboard/pull/44))
+- Queue, Active and History each get a one-line explanation under the heading, with more behind an info button that works with a keyboard and a screen reader ([#45](https://github.com/SBub/adw-dashboard/issues/45), [PR #49](https://github.com/SBub/adw-dashboard/pull/49))
+- A Skills section with rendered guides, starting with one on server prefetch with hydration ([#32](https://github.com/SBub/adw-dashboard/issues/32), [PR #56](https://github.com/SBub/adw-dashboard/pull/56))
+
+## Fixes
+
+- The History search box stays next to the title and the page arrows stay on the right, with or without results ([#46](https://github.com/SBub/adw-dashboard/issues/46), [PR #52](https://github.com/SBub/adw-dashboard/pull/52))
+
+## Chores
+
+- The run status badge moved to the right end of the row ([#26](https://github.com/SBub/adw-dashboard/issues/26), [PR #27](https://github.com/SBub/adw-dashboard/pull/27))
+- Going back to a project you opened in the last five minutes no longer reloads its History ([#29](https://github.com/SBub/adw-dashboard/issues/29), [PR #34](https://github.com/SBub/adw-dashboard/pull/34))
+- Each status has one colour everywhere: queued amber, running green, completed blue, failed red ([#42](https://github.com/SBub/adw-dashboard/issues/42), [PR #48](https://github.com/SBub/adw-dashboard/pull/48))
+- Project page sections now go Active, Queue, History, so the run in progress comes first ([#51](https://github.com/SBub/adw-dashboard/issues/51), [PR #58](https://github.com/SBub/adw-dashboard/pull/58))

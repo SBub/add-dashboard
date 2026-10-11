@@ -12,7 +12,7 @@
 
 ## Overview
 
-The project page at `/projects/<owner>/<repo>` (`src/app/(dashboard)/projects/[owner]/[repo]/page.tsx`): its Active section, the Queue rail below it, and the server-rendered History with keyset paging and search through `?q`.
+The project page at `/projects/<owner>/<repo>` (`src/app/(dashboard)/projects/[owner]/[repo]/page.tsx`): its Active section, the Queue rail below it, and the server-rendered History with keyset paging and search through `?q`. On screen the three sections render under the headings `Building now` (Active), `Up next` (Queue) and `Shipped` (History); this doc keeps the conceptual names.
 
 ## How it works
 
@@ -135,7 +135,7 @@ History is rendered below that, by the same page:
    `costs`, each shown run's cost, read by `getCompletedRuns` inside the same
    tagged `"use cache"` scope (so the costs drop with `history:<slug>`
    together with the rows), no clock read, no React Query. The page renders the History heading row
-   itself, statically: a `SectionHeading` whose `<h2>History</h2>`,
+   itself, statically: a `SectionHeading` whose `<h2>Shipped</h2>`,
    description and info button sit outside every boundary, and whose
    `controls` slot holds the `HistorySearchBox` island, right after the
    title, in a `SectionBoundary` (fallback the same box, disabled; detail
@@ -206,7 +206,10 @@ phase` and no `Started`.
    (`src/components/HistoryPageLink.tsx`) push the new URL with
    `scroll: false` (each page stays in the browser history) inside the
    shared `HistoryTransition`, and `HistoryResults` dims the list
-   (`aria-busy="true"`) until the new rows arrive. The arrows remain real
+   (`aria-busy="true"`) until the new rows arrive. A page turn
+   (`startPageTurn`) also holds the list at least as tall as it was before
+   the turn, so a shorter page cannot shorten the document and clamp the
+   window's scroll; a search releases the hold. The arrows remain real
    links, so middle-click and open in a new tab use the same URL. `N of M`
    is never in the URL: `N` is one plus the
    count of newer completed runs divided by the page size (rounded up), `M`
@@ -295,7 +298,7 @@ phase` and no `Started`.
   `src/lib/history-search.test.ts`. Every change to either goes with a test
   case. The search never touches Active, and never filters on the client.
 - A static heading sits outside the boundary of the hole it labels: the
-  `History` `<h2>` is rendered by the page, beside and above the islands, never inside a
+  History's `<h2>` ("Shipped") is rendered by the page, beside and above the islands, never inside a
   `SectionBoundary` or its fallback, so it is in the static shell.
 - `HistorySearchBox`, `HistoryPagination` and `CompletedRuns` are the only
   readers of `searchParams`, and each awaits it itself. The page passes the promise down

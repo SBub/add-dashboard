@@ -6,9 +6,11 @@
 - specs/issue-141-adw-ab53aaef-sdlc_planner-sticky-header.md
 - specs/issue-142-adw-0093e1de-sdlc_planner-friendly-run-phase-labels.md
 - specs/issue-145-adw-6726a682-sdlc_planner-history-card-full-branch.md
+- specs/issue-169-adw-98e70d08-sdlc_planner-who-you-are-home-page.md
 - specs/issue-147-adw-50c77227-sdlc_planner-history-card-pr-link.md
 - specs/issue-152-adw-a6b99270-sdlc_planner-fix-between-phase-complete-label.md
 - specs/issue-158-adw-a58f07d8-sdlc_planner-worker-status-widget.md
+- specs/issue-164-adw-cf1087b2-sdlc_planner-hire-me-page-contact-form.md
 
 ## Overview
 
@@ -17,8 +19,8 @@ The two-pane `/projects` screen (the sidebar in `src/app/(dashboard)/layout.tsx`
 ## How it works
 
 A public dashboard for runs of the AI Developer Workflow (ADW) toolkit across
-projects, in two sections. `/`, the landing page, is the summary (full width,
-see `app_docs/summary.md`). `/projects` is a two-pane screen:
+projects. `/`, the landing page, is a static intro (see `app_docs/home.md`).
+`/projects` is a two-pane screen, shared by the overview, the daily log at `/projects/log` (the summary, see `app_docs/summary.md`) and every project page:
 
 - The left pane is a persistent sidebar listing every project with its
   queued, running, completed and failed counts and the time its last run started. It
@@ -28,14 +30,16 @@ see `app_docs/summary.md`). `/projects` is a two-pane screen:
   is sticky: it sits `--header-height` + 1.5rem from the top, below the
   sticky root header, and it is a full-height column (its height subtracts the
   header height and both 1.5rem gaps): the project list scrolls inside it and
-  the worker status widget sits at its bottom, always visible. Below `md` the
-  widget follows the strip.
+  the Daily log and Changelog entries (`SidebarEntryLink`, links to
+  `/projects/log` and `/projects/changelog` styled like a project entry; Daily
+  log current only on its page, Changelog on its index and every entry) and
+  the worker status widget sit at its bottom, always visible. Below `md` both follow the strip.
   The widget (`WorkerStatus`) shows whether the toolkit's queue worker is
-  running: "Worker online" (emerald dot) while the freshest heartbeat is under
-  90 s old, "Worker offline" (rose ring) otherwise, each followed by "last
+  running: "Ready to build" (emerald dot) while the freshest heartbeat is under
+  90 s old, "Offline" (rose ring) otherwise, each followed by "last
   beat" and the beat's `Timestamp`, or "never seen" when there is no row.
   Before its first read (the static shell, hydration, the first poll in
-  flight) it reads "Worker status..." with a dashed neutral ring. It never
+  flight) it reads "Checking status..." with a dashed neutral ring. It never
   shows the worker's host, pid or `started_at`.
   Every run and queue state has one colour wherever it appears (queued
   amber, running emerald with a pulsing dot, completed sky, failed rose, a
@@ -151,9 +155,11 @@ see `app_docs/summary.md`). `/projects` is a two-pane screen:
   holds the search box's local text and calls the router, and
   `HistoryPageLink`, which navigates the History pages inside the shared
   History transition, and `HistoryTransition`, which holds the one
-  `useTransition` the box, the arrows and `HistoryResults` share, `SummaryProviders` in `src/app/summary-providers.tsx`,
-  the summary page's bare query client, and `TodaySummary`, which reads today's
-  card from the query cache and refetches it). `HistoryLinks`,
+  `useTransition` the box, the arrows and `HistoryResults` share, `SidebarEntryLink`,
+  which reads the pathname to mark the sidebar's Daily log and Changelog entries, and `TodaySummary`, which reads today's
+  card from the query cache and refetches it, `SubmitButton`, which reads its
+  form's pending state, and `TurnstileScript`, which renders the Turnstile
+  widget on mount). `HistoryLinks`,
   `RunHistoryList`, `SectionNav`,
   `DailySummaryList`, `SummaryDayCard`, `DayCharts`, `ColumnChart`,
   `ClassColumnChart`, `ModelColumnChart`, `PhaseColumnChart`,
@@ -219,4 +225,10 @@ see `app_docs/summary.md`). `/projects` is a two-pane screen:
   the socket, not a run). The worker widget takes its colours from the map
   (`running` online, `failed` offline, `neutral` unknown), not an exemption,
   and has no `role="status"`: the pill is the one status element. Issue class badges are not states and use hues
-  outside the palette.
+  outside the palette. The summary's class chart uses the badge hues; its model
+  and phase chart bars are one neutral gray (`MODEL_BG`, `PHASE_BG` in
+  `src/lib/chart-colors.ts`), their names carrying identity.
+- The header's Work with me button and the `/hire` Send button take their colour
+  only from `HIRE_ACCENT` in `src/lib/accent.ts` (fuchsia 700, hover 800, the
+  `/bug` class hue, not a status hue), so the two always match; never write
+  a button's fuchsia fill inline.

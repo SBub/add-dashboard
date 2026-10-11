@@ -1,5 +1,5 @@
 import { CLASS_BG } from "@/lib/chart-colors";
-import { classCounts, classLabel, shareLabel } from "@/lib/daily-summary";
+import { classColumns, classLabel, shareLabel } from "@/lib/daily-summary";
 import type { DailySummary } from "@/types/adw";
 import { ColumnChart } from "./ColumnChart";
 
@@ -10,22 +10,23 @@ interface ClassColumnChartProps {
 }
 
 /**
- * A day's runs by issue class, one column per class present, in classCounts'
- * fixed order; hover or focus shows the count and the share of the day's
- * runs. Nothing when there are no runs.
+ * A day's runs by issue class: /feature, /chore and /bug always, /patch and
+ * other when present, in classColumns' fixed order; a zero column is a
+ * hairline with 0 above it. Hover or focus shows the count and the share of
+ * the day's runs. Nothing when there are no runs.
  */
 export function ClassColumnChart({ counts, day }: ClassColumnChartProps) {
-  const present = classCounts(counts);
-  if (present.length === 0) return null;
-  const total = present.reduce((sum, { count }) => sum + count, 0);
+  const columns = classColumns(counts);
+  const total = columns.reduce((sum, { count }) => sum + count, 0);
+  if (total === 0) return null;
 
   return (
     <ColumnChart
-      title="Work by class"
+      title="What I worked on"
       subtitle="Runs finished that day"
       idPrefix={`runs-by-class-${day}`}
-      summary={`Work by class: ${present.map(({ key, count }) => `${count} ${classLabel(key)}`).join(", ")}`}
-      columns={present.map(({ key, count }) => ({
+      summary={`What I worked on: ${columns.map(({ key, count }) => `${count} ${classLabel(key)}`).join(", ")}`}
+      columns={columns.map(({ key, count }) => ({
         key,
         value: count,
         valueLabel: String(count),

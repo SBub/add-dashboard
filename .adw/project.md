@@ -18,16 +18,21 @@ be kept in step with them and with `README.md`.
 - package manager: Yarn 4.18.1 (Berry, node-modules linker, pinned via `packageManager`, provided by
   corepack). Never `npm`, `npx`, `pnpm` or `bun`; `yarn dlx` only for an unavoidable one-off binary.
 - Node: 24 (`.nvmrc`; `volta` pins 24.21.0).
+- Blog posts: `src/content/posts/<slug>.mdx`, registered in `src/content/posts/index.ts`.
+- Changelog entries: `src/content/changelog/<YYYY-MM-DD>-pr<N>.mdx`, registered in
+  `src/content/changelog/index.ts`; drafted once by `node scripts/backfill-changelog.ts` (with the
+  production pull request's stats), then title, description and lines rewritten by hand from the diff.
 
 ## Workspaces
 
-| name          | path | dev command | port variable | default port | health URL                                                      | ADW may start |
-| ------------- | ---- | ----------- | ------------- | ------------ | --------------------------------------------------------------- | ------------- |
-| adw-dashboard | `.`  | `yarn dev`  | `PORT`        | 3000         | `/`, `/projects`, then `/projects/SBub/issebya-homes-ai-system` | yes           |
+| name          | path | dev command | port variable | default port | health URL                                                                       | ADW may start |
+| ------------- | ---- | ----------- | ------------- | ------------ | -------------------------------------------------------------------------------- | ------------- |
+| adw-dashboard | `.`  | `yarn dev`  | `PORT`        | 3000         | `/`, `/projects/log`, `/projects`, then `/projects/SBub/issebya-homes-ai-system` | yes           |
 
 - `yarn dev` is exactly `next dev`; it takes its port from `PORT`, so nothing passes `--port`.
-- `/` (the summary) answering 200 proves the server is up and can reach Supabase (its report is
-  read from the database at request time). `/projects` answering 200 proves the sidebar's prefetch
+- `/` (the static intro page) answering 200 proves the server is up. `/projects/log` (the summary)
+  answering 200 proves it can reach Supabase (its report is read from the database at request
+  time). `/projects` answering 200 proves the sidebar's prefetch
   path. A 500 means the data layer threw, almost always a missing `.env.local`.
 - The project page is the second compile and the natural second check. A 404 there is not a server
   fault: that slug is not among the public projects the publishable key can see; use the first
@@ -45,7 +50,13 @@ From the worktree root, in order. The main checkout is two directories up from `
    two public Supabase values, `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.
    `.env.local` is the one the build reads: `next build` runs with `NODE_ENV=production` and never
    reads `.env.development`, and `getSupabase()` throws when either variable is missing. Never copy
-   `.env.example`; never invent a value for a missing file, report it.
+   `.env.example`; never invent a value for a missing file, report it. Either file may also carry
+   the four `/hire` form variables (`NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`,
+   `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, see `.env.example`). They are optional for `yarn build`:
+   the page builds with an empty site key and the action answers `?error=send` when unconfigured.
+   `SITE_URL` (the public address for Open Graph and canonical URLs, see `.env.example`) is
+   optional too: unset, metadata URLs fall back to the Vercel production domain or
+   `http://localhost:3000`.
 2. `yarn install --immutable` (`postinstall` runs `lefthook install`). An install that would change
    `yarn.lock` is a finding, not something to paper over with a mutable install.
 3. Verify with `yarn build` (see Build). A build, not a typecheck: only a build loads `.env.local`
@@ -80,7 +91,9 @@ E2E code suite: `none` (no `@playwright/test` specs). `e2e/*.md` holds agent-dri
 `e2e/test_row_full_title_top_align.md`, `e2e/test_single_background_color.md`,
 `e2e/test_projects_skeleton_fallbacks.md`, `e2e/test_sticky_header.md`,
 `e2e/test_run_row_phase_label.md`, `e2e/test_history_card_fields.md`,
-`e2e/test_history_page_turn.md` and `e2e/test_worker_status_widget.md`) that the test
+`e2e/test_history_page_turn.md`, `e2e/test_worker_status_widget.md`, `e2e/test_hire_page.md`,
+`e2e/test_home_page.md`, `e2e/test_writing.md`, `e2e/test_daily_log_sidebar.md` and
+`e2e/test_changelog.md`) that the test
 phase runs through the Playwright MCP server.
 
 lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every commit and
@@ -104,6 +117,8 @@ lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every c
 - Never kill a process this run did not start; never change a port through `package.json`,
   `.ports.env` or any committed file.
 - Never stage `next-env.d.ts`, `.ports.env`, `.env*` (except `.env.example`), `agents/` or `trees/`.
+- Never submit the `/hire` form with valid input against a server running with real Resend and
+  Turnstile keys: it emails `hire@issebya.com`. Never commit the real values of those keys.
 - No em-dashes in any file. Use commas, periods, colons or parentheses.
 - Every "do not" in `AGENTS.md` and in the Rules of the feature docs under `app_docs/` is an
   invariant: no clock read outside the cached boundary, one data
@@ -131,18 +146,32 @@ lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every c
 
 ## Review
 
-- Open at `http://localhost:$PORT`: `/` (the summary: heading, intro, note, the today card with a
-  Refresh button above the past day cards with their work-by-class, tokens-by-model and cost-by-phase chart cards, per-project tables; no sidebar, no pill), `/projects` (project sidebar, with the worker status widget at its bottom, plus every active run
-  grouped by project under an `Active` heading, or "No runs in progress." when none) and `/projects/SBub/issebya-homes-ai-system` (header, Active section, Queue
-  section, History section), or the first project the sidebar lists if that slug is 404. Capture each at desktop 1920x1080 and mobile
+- Open at `http://localhost:$PORT`: `/` (the intro page: heading, the Remote, Lisbon line, intro with its issebya.com link,
+  two door cards into `/hire?offer=...`; no sidebar, no pill),
+  `/projects/log` (the summary: the sidebar with Daily log current, the pill and the worker widget, then heading, intro, note, the today card with a
+  Refresh button above the past day cards with their What I worked on, Tokens by model and What each step cost chart cards, per-project tables), `/projects` (project sidebar, with the Daily log entry and the worker status widget at its bottom, plus every active run
+  grouped by project under a `Building now` heading, or "No runs in progress." when none) and `/projects/SBub/issebya-homes-ai-system` (header, Building now, Up next and
+  Shipped sections), or the first project the sidebar lists if that slug is 404, and
+  `/hire` (heading, the Remote, Lisbon line, LinkedIn link, the form with the offer select, the Turnstile widget, the
+  fuchsia Send button; no sidebar, no pill), `/writing` (heading, intro, the first post with its
+  audience tag; no sidebar, no pill) and `/writing/my-moat` (title, date, tag, body ending with
+  its Watch me build live link to `/projects`), `/projects/changelog` (the sidebar with Changelog current below Daily log, heading,
+  intro, entries newest first with date, title, stats strip and counts) and one entry such as
+  `/projects/changelog/2026-10-09-pr163` (date, title, the stats strip with the PR link, diff,
+  commits, files and comments, the description, the Features, Fixes and Chores lists). The fuchsia Work with me button is in the header on every
+  route. Capture each at desktop 1920x1080 and mobile
   375x667, full page, into `agents/<adw_id>/<agent_name>/review_img/` in the worktree.
-- The sidebar's connection indicator (dashboard routes only; `/` has none) moves from `connecting` to `live` once the Realtime channel
+- The sidebar's connection indicator (dashboard routes only; `/`, `/writing` and `/hire` have none) moves from `connecting` to `live` once the Realtime channel
   joins; wait for `live` in a `browser_snapshot` before judging live data, and do not report
   `connecting` as a defect unless the spec is about the indicator.
-- The sidebar's worker widget reads "Worker status..." until its first read and "Worker offline"
+- The sidebar's worker widget reads "Checking status..." until its first read and "Offline"
   whenever the queue worker is not running on the operator's machine. Neither is a defect unless
   the spec is about the widget.
+- The `sendHireRequest` action has no rendered surface beyond the `/hire?sent=1` and
+  `/hire?error=<code>` states, which open directly by URL; never submit a valid form to reach them.
 - A route handler (`src/app/api/revalidate`), a server action, a reducer or a helper has no rendered
   surface: no visual review, evidence is the diff, the tests and the spec's commands.
-- Browser automation is the Playwright MCP server in `.mcp.json`, configured by
-  `playwright-mcp-config.json` (headless chromium, 1920x1080).
+- Browser automation is the Playwright MCP server in `.mcp.json`: the devDependency
+  `@playwright/mcp`, pinned to exactly `0.0.81`, run from `node_modules` through
+  `yarn playwright-mcp` (no `yarn dlx`), configured by `playwright-mcp-config.json` (headless
+  chromium, 1920x1080). An upgrade is a change to that pin in `package.json`.

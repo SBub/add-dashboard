@@ -1,0 +1,14 @@
+export const meta = {
+  date: "2026-10-06",
+  pr: 79,
+  title: "Summary charts taken back",
+  kind: "revert",
+  counts: { features: 0, fixes: 0, chores: 0 },
+  stats: { additions: 403, deletions: 2867, commits: 1, files: 25, comments: 1 },
+};
+
+I took the summary charts back out of production. They were queued and shipped without being asked for, so the Summary page is back to how it was before them.
+
+## Reverted
+
+- The per-run and daily charts on the Summary page ([#66](https://github.com/SBub/adw-dashboard/issues/66), [PR #75](https://github.com/SBub/adw-dashboard/pull/75))

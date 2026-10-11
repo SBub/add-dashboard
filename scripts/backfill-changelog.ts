@@ -1,7 +1,9 @@
 // One-off generator of the changelog: one MDX entry per merged pull request
 // into master, listing the develop pull requests that first reached master
-// with it, plus the registry. Reads gh and git; the site build never runs it.
-// Refuses to overwrite an existing entry.
+// with it, with the production pull request's stats from the GitHub API, plus
+// the registry. Reads gh and git; the site build never runs it. Refuses to
+// overwrite an existing entry. What it writes is a draft: the owner rewrites
+// the title and the lines and writes the description from the diff.
 //
 //   git fetch origin master develop
 //   node scripts/backfill-changelog.ts
@@ -10,13 +12,15 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, writeFileSync } from "node:fs";
 import {
+  type ChangelogStats,
   type EntryInput,
+  REPO,
   countsOf,
   entryId,
   groupPullRequests,
-  openingParagraph,
   parsePrTitle,
   parseRevert,
+  pullStats,
   renderEntryMdx,
   renderRegistry,
   utcDate,
@@ -27,7 +31,6 @@ const DIR = "src/content/changelog";
 interface ProductionPr {
   number: number;
   title: string;
-  body: string | null;
   mergedAt: string;
   mergeCommit: { oid: string } | null;
 }
@@ -65,7 +68,7 @@ const production = JSON.parse(
     "--limit",
     "200",
     "--json",
-    "number,title,body,mergedAt,mergeCommit",
+    "number,title,mergedAt,mergeCommit",
   ]),
 ) as ProductionPr[];
 
@@ -107,12 +110,24 @@ for (const pr of production) {
     );
 }
 
+for (const pr of production) {
+  const id = entryId(utcDate(pr.mergedAt), pr.number);
+  // eslint-disable-next-line security/detect-non-literal-fs-filename -- one-off offline script; paths are src/content/changelog/<validated id>.mdx
+  if (existsSync(`${DIR}/${id}.mdx`))
+    fail(`${DIR}/${id}.mdx already exists; refusing to overwrite`);
+}
+
+// Additions, deletions, commits, changed files and comments, read once here;
+// the site never calls GitHub.
+function statsOf(n: number): ChangelogStats {
+  return pullStats(JSON.parse(gh(["api", `repos/${REPO}/pulls/${n}`])));
+}
+
 const entries: { id: string; input: EntryInput }[] = production.map((pr) => {
   const oid = pr.mergeCommit!.oid;
   const date = utcDate(pr.mergedAt);
   const { prefix, text: title } = parsePrTitle(pr.title);
-  const opening = openingParagraph(pr.body);
-  const base = { date, pr: pr.number, title, opening };
+  const base = { date, pr: pr.number, title, stats: statsOf(pr.number) };
   if (prefix === "revert") {
     return {
       id: entryId(date, pr.number),
@@ -129,12 +144,6 @@ const entries: { id: string; input: EntryInput }[] = production.map((pr) => {
     input: { ...base, kind: "release", groups: groupPullRequests(shipped) },
   };
 });
-
-for (const { id } of entries) {
-  // eslint-disable-next-line security/detect-non-literal-fs-filename -- one-off offline script; paths are src/content/changelog/<validated id>.mdx
-  if (existsSync(`${DIR}/${id}.mdx`))
-    fail(`${DIR}/${id}.mdx already exists; refusing to overwrite`);
-}
 
 const rendered = entries.map(({ id, input }) => ({ id, input, text: renderEntryMdx(input) }));
 for (const { id, text } of rendered) {

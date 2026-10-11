@@ -1,10 +1,9 @@
 import { describe, expect, it } from "vitest";
 import {
   countsOf,
-  escapeMdxProse,
   escapeMdxText,
   groupPullRequests,
-  openingParagraph,
+  pullStats,
   parsePrTitle,
   parseRevert,
   renderEntryMdx,
@@ -71,35 +70,36 @@ describe("utcDate", () => {
   });
 });
 
-const BODY_163 = [
-  "Promotes `develop` to production (`master`): 85 commits, 20 merged PRs (#121 to #162).",
-  "",
-  "Production is currently broken: the migration that dropped `adw.daily_summary.halted` is applied.",
-  "",
-  "## Features",
-  "- Worker status widget in the sidebar (#158, PR #162)",
-].join("\r\n");
+const STATS = { additions: 365, deletions: 52, commits: 3, files: 20, comments: 26 };
 
-describe("openingParagraph", () => {
-  it("keeps the prose before the first heading", () => {
-    const opening = openingParagraph(BODY_163);
-    expect(opening).toContain("halted");
-    expect(opening).toContain("85 commits");
-    expect(opening).not.toContain("## Features");
-    expect(opening).not.toContain("\r");
+describe("pullStats", () => {
+  it("reads the counts of gh api pulls/<N>, comments plus review comments", () => {
+    expect(
+      pullStats({
+        number: 163,
+        additions: 365,
+        deletions: 52,
+        commits: 3,
+        changed_files: 20,
+        comments: 20,
+        review_comments: 6,
+      }),
+    ).toEqual(STATS);
   });
 
-  it("stops at a list item or a PR line, and is null when there is no prose", () => {
-    expect(openingParagraph("Intro.\n\n- PR #1 x")).toBe("Intro.");
-    expect(openingParagraph("Intro.\n\nPR #94 chore: x")).toBe("Intro.");
-    expect(openingParagraph("Intro.\n1. one")).toBe("Intro.");
-    expect(openingParagraph("- only a list")).toBeNull();
-    expect(openingParagraph("")).toBeNull();
-    expect(openingParagraph(null)).toBeNull();
-  });
-
-  it("keeps a body that is all prose", () => {
-    expect(openingParagraph("One.\n\nTwo.\n")).toBe("One.\n\nTwo.");
+  it("throws on a missing, negative or non-integer count", () => {
+    const pull = {
+      additions: 1,
+      deletions: 1,
+      commits: 1,
+      changed_files: 1,
+      comments: 0,
+      review_comments: 0,
+    };
+    expect(() => pullStats({ ...pull, review_comments: undefined })).toThrow(/review_comments/);
+    expect(() => pullStats({ ...pull, additions: -1 })).toThrow(/additions/);
+    expect(() => pullStats({ ...pull, commits: 1.5 })).toThrow(/commits/);
+    expect(() => pullStats(null)).toThrow(/additions/);
   });
 });
 
@@ -125,11 +125,6 @@ describe("escaping", () => {
   it("escapes every MDX special character in a line of text", () => {
     expect(escapeMdxText("a\\b{c}d<e>f[g]h*i_j")).toBe("a\\\\b\\{c\\}d\\<e\\>f\\[g\\]h\\*i\\_j");
   });
-
-  it("escapes only braces and < in prose, and stops on an em-dash", () => {
-    expect(escapeMdxProse("`code` [link](/x) {a} <b>")).toBe("`code` [link](/x) \\{a\\} \\<b>");
-    expect(() => escapeMdxProse("a \u2014 b")).toThrow(/em-dash/);
-  });
 });
 
 describe("renderEntryMdx", () => {
@@ -144,7 +139,7 @@ describe("renderEntryMdx", () => {
       pr: 163,
       title: "promote develop to master",
       kind: "release",
-      opening: openingParagraph(BODY_163),
+      stats: STATS,
       groups,
     });
     const fixesAt = mdx.indexOf("## Fixes");
@@ -152,7 +147,10 @@ describe("renderEntryMdx", () => {
       fixesAt,
     );
     expect(mdx.indexOf("[PR #161]")).toBeGreaterThan(fixesAt);
-    expect(mdx.indexOf("halted")).toBeLessThan(mdx.indexOf("## Features"));
+    expect(mdx).toContain(
+      "stats: { additions: 365, deletions: 52, commits: 3, files: 20, comments: 26 }",
+    );
+    expect(mdx.indexOf("stats:")).toBeLessThan(mdx.indexOf("## Features"));
     expect(mdx).toContain("finished\\_at");
     expect(mdx).toContain("counts: { features: 1, fixes: 1, chores: 1 }");
     expect(mdx.endsWith("\n")).toBe(true);
@@ -164,7 +162,7 @@ describe("renderEntryMdx", () => {
       pr: 79,
       title: "summary charts (#66, PR #75) on master",
       kind: "revert",
-      opening: null,
+      stats: STATS,
       reverted: parseRevert("revert: summary charts (#66, PR #75) on master"),
     });
     expect(mdx).toContain('kind: "revert"');
@@ -189,7 +187,7 @@ describe("renderEntryMdx", () => {
       pr: 16,
       title: "t",
       kind: "release",
-      opening: null,
+      stats: STATS,
       groups,
     });
     expect(mdx).toContain("/projects/\\[owner\\]/\\[repo\\]");
@@ -204,11 +202,24 @@ describe("renderEntryMdx", () => {
       pr: 1,
       title: "t",
       kind: "release",
-      opening: null,
+      stats: STATS,
       groups,
     });
     expect(mdx).toContain(SYNC_LINE);
     expect(mdx).not.toContain("##");
+  });
+
+  it("stops on an em-dash rather than rewriting the text", () => {
+    expect(() =>
+      renderEntryMdx({
+        date: "2026-10-05",
+        pr: 1,
+        title: "a \u2014 b",
+        kind: "release",
+        stats: STATS,
+        groups: groupPullRequests([]),
+      }),
+    ).toThrow(/em-dash/);
   });
 
   it("serialises a title with quotes safely", () => {
@@ -217,7 +228,7 @@ describe("renderEntryMdx", () => {
       pr: 1,
       title: 'say "hi"',
       kind: "release",
-      opening: null,
+      stats: STATS,
       groups: groupPullRequests([]),
     });
     expect(mdx).toContain('title: "say \\"hi\\""');

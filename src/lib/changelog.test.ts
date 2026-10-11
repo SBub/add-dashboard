@@ -9,13 +9,14 @@ import {
 const VALID = {
   date: "2026-10-09",
   pr: 163,
-  title: "promote develop to master",
+  title: "Run costs in history, worker status, cost by phase",
   kind: "release",
   counts: { features: 5, fixes: 5, chores: 10 },
+  stats: { additions: 10914, deletions: 2508, commits: 85, files: 108, comments: 1 },
 };
 
 describe("parseChangelogMeta", () => {
-  it("parses a valid meta to exactly its five fields", () => {
+  it("parses a valid meta to exactly its six fields", () => {
     expect(parseChangelogMeta("2026-10-09-pr163", { ...VALID, extra: 1 })).toEqual(VALID);
   });
 
@@ -36,6 +37,38 @@ describe("parseChangelogMeta", () => {
     ];
     for (const [raw, field] of cases) {
       expect(() => parseChangelogMeta(id, raw)).toThrow(`Changelog entry "${id}": ${field} `);
+    }
+  });
+
+  it("accepts zero stats", () => {
+    const stats = { additions: 0, deletions: 0, commits: 0, files: 0, comments: 0 };
+    expect(parseChangelogMeta("2026-10-09-pr163", { ...VALID, stats }).stats).toEqual(stats);
+  });
+
+  it("drops extra fields inside stats", () => {
+    const stats = { ...VALID.stats, reviewers: 2 };
+    expect(parseChangelogMeta("2026-10-09-pr163", { ...VALID, stats }).stats).toEqual(VALID.stats);
+  });
+
+  it("throws on missing, negative or non-integer stats", () => {
+    const id = "2026-10-09-pr163";
+    const without = (o: object, key: string) =>
+      Object.fromEntries(Object.entries(o).filter(([k]) => k !== key));
+    const withoutStats = without(VALID, "stats");
+    const withoutComments = without(VALID.stats, "comments");
+    const cases: [unknown, string][] = [
+      [withoutStats, "stats must be an object"],
+      [{ ...VALID, stats: null }, "stats must be an object"],
+      [{ ...VALID, stats: [1, 2, 3, 4, 5] }, "stats must be an object"],
+      [{ ...VALID, stats: withoutComments }, "stats comments must be"],
+      [{ ...VALID, stats: { ...VALID.stats, additions: -1 } }, "stats additions must be"],
+      [{ ...VALID, stats: { ...VALID.stats, deletions: -52 } }, "stats deletions must be"],
+      [{ ...VALID, stats: { ...VALID.stats, commits: 2.5 } }, "stats commits must be"],
+      [{ ...VALID, stats: { ...VALID.stats, files: "20" } }, "stats files must be"],
+      [{ ...VALID, stats: { ...VALID.stats, comments: Number.NaN } }, "stats comments must be"],
+    ];
+    for (const [raw, message] of cases) {
+      expect(() => parseChangelogMeta(id, raw)).toThrow(`Changelog entry "${id}": ${message}`);
     }
   });
 

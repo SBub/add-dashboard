@@ -1,25 +1,22 @@
 export const meta = {
   date: "2026-10-03",
   pr: 8,
-  title: "promote develop to master",
+  title: "Live runs per project, history rendered on the server",
   kind: "release",
   counts: { features: 5, fixes: 0, chores: 1 },
+  stats: { additions: 2874, deletions: 668, commits: 18, files: 36, comments: 1 },
 };
 
-First production release of the ADW dashboard.
-
-Includes everything merged into develop so far: projects sidebar and per-project runs prefetched on the server and hydrated, database reads with the publishable key, Realtime for projects and runs with live sidebar counts and catch-up on subscribe, server-rendered completed history as a request-time hole with revalidation from the browser and from the database webhook, the connection indicator, and the Yarn 4.18.1 and corepack fixes for the Vercel build.
-
-Production tracks master on Vercel at https://adw-dashboard.vercel.app. The database webhook in the toolkit already points at that host and becomes effective with this deployment.
+The first production release. A project page reads its runs from the database, updates live as runs start and finish, and moves finished runs into a History section rendered on the server.
 
 ## Features
 
-- prefetch and hydrate a project's runs, one file for query keys ([PR #1](https://github.com/SBub/adw-dashboard/pull/1))
-- read a project's runs from the database and derive run labels from a client clock ([PR #2](https://github.com/SBub/adw-dashboard/pull/2))
-- realtime runs listener, live sidebar counts and catch-up on subscribe ([PR #4](https://github.com/SBub/adw-dashboard/pull/4))
-- server-render completed runs as history, keep running and failed live ([PR #6](https://github.com/SBub/adw-dashboard/pull/6))
-- revalidate a project's history from a database webhook ([PR #7](https://github.com/SBub/adw-dashboard/pull/7))
+- Project pages load their runs on the server and show them on first paint, with no second request from the browser ([PR #1](https://github.com/SBub/adw-dashboard/pull/1))
+- Runs come from the database instead of sample data ([PR #2](https://github.com/SBub/adw-dashboard/pull/2))
+- Runs update live: new and finished runs appear without a reload, and the sidebar counts follow them ([PR #4](https://github.com/SBub/adw-dashboard/pull/4))
+- Completed runs move into a History section rendered on the server; running and failed runs stay live above it ([PR #6](https://github.com/SBub/adw-dashboard/pull/6))
+- History refreshes when a run completes, even if nobody has the page open, through a database webhook ([PR #7](https://github.com/SBub/adw-dashboard/pull/7))
 
 ## Chores
 
-- remove the clock-dependent run labels pending issue #3 ([PR #5](https://github.com/SBub/adw-dashboard/pull/5))
+- Removed the "updated X ago" label, the stale badge and the running timer until they can be shown without a ticking clock ([PR #5](https://github.com/SBub/adw-dashboard/pull/5))

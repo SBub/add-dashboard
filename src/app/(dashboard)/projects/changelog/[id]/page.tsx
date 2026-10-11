@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ChangelogStats } from "@/components/ChangelogStats";
 import { getChangelog, getChangelogEntry } from "@/lib/changelog";
-import { pullUrl } from "@/lib/changelog-backfill";
 import { formatDay } from "@/lib/format-date";
 
 interface ChangelogEntryPageProps {
@@ -25,7 +25,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: ChangelogEntryPageProps): Promise<Metadata> {
   const entry = await getChangelogEntry((await params).id);
   if (!entry) return {};
-  return { title: `Changelog: ${entry.meta.title} (${entry.meta.date})` };
+  return { title: `Changelog: ${entry.meta.title} (${formatDay(entry.meta.date)})` };
 }
 
 export default async function ChangelogEntryPage({ params }: ChangelogEntryPageProps) {
@@ -38,11 +38,7 @@ export default async function ChangelogEntryPage({ params }: ChangelogEntryPageP
         <time dateTime={meta.date}>{formatDay(meta.date)}</time>
       </p>
       <h1 className="mt-1 text-2xl font-semibold tracking-tight">{meta.title}</h1>
-      <p className="mt-2 text-sm text-neutral-600 dark:text-neutral-400">
-        <a href={pullUrl(meta.pr)} className={TEXT_LINK}>
-          Production pull request #{meta.pr}
-        </a>
-      </p>
+      <ChangelogStats pr={meta.pr} stats={meta.stats} className="mt-3" />
       <Content />
       <p className="mt-10 border-t border-neutral-200 pt-6 text-sm dark:border-neutral-800">
         <Link href="/projects/changelog" className={TEXT_LINK}>

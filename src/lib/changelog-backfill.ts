@@ -17,6 +17,27 @@ export interface ChangelogCounts {
   chores: number;
 }
 
+/**
+ * A production pull request's size as GitHub reports it at generation time:
+ * lines added and removed, commits, changed files, and conversation plus
+ * review comments.
+ */
+export interface ChangelogStats {
+  additions: number;
+  deletions: number;
+  commits: number;
+  files: number;
+  comments: number;
+}
+
+export const CHANGELOG_STAT_FIELDS: readonly (keyof ChangelogStats)[] = [
+  "additions",
+  "deletions",
+  "commits",
+  "files",
+  "comments",
+];
+
 export interface ChangelogLine {
   text: string;
   issue: number | null;
@@ -25,7 +46,8 @@ export interface ChangelogLine {
 
 export type ChangelogGroups = Record<ChangelogSection, ChangelogLine[]>;
 
-const REPO_URL = "https://github.com/SBub/adw-dashboard";
+export const REPO = "SBub/adw-dashboard";
+const REPO_URL = `https://github.com/${REPO}`;
 
 function issueUrl(n: number): string {
   return `${REPO_URL}/issues/${n}`;
@@ -89,24 +111,6 @@ export function utcDate(iso: string): string {
   return iso.slice(0, 10);
 }
 
-// A line that starts a heading or a list: a markdown list item, or the
-// "PR #N ..." lines several promotion bodies list their pull requests with.
-function startsListOrHeading(line: string): boolean {
-  return /^(#|[-*] |\d+\. |PR #\d+)/.test(line.trimStart());
-}
-
-/**
- * The prose a promotion pull request opens with: its leading lines up to the
- * first heading or list line, trimmed. Null when there is none.
- */
-export function openingParagraph(body: string | null): string | null {
-  if (body === null) return null;
-  const lines = body.replace(/\r\n/g, "\n").split("\n");
-  const end = lines.findIndex(startsListOrHeading);
-  const opening = (end === -1 ? lines : lines.slice(0, end)).join("\n").trim();
-  return opening === "" ? null : opening;
-}
-
 /**
  * What a revert pushed straight to master reverted, from a title such as
  * `revert: <text> (#66, PR #75) on master`.
@@ -134,13 +138,29 @@ export function escapeMdxText(s: string): string {
   return s.replace(/[\\{}<>[\]*_]/g, (c) => `\\${c}`);
 }
 
+function isStat(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0;
+}
+
 /**
- * Verbatim prose: keeps its own markdown, escapes only what MDX would read as
- * JSX or an expression. Stops on an em-dash rather than rewriting public text.
+ * The stats of one pull request from the JSON of
+ * `gh api repos/<owner>/<repo>/pulls/<N>`: comments are the conversation
+ * comments plus the review comments. Throws on a missing or bad field.
  */
-export function escapeMdxProse(s: string): string {
-  if (s.includes("\u2014")) throw new Error("Text contains an em-dash; edit it by hand first");
-  return s.replace(/[{}<]/g, (c) => `\\${c}`);
+export function pullStats(raw: unknown): ChangelogStats {
+  const pull = (typeof raw === "object" && raw !== null ? raw : {}) as Record<string, unknown>;
+  const read = (field: string): number => {
+    const value = pull[field];
+    if (!isStat(value)) throw new Error(`Pull request JSON: ${field} is not a count`);
+    return value;
+  };
+  return {
+    additions: read("additions"),
+    deletions: read("deletions"),
+    commits: read("commits"),
+    files: read("changed_files"),
+    comments: read("comments") + read("review_comments"),
+  };
 }
 
 /** Develop pull requests under their section, each ordered by number. */
@@ -173,7 +193,7 @@ interface EntryBase {
   date: string;
   pr: number;
   title: string;
-  opening: string | null;
+  stats: ChangelogStats;
 }
 
 export type EntryInput =
@@ -191,7 +211,12 @@ const SECTION_HEADINGS: Record<ChangelogSection, string> = {
 
 export const SYNC_LINE = "No new pull requests; branch sync.";
 
-/** The full text of one entry's `.mdx` file. */
+/**
+ * The full text of one entry's `.mdx` file: a draft. The title and the lines
+ * come from the pull request titles and there is no opening paragraph; the
+ * owner rewrites the title and the lines and writes the description from the
+ * diff before committing. Stops on an em-dash rather than rewriting text.
+ */
 export function renderEntryMdx(input: EntryInput): string {
   const counts: ChangelogCounts =
     input.kind === "release" ? countsOf(input.groups) : { features: 0, fixes: 0, chores: 0 };
@@ -201,9 +226,9 @@ export function renderEntryMdx(input: EntryInput): string {
     `  title: ${JSON.stringify(input.title)},`,
     `  kind: ${JSON.stringify(input.kind)},`,
     `  counts: { features: ${counts.features}, fixes: ${counts.fixes}, chores: ${counts.chores} },`,
+    `  stats: { ${CHANGELOG_STAT_FIELDS.map((f) => `${f}: ${input.stats[f]}`).join(", ")} },`,
   ];
   const blocks = [`export const meta = {\n${meta.join("\n")}\n};`];
-  if (input.opening !== null) blocks.push(escapeMdxProse(input.opening));
   if (input.kind === "release") {
     const sections = CHANGELOG_SECTIONS.filter((s) => input.groups[s].length > 0);
     if (sections.length === 0) blocks.push(SYNC_LINE);
@@ -219,7 +244,9 @@ export function renderEntryMdx(input: EntryInput): string {
     const suffix = links.length > 0 ? ` (${links.join(", ")})` : "";
     blocks.push(`## Reverted\n\n- ${escapeMdxText(text)}${suffix}`);
   }
-  return `${blocks.join("\n\n")}\n`;
+  const text = `${blocks.join("\n\n")}\n`;
+  if (text.includes("\u2014")) throw new Error("Entry contains an em-dash; edit the title first");
+  return text;
 }
 
 /** The full text of src/content/changelog/index.ts. */

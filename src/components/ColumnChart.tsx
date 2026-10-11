@@ -6,7 +6,7 @@ export interface ChartColumn {
   value: number;
   /** The value as text, inside the bar or just above a bar too short for it. */
   valueLabel: string;
-  /** The column's name, under the plot beside a colour dot. */
+  /** The column's name, under the plot, beside a colour dot when the chart has dots. */
   name: ReactNode;
   /** The column's accessible label, with its value. */
   ariaLabel: string;
@@ -27,6 +27,10 @@ interface ColumnChartProps {
   summary: string;
   /** Shown in place of the columns, in a box of the plot's height, when there are none. */
   empty?: ReactNode;
+  /** A dot of the bar's colour beside each name; off when every bar is the same gray. */
+  dots?: boolean;
+  /** Text colour of a value inside its bar, a full literal class string from src/lib/chart-colors.ts. */
+  valueClass?: string;
 }
 
 /** The guide lines, in percent of the plot height from its baseline. */
@@ -41,13 +45,14 @@ function idPart(value: string): string {
  * A chart card: a bordered figure with a title and a muted subtitle, then
  * CSS columns on a 180px plot (`h-45`) over faint dotted guide lines, each
  * scaled to the chart's own maximum (columnHeights), with rounded tops and
- * a capped width. The value sits inside the bar in white when
- * barValueInside says the bar holds it, otherwise just above the bar; the
- * name sits under the plot beside a dot of the bar's colour. Every column
+ * a capped width. The value sits inside the bar in `valueClass` (white by
+ * default) when barValueInside says the bar holds it, otherwise just above
+ * the bar; the name sits under the plot, beside a dot of the bar's colour
+ * when `dots` (the default). Every column
  * takes an equal grid slot of at most 80px (`minmax(0, 5rem)`), never sized
  * from its name; the bar is capped at 56px and centred in its slot, so
- * adjacent bars are equally spaced. A name wider than its slot wraps under
- * its dot and then inside the word, never widening the slot; five or more
+ * adjacent bars are equally spaced. A name wider than its slot wraps (under
+ * its dot when there is one) and then inside the word, never widening the slot; five or more
  * columns take a 4px gap, so the row fits a one-third card at 1024px and a
  * stacked card at 375px. A column with
  * `detail` is focusable and holds a CSS-only popover (group hover and
@@ -62,6 +67,8 @@ export function ColumnChart({
   columns,
   summary,
   empty,
+  dots = true,
+  valueClass = "text-white",
 }: ColumnChartProps) {
   const heights = columnHeights(columns.map((column) => column.value));
   const gap = columns.length >= 5 ? "gap-1" : "gap-2 sm:gap-4";
@@ -119,7 +126,7 @@ export function ColumnChart({
                       {inside && (
                         <span
                           data-value-placement="inside"
-                          className="text-xs font-semibold tabular-nums text-white"
+                          className={`text-xs font-semibold tabular-nums ${valueClass}`}
                         >
                           {column.valueLabel}
                         </span>
@@ -127,10 +134,12 @@ export function ColumnChart({
                     </span>
                   </span>
                   <span className="mt-2 flex w-full min-w-0 flex-wrap items-center justify-center gap-1 text-center text-xs">
-                    <span
-                      aria-hidden="true"
-                      className={`size-2 shrink-0 rounded-full ${column.colorClass}`}
-                    />
+                    {dots && (
+                      <span
+                        aria-hidden="true"
+                        className={`size-2 shrink-0 rounded-full ${column.colorClass}`}
+                      />
+                    )}
                     <span className="min-w-0 wrap-anywhere">{column.name}</span>
                   </span>
                   {column.detail && (

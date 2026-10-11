@@ -6,6 +6,7 @@
 - specs/issue-134-adw-b6fb710c-sdlc_planner-remove-halted-from-summary.md
 - specs/issue-169-adw-98e70d08-sdlc_planner-who-you-are-home-page.md
 - specs/issue-174-adw-d7f72f46-sdlc_planner-summary-chart-core-class-columns.md
+- specs/issue-175-adw-fe4916f8-sdlc_planner-gray-model-phase-charts.md
 
 ## Overview
 
@@ -34,10 +35,13 @@ per-project table's class bar, both in the same order), `Haiku`, `Sonnet`, `Opus
 and optional classes (`patch`, `other`) are omitted. The plot is 180px high with faint dotted guide lines and bars with
 rounded tops and a capped width; every column takes the same slot width
 whatever its name, so the bars are evenly spaced; the value (run count, token label or cost in
-dollars) sits in
-white inside its bar, or just above a bar too short for it (`barValueInside`).
-Under each bar is its name (the class without its slash, the short model
-name or the phase name) beside a dot of the bar's colour. Hovering or focusing
+dollars) sits inside its bar (white on the class colours; on the gray model
+and phase bars near-black in light mode and white in dark mode), or just above
+a bar too short for it (`barValueInside`). Under each bar is its name (the
+class without its slash, the short model name or the phase name). The class
+chart's names sit beside a dot of the bar's colour (the class hue, matching the
+badges); the model and phase bars are one neutral gray with no dot, the name
+alone identifying the column. Hovering or focusing
 a column shows a tooltip: the full model id, input, cache read, cache write,
 output and the day's cost for a model; input, cache read, cache write, output,
 the total time and the runs for a phase; the run count and the share of the
@@ -199,10 +203,14 @@ card; Refresh is the remedy. The page has no Realtime listener: it is outside
   (`SUMMARY_DEFAULT_DAYS` defined there and nowhere else), pure and tested in
   `src/lib/daily-summary.test.ts`; every change to it goes with a test case.
 - Charts are inline SVG or CSS columns with their values also as text; no
-  charting library. Class colours come only from `CLASS_FILL`/`CLASS_BG` and
-  model colours only from `MODEL_BG` and phase colours only from `PHASE_BG`
-  in `src/lib/chart-colors.ts`; class hues
-  match `IssueClassBadge`; completed and failed counts use `STATUS_COLORS`.
+  charting library. Class colours come only from `CLASS_FILL`/`CLASS_BG` in
+  `src/lib/chart-colors.ts` and match `IssueClassBadge`. Model and phase bars
+  come only from `MODEL_BG`/`PHASE_BG` there, which hold one neutral gray
+  (`bg-neutral-400 dark:bg-neutral-500`) for every key, with in-bar text from
+  `NEUTRAL_BAR_VALUE` (AA on that gray in both themes, pinned in
+  `src/lib/chart-colors.test.ts`). Never give a model or a phase its own hue,
+  and never drop the class chart's dots or change class hues here. Completed
+  and failed counts use `STATUS_COLORS`.
   The column geometry and labels (`classCounts`, `classColumns`, `columnHeights`,
   `barValueInside`, `classLabel`, `shareLabel`) live in
   `src/lib/daily-summary.ts`; each chart scales to its own maximum.
@@ -231,7 +239,7 @@ card; Refresh is the remedy. The page has no Realtime listener: it is outside
   (`repeat(n, minmax(0, 5rem))`, never sized from its content), and the bar
   is capped (`max-w-14`) and centred in it, so adjacent bars are equally
   spaced. A name never widens its slot and is never cut (no `truncate`): it
-  wraps under its dot and then inside the word (`wrap-anywhere`). A chart
+  wraps (under its dot in the class chart) and then inside the word (`wrap-anywhere`). A chart
   with five or more columns uses `gap-1` so
   the row fits a one-third card at `lg` and a stacked card at 375px; the plot box is 180px
   (`h-45`) and the value placement (inside the bar or above it) comes only

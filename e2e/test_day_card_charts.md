@@ -3,8 +3,10 @@
 Checks that every day card on the summary at `/watch` shows three separate chart cards directly under
 its header, "What I worked on", "Tokens by model" and "What each step cost", in one row on desktop
 and stacked on mobile; that classes, models and phases come in a fixed order; that a bar's value
-sits inside it in white (or just above a bar too short for it); that labels under the bars are text
-with a colour dot; that the tooltips show the token split with cost, the phase usage with time and
+sits inside it (white on class bars, AA contrast text on the gray model and phase bars) or just
+above a bar too short for it; that class labels carry a colour dot while model and phase labels are
+text only, the model and phase bars a neutral gray; that status badges and the Work with me button
+keep their colours; that the tooltips show the token split with cost, the phase usage with time and
 runs, and the class count with its share; and that the per-project table keeps its compact class bars.
 
 ## User Story
@@ -41,10 +43,13 @@ which column
 6. **Verify** the phase figure's labels are a subsequence of `Plan`, `Build`, `Test`, `Review`,
    `Docs` in that order, never `CI`, never `Document`, and each column's value text matches
    `^(\$\d+\.\d{2}|<\$0\.01)$`; or the figure says `No per-phase usage published.`
-7. **Verify** the tallest bar of any chart has its value inside: a
+7. **Verify** the tallest bar of the class figure has its value inside: a
    `[data-value-placement="inside"]` element inside the bar whose computed `color` is
-   `rgb(255, 255, 255)`; and any `[data-value-placement="above"]` element sits outside its bar
-   (not a descendant of the coloured bar).
+   `rgb(255, 255, 255)`. For the model and phase figures, **Verify** with `browser_evaluate` that
+   every bar's computed `background-color` is a neutral gray (equal R, G and B), and that any
+   inside value's computed `color` has equal R, G and B and differs from its bar (near black, about
+   `rgb(10, 10, 10)`, in the light scheme; `rgb(255, 255, 255)` in the dark scheme). **Verify** any
+   `[data-value-placement="above"]` element sits outside its bar (not a descendant of the bar).
 8. **Verify** with `browser_evaluate`, for each of the three figures of the card that has two or
    more columns, that the bars (each `li`'s coloured bar, the element with an inline `height` style
    inside the plot) all have the same `getBoundingClientRect().width` within 1px, and that the
@@ -58,14 +63,24 @@ which column
    Tab and **Verify** in both cases the tooltip shows `Input`, `Cache read`, `Cache write`,
    `Output`, `Time` and `Runs`. Hover a class column and **Verify** the tooltip shows `Runs` and
    `Share` with a `%` value.
-10. **Verify** each label under a bar is text with a colour dot (no `img` or `svg` in the label
-    row) and is shown in full (with `browser_evaluate`, its `scrollWidth <= clientWidth`).
-11. **Verify** the per-project table below still has its compact class bars (an `svg` with an
+10. **Verify** with `browser_evaluate` that each class figure label row (`li > span.mt-2`) has one
+    `[aria-hidden="true"]` dot whose computed `background-color` is not gray (R, G, B not all
+    equal) for `feature` and `bug`; that model and phase figure label rows contain no
+    `[aria-hidden="true"]` element; that no label row has an `img` or `svg`; and that every label is
+    shown in full (its `scrollWidth <= clientWidth`).
+11. **Verify** with `browser_evaluate` that a status count on the day card header (a completed or
+    failed count) keeps its status colour (computed `color` not gray), and that the header's
+    `Work with me` link keeps its fuchsia background (computed `background-color` not gray).
+12. **Verify** the per-project table below still has its compact class bars (an `svg` with an
     `aria-label` starting `Issue classes:` inside the table).
-12. **Verify** the server-rendered HTML (`browser_evaluate` `fetch("/watch").then((r) => r.text())`)
+13. **Verify** the server-rendered HTML (`browser_evaluate` `fetch("/watch").then((r) => r.text())`)
     contains `What I worked on`, `Tokens by model` and `What each step cost`.
-13. Take a screenshot at 1920x1080.
-14. Resize to 1024x768 and **Verify** the three cards still share one row (the same `top`) with no
+14. Take a screenshot at 1920x1080 in both colour schemes: with `browser_run_code_unsafe`, run
+    `page.emulateMedia({ colorScheme: "light" })`, screenshot, then
+    `page.emulateMedia({ colorScheme: "dark" })`, screenshot. Both show gray model and phase bars
+    without dots and the class chart with its hues and dots. Repeat the step 7 colour checks in the
+    dark scheme, then go back to `light` for the remaining steps.
+15. Resize to 1024x768 and **Verify** the three cards still share one row (the same `top`) with no
     horizontal page overflow (`document.documentElement.scrollWidth <= window.innerWidth`).
     **Verify** with `browser_evaluate` that the `What each step cost` figure's `ul` and every one of
     its `li`s and name rows (`li > span.mt-2`) lie inside the figure's content box (the figure's
@@ -73,13 +88,13 @@ which column
     each `right <=` the content right, 0.5px tolerance), and that no two name rows overlap (each
     one's `right <=` the next one's `left`). **Verify** the same bar width and centre-distance check
     as in step 8 for every figure with two or more columns. Take a screenshot at 1024x768.
-15. Resize to 375x667 and **Verify** the three cards are stacked (each figure's `top` is at or
+16. Resize to 375x667 and **Verify** the three cards are stacked (each figure's `top` is at or
     below the previous figure's `bottom`) with no horizontal page overflow
     (`document.documentElement.scrollWidth <= window.innerWidth`). **Verify** the same
-    `What each step cost` containment and no-overlap check as in step 14, and the same bar width and
+    `What each step cost` containment and no-overlap check as in step 15, and the same bar width and
     centre-distance check as in step 8 for every figure with two or more columns. When the phase
     figure has `Docs`, **Verify** the same one-line `Docs` name row check as in step 8.
-16. Take a screenshot at 375x667. The colour scheme follows the OS; note which one the screenshots
+17. Take a screenshot at 375x667. The colour scheme follows the OS; note which one the screenshots
     show, no toggle is needed.
 
 ## Success Criteria
@@ -93,8 +108,10 @@ which column
   Review, Docs (never CI, never Document); absent models, phases and optional classes are omitted.
 - The `Docs` phase label sits on one line, like `Plan`, at 1920 and at 375 wide.
 - Phase values are dollar amounts with two decimals (or `<$0.01`).
-- The tallest bar shows its value in white inside it; a short bar shows it above.
-- Labels under the bars are text with a colour dot, shown in full.
+- The tallest class bar shows its value in white inside it; model and phase bars show an inside
+  value in AA contrast text (near black in light, white in dark); a short bar shows it above.
+- Model and phase bars are gray without label dots in both schemes; class bars keep their colours
+  and dots; the status badge and Work with me button keep their colours. Labels are shown in full.
 - The bars in each chart have equal widths and equally spaced centres (within 1px) at 1920, 1024
   and 375 wide, whatever the names under them.
 - Model tooltips show the token split and the cost; phase tooltips show the token split, the time
@@ -103,4 +120,4 @@ which column
   overlapping, at 1024px and at 375px.
 - The per-project table keeps its compact class bars.
 - All three charts are in the server HTML.
-- 3 screenshots are taken.
+- 4 screenshots are taken (1920x1080 light and dark, 1024x768, 375x667).

@@ -4,9 +4,9 @@ import { HeaderLink } from "@/components/HeaderLink";
 import { HIRE_ACCENT } from "@/lib/accent";
 
 // The header's four links: the brand (BrandLink, rendered by the root layout)
-// leads to the intro page at "/", this nav holds two sections, the summary at
-// /watch ("Watch me build", also current on the project overview and project
-// pages) and the blog at /writing ("Writing", also current on every post), and
+// leads to the intro page at "/", this nav holds two sections, the projects
+// overview at /projects ("Watch me build", also current on the daily log at
+// /projects/log and every project page) and the blog at /writing ("Writing", also current on every post), and
 // the Work with me button (HireLink, in the header's right group) leads to
 // /hire. All mark the current section
 // through HeaderLink, the one usePathname reader in the header. Each sits in a
@@ -27,13 +27,13 @@ export function SectionNav() {
     <nav aria-label="Sections" className="flex items-center gap-3 text-sm sm:gap-4">
       <Suspense
         fallback={
-          <Link href="/watch" className={`${SECTION_LINK} ${SECTION_LINK_INACTIVE}`}>
+          <Link href="/projects" className={`${SECTION_LINK} ${SECTION_LINK_INACTIVE}`}>
             Watch me build
           </Link>
         }
       >
         <HeaderLink
-          href="/watch"
+          href="/projects"
           section="watch"
           className={SECTION_LINK}
           activeClassName={SECTION_LINK_ACTIVE}

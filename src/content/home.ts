@@ -10,7 +10,7 @@ export const HOME_INTRO: string[] = [
   "[Placeholder] I build my own products in public, with ADW, an autonomous development workflow that turns a GitHub issue into a reviewed, merged pull request.",
 ];
 
-// Rendered followed by the "Watch me build" link to /watch.
+// Rendered followed by the "Watch me build" link to /projects.
 export const HOME_ADW_LINE =
   "[Placeholder] Every run ADW finishes lands in a public ledger: what it built, how long it took and what it cost.";
 

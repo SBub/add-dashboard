@@ -1,8 +1,9 @@
 # ADW Dashboard
 
 A public dashboard for runs of the AI Developer Workflow (ADW) toolkit across projects. `/` introduces the
-owner and leads to `/hire`. `/watch` is the summary of finished runs per UTC day across projects. `/writing` is the blog. `/projects` is a two-pane screen: a sidebar
-of projects and, for the selected project, its Active runs, its Queue and its History.
+owner and leads to `/hire`; its Watch me build link leads to `/projects`. `/writing` is the blog. `/projects` is a two-pane screen: a sidebar
+of projects and, for the selected project, its Active runs, its Queue and its History. The sidebar's Daily log entry opens
+`/projects/log`, the summary of finished runs per UTC day across projects.
 
 ## Documentation
 

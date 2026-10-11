@@ -20,7 +20,7 @@ The two-pane `/projects` screen (the sidebar in `src/app/(dashboard)/layout.tsx`
 
 A public dashboard for runs of the AI Developer Workflow (ADW) toolkit across
 projects. `/`, the landing page, is a static intro (see `app_docs/home.md`).
-`/watch` is the summary (full width, see `app_docs/summary.md`). `/projects` is a two-pane screen:
+`/projects` is a two-pane screen, shared by the overview, the daily log at `/projects/log` (the summary, see `app_docs/summary.md`) and every project page:
 
 - The left pane is a persistent sidebar listing every project with its
   queued, running, completed and failed counts and the time its last run started. It
@@ -30,8 +30,9 @@ projects. `/`, the landing page, is a static intro (see `app_docs/home.md`).
   is sticky: it sits `--header-height` + 1.5rem from the top, below the
   sticky root header, and it is a full-height column (its height subtracts the
   header height and both 1.5rem gaps): the project list scrolls inside it and
-  the worker status widget sits at its bottom, always visible. Below `md` the
-  widget follows the strip.
+  the Daily log entry (`DailyLogLink`, a link to `/projects/log` styled like a
+  project entry and current only there) and the worker status widget sit at
+  its bottom, always visible. Below `md` both follow the strip.
   The widget (`WorkerStatus`) shows whether the toolkit's queue worker is
   running: "Ready to build" (emerald dot) while the freshest heartbeat is under
   90 s old, "Offline" (rose ring) otherwise, each followed by "last
@@ -153,8 +154,8 @@ projects. `/`, the landing page, is a static intro (see `app_docs/home.md`).
   holds the search box's local text and calls the router, and
   `HistoryPageLink`, which navigates the History pages inside the shared
   History transition, and `HistoryTransition`, which holds the one
-  `useTransition` the box, the arrows and `HistoryResults` share, `SummaryProviders` in `src/app/watch/summary-providers.tsx`,
-  the summary page's bare query client, and `TodaySummary`, which reads today's
+  `useTransition` the box, the arrows and `HistoryResults` share, `DailyLogLink`,
+  which reads the pathname to mark the sidebar's Daily log entry, and `TodaySummary`, which reads today's
   card from the query cache and refetches it, `SubmitButton`, which reads its
   form's pending state, and `TurnstileScript`, which renders the Turnstile
   widget on mount). `HistoryLinks`,

@@ -29,10 +29,11 @@ const CLEAR =
 export function HistorySearch({ slug, initial }: HistorySearchProps) {
   const [text, setText] = useState(initial);
   const router = useRouter();
-  const { startTransition } = useHistoryTransition();
+  const { startTransition, releaseHeight } = useHistoryTransition();
 
   function navigate(next: string) {
     startTransition(() => {
+      releaseHeight();
       router.replace(historyHref(slug, null, readHistoryQuery(next)), { scroll: false });
     });
   }

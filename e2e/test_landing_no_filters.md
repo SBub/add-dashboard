@@ -1,19 +1,19 @@
 # E2E Test: Landing Page Without Filters
 
-Checks that the summary at `/watch` has no Project or Window filter: it shows the heading, the intro,
-the reading note directly under the intro and the day cards for all projects over the fixed
-30-day window, ignores `?days` and `?project`, and that the old `/summary` address lands on a bare
-`/watch`.
+Checks that the summary at `/projects/log` has no Project or Window filter: it shows the heading, the
+intro, the reading note directly under the intro and the day cards for all projects over the fixed
+30-day window, ignores `?days` and `?project`, and that the old `/summary` and `/watch` addresses
+render the not-found page (no redirect).
 
 ## User Story
 
 As a visitor reading the ADW public ledger
 I want the summary to show every project's finished runs without a form to fill in
-So that the report reads straight through and old filtered links still land on it
+So that the report reads straight through and ignores old filter parameters
 
 ## Test Steps
 
-1. Navigate to `/watch` under the `Application URL`.
+1. Navigate to `/projects/log` under the `Application URL`.
 2. **Verify** the `What an AI developer workflow gets done` heading (level 1) is present, followed
    by the intro paragraph starting `ADW is an autonomous pipeline`.
 3. **Verify** the text `Times are UTC. Tokens and cost count runs that published metrics.` follows
@@ -24,20 +24,21 @@ So that the report reads straight through and old filtered links still land on i
 5. **Verify** the window line above the day cards ends with `all projects`.
 6. **Verify** the snapshot contains no `combobox`, no `button` named `Apply` and no `form`.
 7. Take a screenshot of the summary page.
-8. Navigate directly (full page load) to `/watch?days=7&project=x`.
+8. Navigate directly (full page load) to `/projects/log?days=7&project=x`.
 9. **Verify** the same content as in steps 2 to 6: the window line says `30 days`, there is no
    error panel and no `No public project named` text.
 10. Take a screenshot of the summary page with ignored parameters.
-11. Navigate directly (full page load) to `/summary?days=7`.
-12. **Verify** the final URL is exactly `/watch` (no `?`) and the
-    `What an AI developer workflow gets done` heading is present.
-13. Take a screenshot of the redirected page.
+11. Navigate directly (full page load) to `/summary?days=7`, then to `/watch`.
+12. **Verify** on each that the URL is unchanged (no redirect), the not-found page renders (the
+    `Not found` heading and the text `There is nothing at this address.`) and the
+    `What an AI developer workflow gets done` heading is absent.
+13. Take a screenshot of the not-found page at `/watch`.
 
 ## Success Criteria
 
-- `/watch` shows the heading, the intro, the reading note directly under the intro and the day cards.
-- No `<select>`, no Apply button and no form on `/watch`.
+- `/projects/log` shows the heading, the intro, the reading note directly under the intro and the day cards.
+- No `<select>`, no Apply button and no form on `/projects/log`.
 - Project names in the per-project tables are plain text.
-- `/watch?days=7&project=x` renders the same 30-day, all-projects report as `/watch`.
-- `/summary?days=7` ends at `/watch` with no query string.
+- `/projects/log?days=7&project=x` renders the same 30-day, all-projects report as `/projects/log`.
+- `/summary?days=7` and `/watch` render the not-found page, with no redirect.
 - 3 screenshots are taken.

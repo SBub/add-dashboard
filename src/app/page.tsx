@@ -16,8 +16,8 @@ const DOOR =
 // Not async and no props: the whole page is the static shell. It reads nothing
 // at request time (no request API, no query string, no clock, no data), and
 // has no live ADW figure, which would be a third argument-less clock read
-// (app_docs/clock-and-prerender.md); the static link to /watch is the teaser.
-// Outside (dashboard), like /watch and /hire: no Providers, no Realtime, no pill.
+// (app_docs/clock-and-prerender.md); the static link to /projects is the teaser.
+// Outside (dashboard), like /writing and /hire: no Providers, no Realtime, no pill.
 export default function HomePage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
@@ -29,7 +29,7 @@ export default function HomePage() {
       </div>
       <p className="mt-3 max-w-[70ch] text-base text-neutral-700 dark:text-neutral-300">
         {HOME_ADW_LINE}{" "}
-        <Link href="/watch" className={TEXT_LINK}>
+        <Link href="/projects" className={TEXT_LINK}>
           Watch me build
         </Link>
       </p>

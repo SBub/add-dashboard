@@ -22,12 +22,12 @@ be kept in step with them and with `README.md`.
 
 ## Workspaces
 
-| name          | path | dev command | port variable | default port | health URL                                                                | ADW may start |
-| ------------- | ---- | ----------- | ------------- | ------------ | ------------------------------------------------------------------------- | ------------- |
-| adw-dashboard | `.`  | `yarn dev`  | `PORT`        | 3000         | `/`, `/watch`, `/projects`, then `/projects/SBub/issebya-homes-ai-system` | yes           |
+| name          | path | dev command | port variable | default port | health URL                                                                       | ADW may start |
+| ------------- | ---- | ----------- | ------------- | ------------ | -------------------------------------------------------------------------------- | ------------- |
+| adw-dashboard | `.`  | `yarn dev`  | `PORT`        | 3000         | `/`, `/projects/log`, `/projects`, then `/projects/SBub/issebya-homes-ai-system` | yes           |
 
 - `yarn dev` is exactly `next dev`; it takes its port from `PORT`, so nothing passes `--port`.
-- `/` (the static intro page) answering 200 proves the server is up. `/watch` (the summary)
+- `/` (the static intro page) answering 200 proves the server is up. `/projects/log` (the summary)
   answering 200 proves it can reach Supabase (its report is read from the database at request
   time). `/projects` answering 200 proves the sidebar's prefetch
   path. A 500 means the data layer threw, almost always a missing `.env.local`.
@@ -86,7 +86,7 @@ E2E code suite: `none` (no `@playwright/test` specs). `e2e/*.md` holds agent-dri
 `e2e/test_projects_skeleton_fallbacks.md`, `e2e/test_sticky_header.md`,
 `e2e/test_run_row_phase_label.md`, `e2e/test_history_card_fields.md`,
 `e2e/test_history_page_turn.md`, `e2e/test_worker_status_widget.md`, `e2e/test_hire_page.md`,
-`e2e/test_home_page.md` and `e2e/test_writing.md`) that the test
+`e2e/test_home_page.md`, `e2e/test_writing.md` and `e2e/test_daily_log_sidebar.md`) that the test
 phase runs through the Playwright MCP server.
 
 lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every commit and
@@ -140,9 +140,9 @@ lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every c
 ## Review
 
 - Open at `http://localhost:$PORT`: `/` (the intro page: heading, intro, the ADW line with its
-  Watch me build link to `/watch`, two door cards into `/hire?offer=...`; no sidebar, no pill),
-  `/watch` (the summary: heading, intro, note, the today card with a
-  Refresh button above the past day cards with their What I worked on, Tokens by model and What each step cost chart cards, per-project tables; no sidebar, no pill), `/projects` (project sidebar, with the worker status widget at its bottom, plus every active run
+  Watch me build link to `/projects`, two door cards into `/hire?offer=...`; no sidebar, no pill),
+  `/projects/log` (the summary: the sidebar with Daily log current, the pill and the worker widget, then heading, intro, note, the today card with a
+  Refresh button above the past day cards with their What I worked on, Tokens by model and What each step cost chart cards, per-project tables), `/projects` (project sidebar, with the Daily log entry and the worker status widget at its bottom, plus every active run
   grouped by project under a `Building now` heading, or "No runs in progress." when none) and `/projects/SBub/issebya-homes-ai-system` (header, Building now, Up next and
   Shipped sections), or the first project the sidebar lists if that slug is 404, and
   `/hire` (heading, intro, LinkedIn link, the form with the two offers, the Turnstile widget, the
@@ -151,7 +151,7 @@ lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every c
   link). The fuchsia Work with me button is in the header on every
   route. Capture each at desktop 1920x1080 and mobile
   375x667, full page, into `agents/<adw_id>/<agent_name>/review_img/` in the worktree.
-- The sidebar's connection indicator (dashboard routes only; `/`, `/watch` and `/hire` have none) moves from `connecting` to `live` once the Realtime channel
+- The sidebar's connection indicator (dashboard routes only; `/`, `/writing` and `/hire` have none) moves from `connecting` to `live` once the Realtime channel
   joins; wait for `live` in a `browser_snapshot` before judging live data, and do not report
   `connecting` as a defect unless the spec is about the indicator.
 - The sidebar's worker widget reads "Checking status..." until its first read and "Offline"

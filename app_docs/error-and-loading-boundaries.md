@@ -95,5 +95,5 @@ server-rendered section that can fail independently goes in
   The project page's Active fallback carries the real Active and Queue
   headings (the page builds them before the boundary), so they are in the
   static shell. `HistorySearchFallback` stays the real box, disabled, not a
-  skeleton, and the error panels are unchanged. The summary page (`/watch`) and
+  skeleton, and the error panels are unchanged. The summary page (`/projects/log`) and
   `HeaderLink`'s fallback are not part of this rule.

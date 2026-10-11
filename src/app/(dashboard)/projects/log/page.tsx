@@ -11,7 +11,6 @@ import { prefetch } from "@/data/query-client";
 import { queryKeys } from "@/data/query-keys";
 import { SUMMARY_DEFAULT_DAYS, utcDay } from "@/lib/daily-summary";
 import { summaryPastTag, summaryTodayTag } from "@/lib/history-tags";
-import { SummaryProviders } from "./summary-providers";
 
 export const metadata: Metadata = {
   title: "Sviatlana Buben: what an AI developer workflow ships",
@@ -58,25 +57,24 @@ async function getTodayState(today: string) {
   return prefetch(queryKeys.summaryToday(today), () => getSummaryToday(today));
 }
 
-// The today island: the server prefetch hydrated into the page's own minimal
-// provider (no Realtime), so the first paint is server-rendered and Refresh
-// refetches in the browser.
+// The today island: the server prefetch hydrated into the dashboard layout's
+// Providers client, so the first paint is server-rendered and Refresh
+// refetches in the browser. The Realtime listener never touches its key
+// (app_docs/summary.md).
 async function TodayIsland({ today }: { today: string }) {
   const { state } = await getTodayState(today);
 
   return (
-    <SummaryProviders>
-      <HydrationBoundary state={state}>
-        <QueryBoundary
-          fallback={
-            <p className="text-sm text-neutral-500 dark:text-neutral-400">Loading today...</p>
-          }
-          detail="Today's figures did not load."
-        >
-          <TodaySummary today={today} />
-        </QueryBoundary>
-      </HydrationBoundary>
-    </SummaryProviders>
+    <HydrationBoundary state={state}>
+      <QueryBoundary
+        fallback={
+          <p className="text-sm text-neutral-500 dark:text-neutral-400">Loading today...</p>
+        }
+        detail="Today's figures did not load."
+      >
+        <TodaySummary today={today} />
+      </QueryBoundary>
+    </HydrationBoundary>
   );
 }
 
@@ -130,11 +128,13 @@ async function SummaryContent() {
   );
 }
 
-// Not async: the heading, the intro and the reading note are the static
-// shell, the today card and the past days are the hole.
+// The daily log, beside the sidebar the (dashboard) layout renders, which
+// also gives it width and padding. Not async: the heading, the intro and the
+// reading note are the static shell, the today card and the past days are the
+// hole.
 export default function SummaryPage() {
   return (
-    <div className="mx-auto max-w-6xl px-4 py-6">
+    <div>
       <h1 className="text-2xl font-semibold tracking-tight">
         What an AI developer workflow gets done
       </h1>

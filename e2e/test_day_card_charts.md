@@ -1,6 +1,6 @@
 # E2E Test: Day Card Chart Cards
 
-Checks that every day card on the summary at `/watch` shows three separate chart cards directly under
+Checks that every day card on the summary at `/projects/log` shows three separate chart cards directly under
 its header, "What I worked on", "Tokens by model" and "What each step cost", in one row on desktop
 and stacked on mobile; that classes, models and phases come in a fixed order; that a bar's value
 sits inside it (white on class bars, AA contrast text on the gray model and phase bars) or just
@@ -11,7 +11,7 @@ runs, and the class count with its share; and that the per-project table keeps i
 
 ## User Story
 
-As a visitor reading the ADW public ledger on `/watch`
+As a visitor reading the ADW public ledger on `/projects/log`
 I want each day's class split, model split and cost by pipeline phase shown as three clearly
 separated, consistently ordered charts with the numbers on the bars
 So that I can read a day at a glance and compare days without hunting for which label belongs to
@@ -19,7 +19,7 @@ which column
 
 ## Test Steps
 
-1. Navigate to `/watch` under the `Application URL`. Take the first day card that has runs (the today card
+1. Navigate to `/projects/log` under the `Application URL`. Take the first day card that has runs (the today card
    when it has runs, else the first past card).
 2. **Verify** directly below its header there are three `figure`s, captioned `What I worked on` with
    the subtitle `Runs finished that day`, `Tokens by model` with the subtitle
@@ -73,7 +73,7 @@ which column
     `Work with me` link keeps its fuchsia background (computed `background-color` not gray).
 12. **Verify** the per-project table below still has its compact class bars (an `svg` with an
     `aria-label` starting `Issue classes:` inside the table).
-13. **Verify** the server-rendered HTML (`browser_evaluate` `fetch("/watch").then((r) => r.text())`)
+13. **Verify** the server-rendered HTML (`browser_evaluate` `fetch("/projects/log").then((r) => r.text())`)
     contains `What I worked on`, `Tokens by model` and `What each step cost`.
 14. Take a screenshot at 1920x1080 in both colour schemes: with `browser_run_code_unsafe`, run
     `page.emulateMedia({ colorScheme: "light" })`, screenshot, then

@@ -23,7 +23,7 @@ export const HOME_DOORS: { offer: Offer; title: string; body: string }[] = [
   },
   {
     offer: "AI consulting",
-    title: "Want work off your plate?",
+    title: "Want to automate your processes with AI?",
     body: "[Placeholder] Tell me what eats your time and I will tell you what AI can take over.",
   },
 ];

@@ -37,7 +37,7 @@ The form posts to the `sendHireRequest` server action. Its fields:
 - `offer`: a select over `OFFERS`, required, labelled "What brings you here?".
   Each option's value is the `OFFERS` entry (`Product engineer`, `AI
 consulting`); its visible text is `OFFER_LABELS[offer]` ("I need a product
-  engineer (contract or full-time)", "I want to take work off my own plate").
+  engineer (contract or full-time)", "I want to structure and automate my processes with AI").
 - `email`: required, at most `EMAIL_MAX` (254) characters.
 - `name`: optional, at most `NAME_MAX` (100) characters.
 - `motivation`: labelled "What's eating your time, or what are you

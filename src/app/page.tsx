@@ -6,7 +6,7 @@ import { hireOfferHref } from "@/lib/hire-request";
 export const metadata: Metadata = {
   title: "Sviatlana Buben, product engineer",
   description:
-    "Product engineer building her products in public with ADW. Hire her, or hand her work off your plate.",
+    "Product engineer building her products in public with ADW. Hire her, or have her automate your processes with AI.",
 };
 
 const TEXT_LINK = "underline underline-offset-2 hover:text-neutral-900 dark:hover:text-neutral-100";

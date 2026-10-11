@@ -17,7 +17,7 @@ import { sendHireRequest } from "../actions/send-hire-request";
 export const metadata: Metadata = {
   title: "Work with me",
   description:
-    "Work with Sviatlana Buben: product engineering on contract or full-time, or AI that takes work off your plate.",
+    "Work with Sviatlana Buben: product engineering on contract or full-time, or structuring and automating business processes with AI.",
 };
 
 type SearchParams = Promise<{

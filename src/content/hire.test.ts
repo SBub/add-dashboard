@@ -11,6 +11,8 @@ describe("OFFERS and OFFER_LABELS", () => {
     expect(OFFER_LABELS["Product engineer"]).toBe(
       "I need a product engineer (contract or full-time)",
     );
-    expect(OFFER_LABELS["AI consulting"]).toBe("I want to take work off my own plate");
+    expect(OFFER_LABELS["AI consulting"]).toBe(
+      "I want to structure and automate my processes with AI",
+    );
   });
 });

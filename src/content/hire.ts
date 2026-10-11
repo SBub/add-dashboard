@@ -9,7 +9,7 @@ export type Offer = (typeof OFFERS)[number];
 // The value is what the action validates and the subject carries; the label is only the visible text.
 export const OFFER_LABELS: Record<Offer, string> = {
   "Product engineer": "I need a product engineer (contract or full-time)",
-  "AI consulting": "I want to take work off my own plate",
+  "AI consulting": "I want to structure and automate my processes with AI",
 };
 
 export const HIRE_INTRO: string[] = [

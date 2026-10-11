@@ -19,7 +19,7 @@ want proof
    the ADW line ending with a `Watch me build` link with `href="/projects"`.
 3. **Verify** two door links: one with `href="/hire?offer=product-engineer"` whose text starts
    `Hiring a product engineer?`, and one with `href="/hire?offer=ai-consulting"` whose text starts
-   `Want work off your plate?`.
+   `Want to automate your processes with AI?`.
 4. **Verify** the page has no `table`, no heading starting `Today,`, no element with role `status`
    (no connection indicator) and no `navigation` named `Projects`.
 5. **Verify** the header's brand link (`href="/"`) has `aria-current="page"` and the `Watch me build`

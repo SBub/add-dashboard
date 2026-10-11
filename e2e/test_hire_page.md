@@ -26,7 +26,7 @@ the site
 8. **Verify** the `offer` select is labelled `What brings you here?` and has exactly two options.
    With `browser_evaluate`, return each option's `value` and `text`. **Verify** the first is value
    `Product engineer` with text `I need a product engineer (contract or full-time)`, and the second
-   is value `AI consulting` with text `I want to take work off my own plate`. **Verify** the select's
+   is value `AI consulting` with text `I want to structure and automate my processes with AI`. **Verify** the select's
    `value` is `Product engineer` (the default with no `?offer=`).
 9. **Verify** the motivation textarea is labelled
    `What's eating your time, or what are you building?`.
@@ -64,7 +64,7 @@ the site
   marked `aria-current="page"` only on `/hire`.
 - `/hire` shows the `Work with me` heading, intro, LinkedIn link and a form whose select
   (`What brings you here?`) has exactly the two offers, labelled
-  `I need a product engineer (contract or full-time)` and `I want to take work off my own plate`
+  `I need a product engineer (contract or full-time)` and `I want to structure and automate my processes with AI`
   with values `Product engineer` and `AI consulting`, with no sidebar and no connection indicator.
 - The Send button and the header link share the same fuchsia classes.
 - An empty motivation is blocked by the browser; nothing is posted.

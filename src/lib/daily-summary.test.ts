@@ -3,6 +3,7 @@ import type { DailyModelSummary, DailyPhaseSummary, DailySummary } from "@/types
 import { costLabel, secondsLabel } from "./run-view";
 import {
   barValueInside,
+  classColumns,
   classCounts,
   classLabel,
   classSegments,
@@ -625,6 +626,51 @@ describe("classCounts", () => {
 
   it("is empty for no runs", () => {
     expect(classCounts({ runs: 0, features: 0, bugs: 0, chores: 0, patches: 0 })).toEqual([]);
+  });
+});
+
+describe("classColumns", () => {
+  it("always shows feature, chore and bug, zeros included", () => {
+    expect(classColumns({ runs: 3, features: 0, bugs: 0, chores: 3, patches: 0 })).toEqual([
+      { key: "/feature", count: 0 },
+      { key: "/chore", count: 3 },
+      { key: "/bug", count: 0 },
+    ]);
+  });
+
+  it("adds patch last when present, with no other", () => {
+    expect(classColumns({ runs: 4, features: 1, bugs: 0, chores: 2, patches: 1 })).toEqual([
+      { key: "/feature", count: 1 },
+      { key: "/chore", count: 2 },
+      { key: "/bug", count: 0 },
+      { key: "/patch", count: 1 },
+    ]);
+  });
+
+  it("adds other last only when runs exceed the known classes", () => {
+    expect(classColumns({ runs: 6, features: 1, bugs: 1, chores: 1, patches: 1 }).at(-1)).toEqual({
+      key: "other",
+      count: 2,
+    });
+    expect(classColumns({ runs: 1, features: 2, bugs: 0, chores: 0, patches: 0 })).toEqual([
+      { key: "/feature", count: 2 },
+      { key: "/chore", count: 0 },
+      { key: "/bug", count: 0 },
+    ]);
+  });
+
+  it("gives the three core columns at zero for no runs", () => {
+    expect(classColumns({ runs: 0, features: 0, bugs: 0, chores: 0, patches: 0 })).toEqual([
+      { key: "/feature", count: 0 },
+      { key: "/chore", count: 0 },
+      { key: "/bug", count: 0 },
+    ]);
+  });
+
+  it("never sorts by count", () => {
+    expect(
+      classColumns({ runs: 12, features: 1, bugs: 9, chores: 2, patches: 0 }).map((c) => c.key),
+    ).toEqual(["/feature", "/chore", "/bug"]);
   });
 });
 

@@ -33,7 +33,50 @@ describe("ClassColumnChart", () => {
   });
 
   it("starts its screen-reader summary with the title", () => {
-    expect(markup).toContain('<p class="sr-only">What I worked on: 2 feature, 1 bug</p>');
+    expect(markup).toContain('<p class="sr-only">What I worked on: 2 feature, 0 chore, 1 bug</p>');
+  });
+
+  describe("on a chores-only day", () => {
+    const choresOnly = renderToStaticMarkup(
+      createElement(ClassColumnChart, {
+        counts: { runs: 3, features: 0, bugs: 0, chores: 3, patches: 0 },
+        day: DAY,
+      }),
+    );
+
+    it("still shows feature, chore and bug, in that order", () => {
+      const feature = choresOnly.indexOf('aria-label="feature: 0 runs"');
+      const chore = choresOnly.indexOf('aria-label="chore: 3 runs"');
+      const bug = choresOnly.indexOf('aria-label="bug: 0 runs"');
+      expect(feature).toBeGreaterThan(-1);
+      expect(chore).toBeGreaterThan(feature);
+      expect(bug).toBeGreaterThan(chore);
+      expect(choresOnly).not.toMatch(/aria-label="(patch|other):/);
+    });
+
+    it("lists the zeros in its screen-reader summary", () => {
+      expect(choresOnly).toContain(
+        '<p class="sr-only">What I worked on: 0 feature, 3 chore, 0 bug</p>',
+      );
+    });
+
+    it("places a zero above the baseline with a 0% share", () => {
+      expect(choresOnly).toContain(
+        '<span data-value-placement="above" class="mb-1 text-xs tabular-nums">0</span>',
+      );
+      expect(choresOnly).toContain('<dd class="text-right tabular-nums">0%</dd>');
+    });
+  });
+
+  it("renders nothing for a day with no runs", () => {
+    expect(
+      renderToStaticMarkup(
+        createElement(ClassColumnChart, {
+          counts: { runs: 0, features: 0, bugs: 0, chores: 0, patches: 0 },
+          day: DAY,
+        }),
+      ),
+    ).toBe("");
   });
 });
 

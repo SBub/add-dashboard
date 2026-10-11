@@ -36,9 +36,9 @@ is a module imported by a page, not a route; a separate name keeps the two apart
 
 ### Slugs
 
-`isPostSlug` accepts lowercase letters, digits and inner hyphens (`hello`, `ai-at-work-2`).
+`isPostSlug` accepts lowercase letters, digits and inner hyphens (`my-moat`, `ai-at-work-2`).
 `getPost` rejects a malformed or unregistered slug against the registry before importing any
-module, so `/writing/does-not-exist`, `/writing/_` and `/writing/hello.linkedin` are 404.
+module, so `/writing/does-not-exist`, `/writing/_` and `/writing/my-moat.linkedin` are 404.
 
 ### Drafts
 

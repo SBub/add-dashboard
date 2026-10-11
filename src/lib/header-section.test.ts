@@ -46,7 +46,7 @@ describe("headerSection", () => {
   it("is writing for /writing and every post below it", () => {
     expect(headerSection("/writing")).toBe("writing");
     expect(headerSection("/writing/")).toBe("writing");
-    expect(headerSection("/writing/hello")).toBe("writing");
+    expect(headerSection("/writing/my-moat")).toBe("writing");
     expect(headerSection("/writingx")).toBeNull();
     expect(headerSection("/writing-old")).toBeNull();
   });

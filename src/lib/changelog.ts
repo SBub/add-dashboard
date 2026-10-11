@@ -8,8 +8,10 @@ import type { MDXContent } from "mdx/types";
 import { CHANGELOG_ENTRIES, type ChangelogEntry } from "@/content/changelog";
 import {
   CHANGELOG_KINDS,
+  CHANGELOG_STAT_FIELDS,
   type ChangelogCounts,
   type ChangelogKind,
+  type ChangelogStats,
   entryId,
 } from "@/lib/changelog-backfill";
 
@@ -19,6 +21,7 @@ export interface ChangelogMeta {
   title: string;
   kind: ChangelogKind;
   counts: ChangelogCounts;
+  stats: ChangelogStats;
 }
 
 export interface ChangelogItem {
@@ -60,7 +63,7 @@ export function parseChangelogMeta(id: string, raw: unknown): ChangelogMeta {
   if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
     return fail("meta", "must be an object (export const meta = {...})");
   }
-  const { date, pr, title, kind, counts } = raw as Record<string, unknown>;
+  const { date, pr, title, kind, counts, stats } = raw as Record<string, unknown>;
   if (!isCalendarDate(date)) return fail("date", "must be a real date as YYYY-MM-DD");
   if (typeof pr !== "number" || !Number.isInteger(pr) || pr <= 0) {
     return fail("pr", "must be a positive integer");
@@ -76,8 +79,25 @@ export function parseChangelogMeta(id: string, raw: unknown): ChangelogMeta {
   if (!isCount(features) || !isCount(fixes) || !isCount(chores)) {
     return fail("counts", "must hold three non-negative integers");
   }
+  if (typeof stats !== "object" || stats === null || Array.isArray(stats)) {
+    return fail("stats", `must be an object { ${CHANGELOG_STAT_FIELDS.join(", ")} }`);
+  }
+  const statsRecord = stats as Record<string, unknown>;
+  for (const field of CHANGELOG_STAT_FIELDS) {
+    if (!isCount(statsRecord[field]))
+      return fail("stats", `${field} must be a non-negative integer`);
+  }
+  const { additions, deletions, commits, files, comments } =
+    statsRecord as unknown as ChangelogStats;
   if (id !== entryId(date, pr)) return fail("id", `must be ${entryId(date, pr)} (date and pr)`);
-  return { date, pr, title, kind, counts: { features, fixes, chores } };
+  return {
+    date,
+    pr,
+    title,
+    kind,
+    counts: { features, fixes, chores },
+    stats: { additions, deletions, commits, files, comments },
+  };
 }
 
 /** A copy, newest date first; pushes on one day by pull request, newest first. */

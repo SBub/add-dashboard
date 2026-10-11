@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ChangelogStats } from "@/components/ChangelogStats";
 import { changelogCountsLabel, getChangelog } from "@/lib/changelog";
 import { formatDay } from "@/lib/format-date";
 
@@ -19,7 +20,7 @@ export default async function ChangelogPage() {
       <p className="mt-2 max-w-[70ch] text-base text-neutral-700 dark:text-neutral-300">
         Every push to production, with the pull requests it shipped.
       </p>
-      <ol className="mt-6 max-w-[70ch] space-y-4">
+      <ol className="mt-6 max-w-[70ch] space-y-6">
         {entries.map(({ id, meta }) => (
           <li key={id} className="min-w-0">
             <p className="text-sm text-neutral-500 dark:text-neutral-400">
@@ -31,7 +32,8 @@ export default async function ChangelogPage() {
             >
               {meta.title}
             </Link>
-            <p className="text-sm text-neutral-600 dark:text-neutral-400">
+            <ChangelogStats pr={meta.pr} stats={meta.stats} className="mt-1" />
+            <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">
               {changelogCountsLabel(meta)}
             </p>
           </li>

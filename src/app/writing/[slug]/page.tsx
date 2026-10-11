@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PostMetaLine } from "@/components/PostMetaLine";
-import { HIRE_ACCENT } from "@/lib/accent";
-import { getPost, getPosts, postHireHref } from "@/lib/posts";
+import { getPost, getPosts } from "@/lib/posts";
 import { SITE_NAME } from "@/lib/site-url";
 
 interface PostPageProps {
@@ -48,8 +46,6 @@ export async function generateMetadata({ params }: PostPageProps): Promise<Metad
   };
 }
 
-const HIRE_LINK = `inline-block rounded-md px-3 py-1.5 text-sm font-medium ${HIRE_ACCENT}`;
-
 export default async function PostPage({ params }: PostPageProps) {
   const post = await getPost((await params).slug);
   if (!post) notFound();
@@ -60,14 +56,6 @@ export default async function PostPage({ params }: PostPageProps) {
         <h1 className="text-2xl font-semibold tracking-tight">{meta.title}</h1>
         <PostMetaLine meta={meta} />
         <Content />
-        <section className="mt-10 border-t border-neutral-200 pt-6 dark:border-neutral-800">
-          <p className="text-base text-neutral-700 dark:text-neutral-300">
-            Want this kind of work done for you?
-          </p>
-          <Link href={postHireHref(meta.audience)} className={`mt-3 ${HIRE_LINK}`}>
-            Work with me
-          </Link>
-        </section>
       </div>
     </article>
   );

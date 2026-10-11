@@ -1,26 +1,27 @@
 export const meta = {
   date: "2026-10-06",
   pr: 96,
-  title: "promote develop to master",
+  title: "Summary on the home page, totals instead of medians",
   kind: "release",
   counts: { features: 1, fixes: 2, chores: 5 },
+  stats: { additions: 1896, deletions: 547, commits: 31, files: 43, comments: 1 },
 };
 
-Promotion of develop to master
+The Summary is now the home page, and the projects moved to /projects. It shows totals instead of medians, counts cached tokens on their own, and puts a Total row under each day's table. Queue rows are down to one line.
 
 ## Features
 
-- Summary page: sums instead of medians, with a cache-read column ([#80](https://github.com/SBub/adw-dashboard/issues/80), [PR #81](https://github.com/SBub/adw-dashboard/pull/81))
+- The Summary shows sums instead of medians, with a column for cached tokens read ([#80](https://github.com/SBub/adw-dashboard/issues/80), [PR #81](https://github.com/SBub/adw-dashboard/pull/81))
 
 ## Fixes
 
-- Summary filters render as native pill selects in Safari and misalign with Apply ([#82](https://github.com/SBub/adw-dashboard/issues/82), [PR #84](https://github.com/SBub/adw-dashboard/pull/84))
-- the queue rail "next" pill renders on top of the section tooltip ([#88](https://github.com/SBub/adw-dashboard/issues/88), [PR #93](https://github.com/SBub/adw-dashboard/pull/93))
+- The Summary's Project and Window filters look the same in Safari as in Chrome and line up with the Apply button ([#82](https://github.com/SBub/adw-dashboard/issues/82), [PR #84](https://github.com/SBub/adw-dashboard/pull/84))
+- The section info tooltip now shows above the Queue's "next" marker instead of under it ([#88](https://github.com/SBub/adw-dashboard/issues/88), [PR #93](https://github.com/SBub/adw-dashboard/pull/93))
 
 ## Chores
 
-- summary run detail and daily aggregate charts (#66, PR #75) ([PR #78](https://github.com/SBub/adw-dashboard/pull/78))
-- Summary becomes the landing page at /; the project sidebar moves to /projects ([#83](https://github.com/SBub/adw-dashboard/issues/83), [PR #87](https://github.com/SBub/adw-dashboard/pull/87))
-- Summary: replace the totals strip with a Total row at the bottom of the per-project table ([#85](https://github.com/SBub/adw-dashboard/issues/85), [PR #90](https://github.com/SBub/adw-dashboard/pull/90))
-- Queue row: drop the label chip and the wait line ([#86](https://github.com/SBub/adw-dashboard/issues/86), [PR #92](https://github.com/SBub/adw-dashboard/pull/92))
-- Landing page: replace the "Summary" title with an intro that explains what this is ([#89](https://github.com/SBub/adw-dashboard/issues/89), [PR #94](https://github.com/SBub/adw-dashboard/pull/94))
+- Took the summary charts (#66, PR #75) back out of develop ([PR #78](https://github.com/SBub/adw-dashboard/pull/78))
+- The Summary became the home page at /, and the project list moved to /projects ([#83](https://github.com/SBub/adw-dashboard/issues/83), [PR #87](https://github.com/SBub/adw-dashboard/pull/87))
+- Each day's totals moved from a strip above the table to a Total row at the bottom, lined up with its columns ([#85](https://github.com/SBub/adw-dashboard/issues/85), [PR #90](https://github.com/SBub/adw-dashboard/pull/90))
+- Queue rows lost the label chip and the wait line: one line per row ([#86](https://github.com/SBub/adw-dashboard/issues/86), [PR #92](https://github.com/SBub/adw-dashboard/pull/92))
+- The home page opens with a short intro on what ADW is and what this dashboard shows, instead of the heading "Summary" ([#89](https://github.com/SBub/adw-dashboard/issues/89), [PR #94](https://github.com/SBub/adw-dashboard/pull/94))

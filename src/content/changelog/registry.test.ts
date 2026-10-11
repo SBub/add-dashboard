@@ -49,6 +49,20 @@ const META_NUMBER = {
   chores: /\bchores: (\d+)/,
 } as const;
 
+const STATS_LINE =
+  /\n {2}stats: \{ additions: \d+, deletions: \d+, commits: \d+, files: \d+, comments: \d+ \},\n/;
+
+function titleOf(text: string): string {
+  const match = /\n {2}title: "(.*)",\n/.exec(text);
+  if (!match) throw new Error("no title in meta");
+  return match[1]!;
+}
+
+// The description: the prose between the meta and the first heading.
+function opening(text: string): string {
+  return text.slice(text.indexOf("\n};\n") + 4, text.indexOf("\n## "));
+}
+
 function metaNumber(text: string, field: keyof typeof META_NUMBER): number {
   const match = META_NUMBER[field].exec(text);
   if (!match) throw new Error(`no ${field} in meta`);
@@ -85,11 +99,24 @@ describe("changelog registry", () => {
     expect(text).not.toContain("\u2014");
   });
 
+  it.each(files)("%s: reads as a product changelog, with stats", (id) => {
+    const text = read(id);
+    expect(text).toMatch(STATS_LINE);
+    const title = titleOf(text);
+    expect(title).not.toMatch(/promote|develop to master|\d{4}-\d{2}-\d{2}/i);
+    expect(title[0]).toBe(title[0]!.toUpperCase());
+    const prose = opening(text).trim();
+    expect(prose.length).toBeGreaterThan(0);
+    expect(prose).not.toMatch(
+      /Production is currently broken|Promotes? `?develop|\d{4}-\d{2}-\d{2}/,
+    );
+  });
+
   it("ships #162 as a feature and #161 as a fix with #163", () => {
     const text = read("2026-10-09-pr163");
     expect(section(text, "Features")).toContain("PR #162");
     expect(section(text, "Fixes")).toContain("PR #161");
-    expect(text.slice(0, text.indexOf("\n## "))).toContain("halted");
+    expect(section(text, "Chores")).toContain("halted count");
   });
 
   it("records #79 as the revert of #66 and PR #75", () => {

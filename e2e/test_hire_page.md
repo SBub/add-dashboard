@@ -21,15 +21,20 @@ the site
    `Work with me` link is in the header.
 5. Click the header's `Work with me` link.
 6. **Verify** the URL is `/hire` and the `Work with me` link has `aria-current="page"`.
-7. **Verify** the heading `Work with me`, the intro paragraphs, and a `LinkedIn profile` link with
-   `target="_blank"` and `rel="noreferrer"`.
-8. **Verify** the `offer` select is labelled `What brings you here?` and has exactly two options.
+7. **Verify** the heading `Work with me`, the text `Remote, Lisbon` directly under it, and a
+   `LinkedIn profile` link with `target="_blank"` and `rel="noreferrer"`. **Verify** no text
+   `[Placeholder]` on the page.
+8. **Verify** the page has no offer blocks: no level-2 or level-3 heading, and no text
+   `Structure and automate your processes with AI`. The heading, the location line and the
+   LinkedIn link are followed directly by the form.
+9. **Verify** the `offer` select is labelled `What brings you here?` and has exactly two options.
    With `browser_evaluate`, return each option's `value` and `text`. **Verify** the first is value
-   `Product engineer` with text `I need a product engineer (contract or full-time)`, and the second
-   is value `AI consulting` with text `I want to take work off my own plate`. **Verify** the select's
-   `value` is `Product engineer` (the default with no `?offer=`).
-9. **Verify** the motivation textarea is labelled
-   `What's eating your time, or what are you building?`.
+   `Product engineer` with text `I need a product engineer`, and the second is value
+   `AI consulting` with text `I want to structure and automate my processes with AI`. **Verify** the
+   select's `value` is `Product engineer` (the default with no `?offer=`), and the motivation
+   textarea is labelled `What are you building?`. Select the second option and **Verify** the
+   textarea's label changes to `Tell me about your business`; select the first again and **Verify**
+   it is `What are you building?` again.
 10. With `browser_evaluate`, collect the `bg-fuchsia-*` classes of the `Send` button and of the
     header's `Work with me` link. **Verify** the two lists are identical and not empty.
 11. **Verify** the accessibility snapshot has no connection indicator (no `status` element, no
@@ -49,29 +54,38 @@ the site
     `We could not verify you are human. Please try again.` shows above the form.
 16. Navigate to `/hire?error=<script>` and **Verify** the plain form shows with no error message,
     and the text `<script>` appears nowhere on the page.
-17. Navigate to `/hire?offer=ai-consulting` and with `browser_evaluate` **Verify** the select's
-    `value` is `AI consulting`. Navigate to `/hire?offer=<script>` and **Verify** the select's
-    `value` is `Product engineer` and the text `<script>` appears nowhere on the page.
-18. Navigate to `/hire` and take a full-page screenshot at 1920x1080.
-19. Resize to 375x667 and take a full-page screenshot.
-20. **Verify** at 375 that the header shows `Sviatlana Buben`, `Watch me build` and
+17. Navigate to `/hire?offer=product-engineer`. **Verify** no offer block shows (no level-2 or
+    level-3 heading), the page has no `select`, and with `browser_evaluate` the form has one `input[type=hidden][name=offer]` whose
+    `value` is `Product engineer`. **Verify** the textarea is labelled
+    `What are you building?`.
+18. Navigate to `/hire?offer=ai-consulting`. **Verify** no offer block shows (no level-2 or
+    level-3 heading, no text `Structure and automate your processes with AI`), the page has no
+    `select`, the hidden `offer` input's `value` is `AI consulting`, and the
+    textarea is labelled `Tell me about your business`.
+19. Navigate to `/hire?offer=nope`, then to `/hire?offer=<script>`. **Verify** each shows no offer block,
+    the select with `value` `Product engineer`, and the text `<script>` appears nowhere
+    on the page.
+20. Navigate to `/hire` and take a full-page screenshot at 1920x1080.
+21. Resize to 375x667 and take a full-page screenshot.
+22. **Verify** at 375 that the header shows `Sviatlana Buben`, `Watch me build` and
     `Work with me`, does not show `building in public` (that part of the brand is hidden below
-    `sm`), and with `browser_evaluate` that `document.documentElement.scrollWidth <= 375`.
+    `sm`), that `Remote, Lisbon` is visible, and with `browser_evaluate` that `document.documentElement.scrollWidth <= 375`.
 
 ## Success Criteria
 
 - The `Work with me` link is in the header on `/`, `/projects`, a project page and `/hire`, and is
   marked `aria-current="page"` only on `/hire`.
-- `/hire` shows the `Work with me` heading, intro, LinkedIn link and a form whose select
-  (`What brings you here?`) has exactly the two offers, labelled
-  `I need a product engineer (contract or full-time)` and `I want to take work off my own plate`
-  with values `Product engineer` and `AI consulting`, with no sidebar and no connection indicator.
+- `/hire` shows the `Work with me` heading, `Remote, Lisbon`, the LinkedIn link and a form whose select (`What brings you here?`) has exactly the two
+  offers, labelled `I need a product engineer` and
+  `I want to structure and automate my processes with AI` with values `Product engineer` and
+  `AI consulting`, with no sidebar and no connection indicator.
 - The Send button and the header link share the same fuchsia classes.
 - An empty motivation is blocked by the browser; nothing is posted.
 - `?sent=1` shows the confirmation in place of the form, `?error=verification` shows its message
   above the form, and an unknown `?error=` shows the plain form without echoing the query.
-- `?offer=ai-consulting` preselects `AI consulting`; no or an unknown `?offer=` preselects
-  `Product engineer` without echoing the query.
-- The header fits at 375px with no horizontal overflow and shows the short brand
+- `?offer=product-engineer` and `?offer=ai-consulting` each show no offer block, no
+  select, a hidden `offer` input with that offer's value and that offer's prompt as the textarea
+  label; no or an unknown `?offer=` shows the select, with the textarea label following the selected offer, without echoing the query.
+- The page fits at 375px with no horizontal overflow and shows the short brand
   `Sviatlana Buben`.
 - 2 screenshots are taken.

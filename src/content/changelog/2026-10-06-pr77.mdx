@@ -1,22 +1,23 @@
 export const meta = {
   date: "2026-10-06",
   pr: 77,
-  title: "promote develop to master",
+  title: "Queue order made visible, summary charts",
   kind: "release",
   counts: { features: 2, fixes: 1, chores: 1 },
+  stats: { additions: 4000, deletions: 523, commits: 16, files: 43, comments: 1 },
 };
 
-Promote develop to master.
+The Queue now reads as a line: the next item is marked, the others show their place and how long they have waited. The Summary page got charts per run and per day, which I took back the same day. The connection indicator no longer shows on the Summary page.
 
 ## Features
 
-- Queue: rail with ordinals and wait time to make first-in-first-out explicit ([#72](https://github.com/SBub/adw-dashboard/issues/72), [PR #74](https://github.com/SBub/adw-dashboard/pull/74))
-- Summary page: per-run detail chart over days plus selectable daily aggregate chart, with model ([#66](https://github.com/SBub/adw-dashboard/issues/66), [PR #75](https://github.com/SBub/adw-dashboard/pull/75))
+- The Queue shows as a rail: the next item is marked "next", the rest show their position and how long they have been waiting ([#72](https://github.com/SBub/adw-dashboard/issues/72), [PR #74](https://github.com/SBub/adw-dashboard/pull/74))
+- Summary page charts: one point per run across the days, and a daily chart where you pick the measure, with the model used ([#66](https://github.com/SBub/adw-dashboard/issues/66), [PR #75](https://github.com/SBub/adw-dashboard/pull/75))
 
 ## Fixes
 
-- header shows "connecting" on /summary; the indicator does not belong there ([#70](https://github.com/SBub/adw-dashboard/issues/70), [PR #71](https://github.com/SBub/adw-dashboard/pull/71))
+- The live connection indicator shows only on the dashboard pages, so the Summary page no longer says "connecting" forever ([#70](https://github.com/SBub/adw-dashboard/issues/70), [PR #71](https://github.com/SBub/adw-dashboard/pull/71))
 
 ## Chores
 
-- remove docs/agentic-kpis.md and its references ([#67](https://github.com/SBub/adw-dashboard/issues/67), [PR #68](https://github.com/SBub/adw-dashboard/pull/68))
+- Removed the old KPI notes file; run metrics now come from the database the dashboard reads ([#67](https://github.com/SBub/adw-dashboard/issues/67), [PR #68](https://github.com/SBub/adw-dashboard/pull/68))

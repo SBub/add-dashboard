@@ -1,12 +1,11 @@
-// The writing blog's posts: validation, order, draft filter, labels and the
-// Work with me link, plus the two loaders the /writing routes read posts
-// through. The functions above the loaders are pure (no clock, no fs, no
-// request-time reads), so they are testable with plain values; a post's date
-// is a string from its meta, never compared with the clock.
+// The writing blog's posts: validation, order, draft filter and labels, plus
+// the two loaders the /writing routes read posts through. The functions above
+// the loaders are pure (no clock, no fs, no request-time reads), so they are
+// testable with plain values; a post's date is a string from its meta, never
+// compared with the clock.
 
 import type { MDXContent } from "mdx/types";
 import { POST_ENTRIES, type PostEntry } from "@/content/posts";
-import { hireOfferHref } from "@/lib/hire-request";
 
 export const POST_AUDIENCES = ["product-engineer", "small-business", "both"] as const;
 export type PostAudience = (typeof POST_AUDIENCES)[number];
@@ -92,13 +91,6 @@ const AUDIENCE_LABELS: Record<PostAudience, string> = {
 
 export function postAudienceLabel(audience: PostAudience): string {
   return AUDIENCE_LABELS[audience];
-}
-
-/** The Work with me link at a post's end, preselecting the matching offer. */
-export function postHireHref(audience: PostAudience): string {
-  if (audience === "product-engineer") return hireOfferHref("Product engineer");
-  if (audience === "small-business") return hireOfferHref("AI consulting");
-  return "/hire";
 }
 
 async function loadPost(entry: PostEntry): Promise<Post> {

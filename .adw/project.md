@@ -20,7 +20,8 @@ be kept in step with them and with `README.md`.
 - Node: 24 (`.nvmrc`; `volta` pins 24.21.0).
 - Blog posts: `src/content/posts/<slug>.mdx`, registered in `src/content/posts/index.ts`.
 - Changelog entries: `src/content/changelog/<YYYY-MM-DD>-pr<N>.mdx`, registered in
-  `src/content/changelog/index.ts`; generated once by `node scripts/backfill-changelog.ts`.
+  `src/content/changelog/index.ts`; drafted once by `node scripts/backfill-changelog.ts` (with the
+  production pull request's stats), then title, description and lines rewritten by hand from the diff.
 
 ## Workspaces
 
@@ -145,19 +146,19 @@ lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every c
 
 ## Review
 
-- Open at `http://localhost:$PORT`: `/` (the intro page: heading, intro, the ADW line with its
-  Watch me build link to `/projects`, two door cards into `/hire?offer=...`; no sidebar, no pill),
+- Open at `http://localhost:$PORT`: `/` (the intro page: heading, the Remote, Lisbon line, intro with its issebya.com link,
+  two door cards into `/hire?offer=...`; no sidebar, no pill),
   `/projects/log` (the summary: the sidebar with Daily log current, the pill and the worker widget, then heading, intro, note, the today card with a
   Refresh button above the past day cards with their What I worked on, Tokens by model and What each step cost chart cards, per-project tables), `/projects` (project sidebar, with the Daily log entry and the worker status widget at its bottom, plus every active run
   grouped by project under a `Building now` heading, or "No runs in progress." when none) and `/projects/SBub/issebya-homes-ai-system` (header, Building now, Up next and
   Shipped sections), or the first project the sidebar lists if that slug is 404, and
-  `/hire` (heading, intro, LinkedIn link, the form with the two offers, the Turnstile widget, the
+  `/hire` (heading, the Remote, Lisbon line, LinkedIn link, the form with the offer select, the Turnstile widget, the
   fuchsia Send button; no sidebar, no pill), `/writing` (heading, intro, the first post with its
-  audience tag; no sidebar, no pill) and `/writing/my-moat` (title, date, tag, body, Work with me
-  link), `/projects/changelog` (the sidebar with Changelog current below Daily log, heading,
-  intro, entries newest first with date, title and counts) and one entry such as
-  `/projects/changelog/2026-10-09-pr163` (date, title, production PR link, opening paragraph, the
-  Features, Fixes and Chores lists). The fuchsia Work with me button is in the header on every
+  audience tag; no sidebar, no pill) and `/writing/my-moat` (title, date, tag, body ending with
+  its Watch me build live link to `/projects`), `/projects/changelog` (the sidebar with Changelog current below Daily log, heading,
+  intro, entries newest first with date, title, stats strip and counts) and one entry such as
+  `/projects/changelog/2026-10-09-pr163` (date, title, the stats strip with the PR link, diff,
+  commits, files and comments, the description, the Features, Fixes and Chores lists). The fuchsia Work with me button is in the header on every
   route. Capture each at desktop 1920x1080 and mobile
   375x667, full page, into `agents/<adw_id>/<agent_name>/review_img/` in the worktree.
 - The sidebar's connection indicator (dashboard routes only; `/`, `/writing` and `/hire` have none) moves from `connecting` to `live` once the Realtime channel

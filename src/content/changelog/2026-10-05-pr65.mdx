@@ -1,17 +1,18 @@
 export const meta = {
   date: "2026-10-05",
   pr: 65,
-  title: "promote develop to master",
+  title: "Daily summary page, Skills section removed",
   kind: "release",
   counts: { features: 1, fixes: 0, chores: 1 },
+  stats: { additions: 2168, deletions: 1234, commits: 11, files: 39, comments: 1 },
 };
 
-Promote develop to master with the latest dashboard improvements and fixes.
+A new Summary page shows each day's runs: how many completed and failed, the mix of issue classes, median duration, tokens and cost. I took the Skills section down for now.
 
 ## Features
 
-- Summary page: runs per day with class distribution, median duration, tokens and cost ([#55](https://github.com/SBub/adw-dashboard/issues/55), [PR #59](https://github.com/SBub/adw-dashboard/pull/59))
+- A Summary page with one card per day: runs completed and failed, issue classes, median duration, tokens and cost, and a table per project ([#55](https://github.com/SBub/adw-dashboard/issues/55), [PR #59](https://github.com/SBub/adw-dashboard/pull/59))
 
 ## Chores
 
-- Remove the Skills section for now ([#63](https://github.com/SBub/adw-dashboard/issues/63), [PR #64](https://github.com/SBub/adw-dashboard/pull/64))
+- Removed the Skills section for now ([#63](https://github.com/SBub/adw-dashboard/issues/63), [PR #64](https://github.com/SBub/adw-dashboard/pull/64))

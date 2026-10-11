@@ -1,22 +1,23 @@
 export const meta = {
   date: "2026-10-05",
   pr: 16,
-  title: "repo link in the header, European dates, ADW onboarding",
+  title: "European dates, paged history, repository link",
   kind: "release",
   counts: { features: 2, fixes: 0, chores: 5 },
+  stats: { additions: 2633, deletions: 378, commits: 30, files: 31, comments: 1 },
 };
 
-Second production release. Everything merged into develop since the first release, five of them built end to end by ADW from a labelled issue.
+Dates now read as DD.MM.YYYY, and a project's History shows three runs per page. The repository name in the project header is the link to GitHub. This is also the first release where ADW built most of the changes from labelled issues.
 
 ## Features
 
-- Format dates on the dashboard in European format ([#10](https://github.com/SBub/adw-dashboard/issues/10), [PR #13](https://github.com/SBub/adw-dashboard/pull/13))
-- Paginate a project's completed history with a keyset bookmark, three per page ([#17](https://github.com/SBub/adw-dashboard/issues/17), [PR #18](https://github.com/SBub/adw-dashboard/pull/18))
+- Dates and times show as DD.MM.YYYY HH:MM UTC across the dashboard ([#10](https://github.com/SBub/adw-dashboard/issues/10), [PR #13](https://github.com/SBub/adw-dashboard/pull/13))
+- History shows three completed runs per page, with Newer and Older links ([#17](https://github.com/SBub/adw-dashboard/issues/17), [PR #18](https://github.com/SBub/adw-dashboard/pull/18))
 
 ## Chores
 
-- onboard the repository to the ADW toolkit ([PR #11](https://github.com/SBub/adw-dashboard/pull/11))
-- Make the repository name a link and fix the arrow glyph in the project header ([#9](https://github.com/SBub/adw-dashboard/issues/9), [PR #12](https://github.com/SBub/adw-dashboard/pull/12))
-- ignore the Playwright MCP output directory and drop the committed snapshots ([PR #14](https://github.com/SBub/adw-dashboard/pull/14))
-- Keep the History title in the static shell; pagination and list as two request-time islands ([#20](https://github.com/SBub/adw-dashboard/issues/20), [PR #21](https://github.com/SBub/adw-dashboard/pull/21))
-- Route project pages as /projects/\[owner\]/\[repo\] instead of a catch-all slug ([#22](https://github.com/SBub/adw-dashboard/issues/22), [PR #24](https://github.com/SBub/adw-dashboard/pull/24))
+- Set the repository up for the ADW toolkit, so it can plan, build and review issues here ([PR #11](https://github.com/SBub/adw-dashboard/pull/11))
+- The repository name in the project header is now the link to GitHub; the separate Repository button and its broken arrow are gone ([#9](https://github.com/SBub/adw-dashboard/issues/9), [PR #12](https://github.com/SBub/adw-dashboard/pull/12))
+- Stopped committing the browser snapshots the review step writes, and removed the three that slipped in ([PR #14](https://github.com/SBub/adw-dashboard/pull/14))
+- The History title shows straight away; only the list and its page links wait for data ([#20](https://github.com/SBub/adw-dashboard/issues/20), [PR #21](https://github.com/SBub/adw-dashboard/pull/21))
+- The project page route now has named owner and repo parts; addresses stay the same ([#22](https://github.com/SBub/adw-dashboard/issues/22), [PR #24](https://github.com/SBub/adw-dashboard/pull/24))

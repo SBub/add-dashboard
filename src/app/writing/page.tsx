@@ -5,13 +5,11 @@ import { getPosts } from "@/lib/posts";
 
 export const metadata: Metadata = {
   title: "Writing",
-  description:
-    "Writing by Sviatlana Buben on product engineering and AI that takes work off your plate.",
+  description: "Writing by Sviatlana Buben on product engineering and AI.",
   alternates: { canonical: "/writing" },
 };
 
-const WRITING_INTRO =
-  "[Placeholder] Short essays on product engineering and AI that takes work off your plate.";
+const WRITING_INTRO = "Short essays on product engineering and AI";
 
 // Static: the posts are modules in the repository (src/content/posts/), read
 // through getPosts at build time; no request-time reads, no clock. Outside

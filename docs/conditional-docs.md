@@ -13,7 +13,7 @@ One line per feature doc in `app_docs/`, saying when to read it; read the lines 
 - `app_docs/error-and-loading-boundaries.md`: read when adding a `Suspense`, a `QueryBoundary`, a `SectionBoundary` or a loading fallback; when a failed read takes down more than its own section.
 - `app_docs/realtime.md`: read when changing the `adw` channel, a Realtime reducer, the catch-up read or the connection pill; when a live update does not reach the screen.
 - `app_docs/summary.md`: read when changing `/projects/log` (the daily log), its charts, its today card, its cache scopes or the sidebar's Daily log entry; when a day's totals look wrong.
-- `app_docs/hire.md`: read when changing `/hire`, its form, the `sendHireRequest` action, `src/content/hire.ts`, the Turnstile or Resend configuration, the Work with me header button or the `?offer=` preselect.
-- `app_docs/home.md`: read when changing `/`, its copy in `src/content/home.ts` or its two doors into `/hire`.
+- `app_docs/hire.md`: read when changing `/hire`, its form, the `sendHireRequest` action, `src/content/hire.ts`, the Turnstile or Resend configuration, the Work with me header button, the offer prompts or `?offer=`.
+- `app_docs/home.md`: read when changing `/`, its copy in `src/content/home.ts`, `LOCATION` in `src/content/site.ts` or its two doors into `/hire`.
 - `app_docs/writing.md`: read when adding or changing a post under `src/content/posts/`, the registry, `src/lib/posts.ts`, `/writing`, a post page, its Open Graph image or `src/mdx-components.tsx`.
-- `app_docs/changelog.md`: read when adding or changing a changelog entry under `src/content/changelog/`, its registry, `src/lib/changelog.ts`, `src/lib/changelog-backfill.ts`, `scripts/backfill-changelog.ts`, `/projects/changelog` or the sidebar's Changelog entry.
+- `app_docs/changelog.md`: read when adding or changing a changelog entry under `src/content/changelog/`, its registry, `src/lib/changelog.ts`, `src/lib/changelog-backfill.ts`, `scripts/backfill-changelog.ts`, `src/components/ChangelogStats.tsx` (the stats strip), `/projects/changelog` or the sidebar's Changelog entry.

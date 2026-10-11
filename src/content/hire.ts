@@ -18,5 +18,5 @@ export const HIRE_INTRO: string[] = [
   "[Placeholder] If that sounds like what you need, tell me a little about it below and I will reply by email.",
 ];
 
-// Placeholder: the owner's LinkedIn profile URL.
-export const LINKEDIN_URL = "https://www.linkedin.com/in/REPLACE_ME";
+// The owner's LinkedIn profile, linked below the intro.
+export const LINKEDIN_URL = "https://www.linkedin.com/in/sviatlana-buben-42662566";

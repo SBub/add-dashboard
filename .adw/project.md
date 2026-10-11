@@ -153,8 +153,8 @@ lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every c
   Shipped sections), or the first project the sidebar lists if that slug is 404, and
   `/hire` (heading, intro, LinkedIn link, the form with the two offers, the Turnstile widget, the
   fuchsia Send button; no sidebar, no pill), `/writing` (heading, intro, the first post with its
-  audience tag; no sidebar, no pill) and `/writing/my-moat` (title, date, tag, body, Work with me
-  link), `/projects/changelog` (the sidebar with Changelog current below Daily log, heading,
+  audience tag; no sidebar, no pill) and `/writing/my-moat` (title, date, tag, body ending with
+  its Watch me build live link to `/projects`), `/projects/changelog` (the sidebar with Changelog current below Daily log, heading,
   intro, entries newest first with date, title and counts) and one entry such as
   `/projects/changelog/2026-10-09-pr163` (date, title, production PR link, opening paragraph, the
   Features, Fixes and Chores lists). The fuchsia Work with me button is in the header on every

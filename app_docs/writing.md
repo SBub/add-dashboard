@@ -8,8 +8,8 @@
 
 `/writing` (`src/app/writing/page.tsx`) lists the visible posts newest first: each with its title
 linking to the post, its `DD.MM.YYYY` date, its audience tag and its description.
-`/writing/[slug]` (`src/app/writing/[slug]/page.tsx`) renders one post: title, date, tag, the MDX
-body and a closing Work with me link. Both sit outside `(dashboard)`: no sidebar, no `Providers`, no
+`/writing/[slug]` (`src/app/writing/[slug]/page.tsx`) renders one post: title, date, tag and the MDX
+body, which ends with the post's own last line (no call to action is added after it). Both sit outside `(dashboard)`: no sidebar, no `Providers`, no
 Realtime, no pill. Posts are MDX modules under `src/content/posts/`, compiled by `@next/mdx`
 (`createMDX()` in `next.config.ts`) and styled by `src/mdx-components.tsx` (server only).
 
@@ -53,13 +53,12 @@ variable, needs no `.env*` entry and does not touch the data boundary's list of 
 An optional `src/content/posts/<slug>.linkedin.md` beside a post holds its LinkedIn text. It is
 never listed in the registry, imported, routed or rendered; it is copied into LinkedIn by hand.
 
-### Order, tag and Work with me
+### Order and tag
 
 `sortPostsNewestFirst` orders by date descending, equal dates by slug. `postAudienceLabel` gives
-"For product teams", "For business owners" or "For everyone". `postHireHref` maps
-`product-engineer` to `/hire?offer=product-engineer` and `small-business` to
-`/hire?offer=ai-consulting` (both through `hireOfferHref`, see `app_docs/hire.md`), and `both` to
-a plain `/hire`.
+"For product teams", "For business owners" or "For everyone". The audience only picks the tag: the
+post page links nowhere after the body, so a post that wants a next step writes it as its own last
+line (`my-moat` ends with `[Watch me build live](/projects)`).
 
 ### Static params and the \_ placeholder
 
@@ -116,3 +115,5 @@ shared by the list and the post page (see `app_docs/clock-and-prerender.md`).
 - Metadata URLs (`canonical`, `openGraph.url`, images) are relative paths; never hardcode a host.
   The host comes only from `metadataBase`, that is from `siteUrl` in `src/lib/site-url.ts`.
 - A page that sets its own `openGraph` repeats `siteName: SITE_NAME`.
+- A post page never adds a call to action (a Work with me link, a hire box) after the MDX body: a
+  post ends with its own last line.

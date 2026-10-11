@@ -1,15 +1,15 @@
 # E2E Test: Writing
 
 Checks the blog at `/writing`: the list with the first post, its title link, date and audience tag;
-the post page at `/writing/my-moat` with its title, Open Graph tags and the closing `Work with me`
-link to `/hire?offer=product-engineer`; that the header marks `Writing` as current on both; and that
+the post page at `/writing/my-moat` with its title, Open Graph tags and its own closing
+`Watch me build live` link to `/projects`, with no `Work with me` link inside the article; that the header marks `Writing` as current on both; and that
 neither page scrolls horizontally at 375px. It never submits the `/hire` form.
 
 ## User Story
 
 As a reader arriving from a LinkedIn post
-I want the post to open on its own page with a clear title and a way to get in touch
-So that I can read it and reach the Work with me form in one click
+I want the post to open on its own page with a clear title and end on its own last line
+So that I can read it and follow it to the live build in one click
 
 ## Test Steps
 
@@ -23,8 +23,9 @@ So that I can read it and reach the Work with me form in one click
 5. Click the post link. **Verify** the URL is `/writing/my-moat`, the heading (level 1) is
    `My moat as a Product Engineer`, and the `Writing` header link still has
    `aria-current="page"`.
-6. With `browser_evaluate`, **Verify** the last link inside the `article` has text `Work with me`
-   and `href="/hire?offer=product-engineer"`. Take a full-page screenshot.
+6. With `browser_evaluate`, **Verify** the last link inside the `article` has text
+   `Watch me build live` and `href="/projects"`, and no link inside the `article` has text
+   `Work with me`. Take a full-page screenshot.
 7. With `browser_evaluate`, **Verify**
    `document.querySelector('meta[property="og:title"]').content` is
    `My moat as a Product Engineer` and
@@ -38,7 +39,8 @@ So that I can read it and reach the Work with me form in one click
 
 - `/writing` lists the first post with its title link, date and the tag `For product teams`.
 - `/writing/my-moat` shows the post title as its heading, carries `og:title` and a non-empty
-  `og:image`, and ends with a `Work with me` link to `/hire?offer=product-engineer`.
+  `og:image`, and ends with its own `Watch me build live` link to `/projects`; the article has
+  no `Work with me` link.
 - `Writing` is current in the header on both pages; neither has a sidebar or connection indicator.
 - Neither page scrolls horizontally at 375px.
 - 4 screenshots are taken.

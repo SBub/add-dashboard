@@ -3,7 +3,6 @@ import {
   isPostSlug,
   parsePostMeta,
   postAudienceLabel,
-  postHireHref,
   sortPostsNewestFirst,
   visiblePosts,
 } from "./posts";
@@ -85,16 +84,10 @@ describe("visiblePosts", () => {
   });
 });
 
-describe("postAudienceLabel and postHireHref", () => {
+describe("postAudienceLabel", () => {
   it("labels each audience", () => {
     expect(postAudienceLabel("product-engineer")).toBe("For product teams");
     expect(postAudienceLabel("small-business")).toBe("For business owners");
     expect(postAudienceLabel("both")).toBe("For everyone");
-  });
-
-  it("links each audience to its offer", () => {
-    expect(postHireHref("product-engineer")).toBe("/hire?offer=product-engineer");
-    expect(postHireHref("small-business")).toBe("/hire?offer=ai-consulting");
-    expect(postHireHref("both")).toBe("/hire");
   });
 });

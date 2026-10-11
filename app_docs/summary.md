@@ -7,6 +7,7 @@
 - specs/issue-169-adw-98e70d08-sdlc_planner-who-you-are-home-page.md
 - specs/issue-174-adw-d7f72f46-sdlc_planner-summary-chart-core-class-columns.md
 - specs/issue-175-adw-fe4916f8-sdlc_planner-gray-model-phase-charts.md
+- specs/issue-182-adw-00da532e-sdlc_planner-move-summary-to-projects-log.md
 
 ## Overview
 

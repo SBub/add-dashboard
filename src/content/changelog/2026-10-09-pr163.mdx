@@ -1,0 +1,40 @@
+export const meta = {
+  date: "2026-10-09",
+  pr: 163,
+  title: "promote develop to master (2026-10-09)",
+  kind: "release",
+  counts: { features: 5, fixes: 5, chores: 10 },
+};
+
+Promotes `develop` to production (`master`): 85 commits, 20 merged PRs (#121 to #162).
+
+Production is currently broken: the database migration that dropped `adw.daily_summary.halted` is applied, and master still selects that column, so both summary islands on `/` (today and past days) fail. This release includes #134 (halted removed from the summary), which fixes it.
+
+## Features
+
+- Day card: third chart, cost by phase ([#125](https://github.com/SBub/adw-dashboard/issues/125), [PR #126](https://github.com/SBub/adw-dashboard/pull/126))
+- Projects pages: skeleton fallbacks for every Suspense boundary ([#128](https://github.com/SBub/adw-dashboard/issues/128), [PR #130](https://github.com/SBub/adw-dashboard/pull/130))
+- History card: show the cost of each run ([#146](https://github.com/SBub/adw-dashboard/issues/146), [PR #154](https://github.com/SBub/adw-dashboard/pull/154))
+- History card: link the run's pull request ([#147](https://github.com/SBub/adw-dashboard/issues/147), [PR #160](https://github.com/SBub/adw-dashboard/pull/160))
+- Sidebar: worker status widget (online/offline from the heartbeat) ([#158](https://github.com/SBub/adw-dashboard/issues/158), [PR #162](https://github.com/SBub/adw-dashboard/pull/162))
+
+## Fixes
+
+- One background colour for the whole app ([#122](https://github.com/SBub/adw-dashboard/issues/122), [PR #124](https://github.com/SBub/adw-dashboard/pull/124))
+- Column charts: equal spacing between columns ([#131](https://github.com/SBub/adw-dashboard/issues/131), [PR #132](https://github.com/SBub/adw-dashboard/pull/132))
+- History pagination: keep the scroll position and show the pending state on a page turn ([#148](https://github.com/SBub/adw-dashboard/issues/148), [PR #155](https://github.com/SBub/adw-dashboard/pull/155))
+- a running run between phases shows 'Complete' as its phase ([#152](https://github.com/SBub/adw-dashboard/issues/152), [PR #157](https://github.com/SBub/adw-dashboard/pull/157))
+- History order: sort by finished_at, not updated_at ([#153](https://github.com/SBub/adw-dashboard/issues/153), [PR #161](https://github.com/SBub/adw-dashboard/pull/161))
+
+## Chores
+
+- Chart cards: remove the coloured dot before the card titles ([#119](https://github.com/SBub/adw-dashboard/issues/119), [PR #121](https://github.com/SBub/adw-dashboard/pull/121))
+- Queue: read the ledger's reason column instead of note ([#120](https://github.com/SBub/adw-dashboard/issues/120), [PR #123](https://github.com/SBub/adw-dashboard/pull/123))
+- move feature descriptions out of README and AGENTS into feature docs plus the index ([#127](https://github.com/SBub/adw-dashboard/issues/127), [PR #133](https://github.com/SBub/adw-dashboard/pull/133))
+- remove the halted count from the summary ([#134](https://github.com/SBub/adw-dashboard/issues/134), [PR #136](https://github.com/SBub/adw-dashboard/pull/136))
+- Active headings: stop mentioning resume until the UI ships it ([#135](https://github.com/SBub/adw-dashboard/issues/135), [PR #138](https://github.com/SBub/adw-dashboard/pull/138))
+- Queue row: drop the manual hint and the queued time; fix the squeezed title ([#137](https://github.com/SBub/adw-dashboard/issues/137), [PR #139](https://github.com/SBub/adw-dashboard/pull/139))
+- Sticky header: keep the header in view, scroll only the content below it ([#141](https://github.com/SBub/adw-dashboard/issues/141), [PR #143](https://github.com/SBub/adw-dashboard/pull/143))
+- Run rows: show the phase as a friendly label instead of the raw step key ([#142](https://github.com/SBub/adw-dashboard/issues/142), [PR #144](https://github.com/SBub/adw-dashboard/pull/144))
+- History card: drop the redundant fields, show the full branch ([#145](https://github.com/SBub/adw-dashboard/issues/145), [PR #150](https://github.com/SBub/adw-dashboard/pull/150))
+- exclude trees/ and agents/ from TypeScript and ESLint ([#151](https://github.com/SBub/adw-dashboard/issues/151), [PR #156](https://github.com/SBub/adw-dashboard/pull/156))

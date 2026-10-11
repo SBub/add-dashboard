@@ -2,11 +2,11 @@ import { HydrationBoundary } from "@tanstack/react-query";
 import { cacheTag } from "next/cache";
 import { type ReactNode, Suspense } from "react";
 import { ConnectionIndicator } from "@/components/ConnectionIndicator";
-import { DailyLogLink, DailyLogLinkFallback } from "@/components/DailyLogLink";
 import { ProjectNavSkeleton } from "@/components/LoadingSkeletons";
 import { ProjectNav } from "@/components/ProjectNav";
 import { QueryBoundary } from "@/components/QueryBoundary";
 import { SectionBoundary } from "@/components/SectionBoundary";
+import { SidebarEntryLink, SidebarEntryLinkFallback } from "@/components/SidebarEntryLink";
 import { WorkerStatus } from "@/components/WorkerStatus";
 import { getProjects } from "@/data";
 import { getActiveRunsState } from "@/data/active-runs-state";
@@ -65,8 +65,8 @@ async function SidebarActiveRuns() {
   );
 }
 
-// Master-detail shell shared by "/projects", the daily log at "/projects/log"
-// and "/projects/[owner]/[repo]". The project
+// Master-detail shell shared by "/projects", the daily log at "/projects/log",
+// the changelog at "/projects/changelog" and "/projects/[owner]/[repo]". The project
 // list is prefetched once here, in a server layout, into a React Query cache
 // that is dehydrated into the HTML and hydrated in the browser, and the Active
 // entry is read per request by the sidebar island, so the sidebar renders
@@ -113,15 +113,23 @@ export default async function DashboardLayout({ children }: { children: ReactNod
               </SectionBoundary>
             </HydrationBoundary>
           </div>
-          {/* The Daily log entry is static and reads no query, so like the
-              worker widget it sits outside every boundary. shrink-0 and
-              outside the scroll wrapper, so it stays in view from md up; on
-              mobile it follows the project strip. The plain Suspense is for
-              usePathname, which suspends while prerendering a project page
-              outside generateStaticParams (as in SectionNav). */}
-          <div className="shrink-0">
-            <Suspense fallback={<DailyLogLinkFallback />}>
-              <DailyLogLink />
+          {/* The Daily log and Changelog entries are static and read no
+              query, so like the worker widget they sit outside every
+              boundary. shrink-0 and outside the scroll wrapper, so they stay
+              in view from md up; on mobile they follow the project strip.
+              Each plain Suspense is for usePathname, which suspends while
+              prerendering a project page outside generateStaticParams (as in
+              SectionNav). */}
+          <div className="flex shrink-0 flex-col gap-2">
+            <Suspense
+              fallback={<SidebarEntryLinkFallback href="/projects/log" label="Daily log" />}
+            >
+              <SidebarEntryLink href="/projects/log" label="Daily log" />
+            </Suspense>
+            <Suspense
+              fallback={<SidebarEntryLinkFallback href="/projects/changelog" label="Changelog" />}
+            >
+              <SidebarEntryLink href="/projects/changelog" label="Changelog" nested />
             </Suspense>
           </div>
           {/* The worker widget is here because the (dashboard) layout is the

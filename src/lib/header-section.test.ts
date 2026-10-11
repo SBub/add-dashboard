@@ -7,6 +7,11 @@ describe("headerSection", () => {
     expect(headerSection("/projects/log/")).toBe("watch");
   });
 
+  it("is watch for the changelog and its entries", () => {
+    expect(headerSection("/projects/changelog")).toBe("watch");
+    expect(headerSection("/projects/changelog/2026-10-09-pr163")).toBe("watch");
+  });
+
   it("is watch for the overview and a project page", () => {
     expect(headerSection("/projects")).toBe("watch");
     expect(headerSection("/projects/SBub/adw-dashboard")).toBe("watch");

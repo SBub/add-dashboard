@@ -1,0 +1,30 @@
+export const meta = {
+  date: "2026-10-05",
+  pr: 37,
+  title: "issue titles, client router cache, queued count",
+  kind: "release",
+  counts: { features: 7, fixes: 1, chores: 4 },
+};
+
+Third production release. Everything merged into develop since the second release, all built by ADW from labelled issues.
+
+## Features
+
+- Show the issue title on run rows ([#25](https://github.com/SBub/adw-dashboard/issues/25), [PR #33](https://github.com/SBub/adw-dashboard/pull/33))
+- Show the queued count per project in the sidebar ([#30](https://github.com/SBub/adw-dashboard/issues/30), [PR #35](https://github.com/SBub/adw-dashboard/pull/35))
+- Queue section on the project page with live updates ([#31](https://github.com/SBub/adw-dashboard/issues/31), [PR #39](https://github.com/SBub/adw-dashboard/pull/39))
+- Search completed history by issue title, number, branch or run id ([#38](https://github.com/SBub/adw-dashboard/issues/38), [PR #41](https://github.com/SBub/adw-dashboard/pull/41))
+- History pagination as arrows with a derived page number ([#40](https://github.com/SBub/adw-dashboard/issues/40), [PR #44](https://github.com/SBub/adw-dashboard/pull/44))
+- Explain Queue, Active and History under each heading, with an accessible detail affordance ([#45](https://github.com/SBub/adw-dashboard/issues/45), [PR #49](https://github.com/SBub/adw-dashboard/pull/49))
+- Skills section: a rendered library of Claude skills, starting with Server prefetch with hydration ([#32](https://github.com/SBub/adw-dashboard/issues/32), [PR #56](https://github.com/SBub/adw-dashboard/pull/56))
+
+## Fixes
+
+- History header: keep the search box next to the title, pagination on the right, regardless of results ([#46](https://github.com/SBub/adw-dashboard/issues/46), [PR #52](https://github.com/SBub/adw-dashboard/pull/52))
+
+## Chores
+
+- Move the run status badge to the right edge of the row ([#26](https://github.com/SBub/adw-dashboard/issues/26), [PR #27](https://github.com/SBub/adw-dashboard/pull/27))
+- Keep project pages in the client router cache so navigating back does not refetch history ([#29](https://github.com/SBub/adw-dashboard/issues/29), [PR #34](https://github.com/SBub/adw-dashboard/pull/34))
+- One status colour map for every surface: queued amber, running emerald, completed sky, failed rose ([#42](https://github.com/SBub/adw-dashboard/issues/42), [PR #48](https://github.com/SBub/adw-dashboard/pull/48))
+- Project page sections in the order Active, Queue, History ([#51](https://github.com/SBub/adw-dashboard/issues/51), [PR #58](https://github.com/SBub/adw-dashboard/pull/58))

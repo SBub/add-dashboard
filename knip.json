@@ -1,7 +1,11 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "next": true,
-  "project": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.css", "src/**/*.mdx"],
-  "ignoreExportsUsedInFile": { "interface": true, "type": true },
-  "ignoreDependencies": ["@playwright/mcp"]
+  "project": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.css", "src/**/*.mdx", "scripts/**/*.ts"],
+  "ignoreExportsUsedInFile": {
+    "interface": true,
+    "type": true
+  },
+  "ignoreDependencies": ["@playwright/mcp"],
+  "entry": ["scripts/backfill-changelog.ts"]
 }

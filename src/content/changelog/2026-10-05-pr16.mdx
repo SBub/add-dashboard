@@ -1,0 +1,22 @@
+export const meta = {
+  date: "2026-10-05",
+  pr: 16,
+  title: "repo link in the header, European dates, ADW onboarding",
+  kind: "release",
+  counts: { features: 2, fixes: 0, chores: 5 },
+};
+
+Second production release. Everything merged into develop since the first release, five of them built end to end by ADW from a labelled issue.
+
+## Features
+
+- Format dates on the dashboard in European format ([#10](https://github.com/SBub/adw-dashboard/issues/10), [PR #13](https://github.com/SBub/adw-dashboard/pull/13))
+- Paginate a project's completed history with a keyset bookmark, three per page ([#17](https://github.com/SBub/adw-dashboard/issues/17), [PR #18](https://github.com/SBub/adw-dashboard/pull/18))
+
+## Chores
+
+- onboard the repository to the ADW toolkit ([PR #11](https://github.com/SBub/adw-dashboard/pull/11))
+- Make the repository name a link and fix the arrow glyph in the project header ([#9](https://github.com/SBub/adw-dashboard/issues/9), [PR #12](https://github.com/SBub/adw-dashboard/pull/12))
+- ignore the Playwright MCP output directory and drop the committed snapshots ([PR #14](https://github.com/SBub/adw-dashboard/pull/14))
+- Keep the History title in the static shell; pagination and list as two request-time islands ([#20](https://github.com/SBub/adw-dashboard/issues/20), [PR #21](https://github.com/SBub/adw-dashboard/pull/21))
+- Route project pages as /projects/\[owner\]/\[repo\] instead of a catch-all slug ([#22](https://github.com/SBub/adw-dashboard/issues/22), [PR #24](https://github.com/SBub/adw-dashboard/pull/24))

@@ -5,6 +5,7 @@
 - specs/issue-127-adw-2ab91140-sdlc_planner-move-feature-docs.md
 - specs/issue-134-adw-b6fb710c-sdlc_planner-remove-halted-from-summary.md
 - specs/issue-169-adw-98e70d08-sdlc_planner-who-you-are-home-page.md
+- specs/issue-174-adw-d7f72f46-sdlc_planner-summary-chart-core-class-columns.md
 
 ## Overview
 

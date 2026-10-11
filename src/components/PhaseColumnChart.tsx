@@ -14,7 +14,7 @@ interface PhaseColumnChartProps {
 
 /**
  * A day's cost by pipeline phase, one column per phase in sumPhaseUsage's
- * pipeline order (Plan, Build, Test, Review, Document; CI has no cost and is
+ * pipeline order (Plan, Build, Test, Review, Docs; CI has no cost and is
  * omitted), the cost on the bar and the phase name below; hover or focus
  * shows the four-way token split, the total time and the runs. With no phases
  * it keeps its caption and plot height and says so.

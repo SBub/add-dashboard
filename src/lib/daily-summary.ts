@@ -3,8 +3,8 @@
 // report and the today card assembled from adw.daily_summary rows (and the
 // adw.daily_model_summary rows, summed per model by sumModelUsage in
 // src/lib/model-usage.ts, and the adw.daily_phase_summary rows, summed per
-// phase by sumPhaseUsage in src/lib/phase-usage.ts), the class bar's segments, the column charts'
-// class counts, heights and value placement, and the number labels. No clock, no cache, no IO, so every
+// phase by sumPhaseUsage in src/lib/phase-usage.ts), the class bar's segments, the class column
+// chart's columns (classColumns), the column heights and value placement, and the number labels. No clock, no cache, no IO, so every
 // case is unit-tested with fixed inputs (src/lib/daily-summary.test.ts). The
 // data boundary (getSummaryPast and getSummaryToday in src/data/index.ts)
 // reads the rows and calls toSummaryReport or toSummaryDay; the components
@@ -189,24 +189,46 @@ export interface ClassCount {
   count: number;
 }
 
-/**
- * A day's runs per issue class in a fixed order (/feature, /chore, /bug,
- * /patch, other), zero counts omitted, the rest keeping their relative order.
- * "other" is the runs with no known class, floored at 0. Shared by the class
- * bar and the class column chart, so both show the same order.
- */
-export function classCounts(
+/** Every class with its count in the fixed order, zeros included; "other" floored at 0. */
+function allClassCounts(
   day: Pick<DailySummary, "runs" | "features" | "bugs" | "chores" | "patches">,
 ): ClassCount[] {
   const known = day.features + day.bugs + day.chores + day.patches;
-  const counts: ClassCount[] = [
+  return [
     { key: "/feature", count: day.features },
     { key: "/chore", count: day.chores },
     { key: "/bug", count: day.bugs },
     { key: "/patch", count: day.patches },
     { key: "other", count: Math.max(0, day.runs - known) },
   ];
-  return counts.filter(({ count }) => count > 0);
+}
+
+/**
+ * A day's runs per issue class in a fixed order (/feature, /chore, /bug,
+ * /patch, other), zero counts omitted, the rest keeping their relative order.
+ * "other" is the runs with no known class, floored at 0. The class bar's
+ * source (through classSegments); the class column chart uses classColumns,
+ * which shares this order.
+ */
+export function classCounts(
+  day: Pick<DailySummary, "runs" | "features" | "bugs" | "chores" | "patches">,
+): ClassCount[] {
+  return allClassCounts(day).filter(({ count }) => count > 0);
+}
+
+/** The classes the column chart always shows, even at zero. */
+const CORE_CLASSES: readonly ClassKey[] = ["/feature", "/chore", "/bug"];
+
+/**
+ * The class column chart's columns in classCounts' order: /feature, /chore and
+ * /bug always (zero counts included, so every day card has the same three
+ * columns), then /patch and other only when above 0. classCounts and the class
+ * bar keep omitting zeros.
+ */
+export function classColumns(
+  day: Pick<DailySummary, "runs" | "features" | "bugs" | "chores" | "patches">,
+): ClassCount[] {
+  return allClassCounts(day).filter(({ key, count }) => CORE_CLASSES.includes(key) || count > 0);
 }
 
 /**

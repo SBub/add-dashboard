@@ -5,6 +5,7 @@
 - specs/issue-127-adw-2ab91140-sdlc_planner-move-feature-docs.md
 - specs/issue-134-adw-b6fb710c-sdlc_planner-remove-halted-from-summary.md
 - specs/issue-169-adw-98e70d08-sdlc_planner-who-you-are-home-page.md
+- specs/issue-174-adw-d7f72f46-sdlc_planner-summary-chart-core-class-columns.md
 
 ## Overview
 
@@ -18,17 +19,19 @@ The summary at `/watch` (`src/app/watch/page.tsx`): finished runs per UTC day ac
 in its own card with a Refresh button: runs
 completed and failed, then three bordered chart
 cards, in one row from 1024px and stacked below, each with a title and a
-muted subtitle: "What I worked on" ("Runs finished that day", one
-column per class present, counting completed and failed runs, so the title
+muted subtitle: "What I worked on" ("Runs finished that day", `feature`,
+`chore` and `bug` always, even at 0 (a zero column is a hairline at the
+baseline with `0` above it and a `0%` share), `patch` and `other` only when
+present (`classColumns`), counting completed and failed runs, so the title
 does not say shipped), "Tokens by model" ("All tokens, including cache
 reads", one column per model) and "What each step cost" ("What each pipeline step
 cost that day", one column per pipeline phase). The order is fixed every day
 and comes from the data shape, never from the values: `feature`, `chore`,
-`bug`, `patch`, `other` (`classCounts`, which the per-project table's class
-bar shares), `Haiku`, `Sonnet`, `Opus`, then any other model
-(`sumModelUsage`), and `Plan`, `Build`, `Test`, `Review`, `Document`
-(`sumPhaseUsage`; CI has no cost and is never shown); absent entries are
-omitted. The plot is 180px high with faint dotted guide lines and bars with
+`bug`, `patch`, `other` (`classColumns` for the chart, `classCounts` for the
+per-project table's class bar, both in the same order), `Haiku`, `Sonnet`, `Opus`, then any other model
+(`sumModelUsage`), and `Plan`, `Build`, `Test`, `Review`, `Docs`
+(`sumPhaseUsage`; CI has no cost and is never shown); absent models, phases
+and optional classes (`patch`, `other`) are omitted. The plot is 180px high with faint dotted guide lines and bars with
 rounded tops and a capped width; every column takes the same slot width
 whatever its name, so the bars are evenly spaced; the value (run count, token label or cost in
 dollars) sits in
@@ -200,17 +203,19 @@ card; Refresh is the remedy. The page has no Realtime listener: it is outside
   model colours only from `MODEL_BG` and phase colours only from `PHASE_BG`
   in `src/lib/chart-colors.ts`; class hues
   match `IssueClassBadge`; completed and failed counts use `STATUS_COLORS`.
-  The column geometry and labels (`classCounts`, `columnHeights`,
+  The column geometry and labels (`classCounts`, `classColumns`, `columnHeights`,
   `barValueInside`, `classLabel`, `shareLabel`) live in
   `src/lib/daily-summary.ts`; each chart scales to its own maximum.
 - All three chart orders are fixed and come from the data shape, never from a
-  sort by value in a component: classes `feature`, `chore`, `bug`, `patch`,
-  `other` from `classCounts` (shared with `ClassDistributionBar` through
-  `classSegments`), models `Haiku`, `Sonnet`, `Opus`, then any other from
-  `sumModelUsage`, phases `Plan`, `Build`, `Test`, `Review`, `Document` from
+  sort by value in a component: classes `feature`, `chore`, `bug` always,
+  then `patch`, `other` when above 0, from `classColumns` for the class
+  chart, while `classCounts` (shared with `ClassDistributionBar` through
+  `classSegments`) keeps omitting zeros in the same order; models `Haiku`, `Sonnet`, `Opus`, then any other from
+  `sumModelUsage`, phases `Plan`, `Build`, `Test`, `Review`, `Docs` from
   `sumPhaseUsage` (CI has no cost and is omitted, as is any unknown phase
-  key). Absent entries are omitted; the components render the
-  arrays as given.
+  key). Absent models, phases and optional classes are omitted; the
+  components render the arrays as given. Never filter the three core classes
+  out of the class chart, and never add zero segments to the class bar.
 - Each day card shows three chart cards under its header, work by class,
   tokens by model and cost by phase (`DayCharts`), in one row from `lg` and
   stacked below (at `sm` three cards are too narrow for five columns); the

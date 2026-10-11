@@ -32,7 +32,13 @@ the site
    `What's eating your time, or what are you building?`.
 10. With `browser_evaluate`, collect the `bg-fuchsia-*` classes of the `Send` button and of the
     header's `Work with me` link. **Verify** the two lists are identical and not empty.
-11. **Verify** the page has no connection indicator and no `Projects` sidebar navigation.
+11. **Verify** the accessibility snapshot has no connection indicator (no `status` element, no
+    `connecting`, `live` or `reconnecting` text) and no `Projects` sidebar navigation. Judge this
+    from `browser_snapshot`, never from a raw DOM query such as
+    `document.querySelector('nav[aria-label="Projects"]')`: with `cacheComponents`, Next keeps the
+    project page from step 4 in the document inside a hidden React `Activity` (`display: none`).
+    That subtree is not rendered, is absent from the accessibility snapshot and does not count as
+    present.
 12. Choose an offer, fill the email with `visitor@example.com`, leave the motivation empty and
     click `Send`.
 13. **Verify** the URL is still `/hire` with no query, and with `browser_evaluate` that the

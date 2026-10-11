@@ -37,7 +37,7 @@ describe("phaseName", () => {
     ["adw_build_iso", "Build"],
     ["adw_test_iso", "Test"],
     ["adw_review_iso", "Review"],
-    ["adw_document_iso", "Document"],
+    ["adw_document_iso", "Docs"],
   ] as const)("%s is %s", (phase, name) => {
     expect(phaseName(phase)).toBe(name);
   });

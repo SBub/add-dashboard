@@ -70,8 +70,20 @@ fails the build, so a production build with only drafts returns `[{ slug: "_" }]
 
 ### Metadata and the Open Graph image
 
-`generateMetadata` sets `title`, `description` and `openGraph` (`type: "article"`,
-`publishedTime` from `meta.date`, the author). The 1200x630 PNG comes from
+`generateMetadata` sets `title`, `description`, `alternates.canonical` and `openGraph`
+(`type: "article"`, `url`, `siteName`, `publishedTime` from `meta.date`, the author). The canonical
+link and `og:url` are the relative `/writing/<slug>`; `/writing` sets the canonical `/writing`.
+
+Every relative metadata URL (these, and the Open Graph image's) becomes absolute through
+`metadataBase` in the root layout (`src/app/layout.tsx`), which is `siteUrl` (given `SITE_URL` and `VERCEL_PROJECT_PRODUCTION_URL`) from
+`src/lib/site-url.ts`. `siteUrl` is pure: it trims `SITE_URL`, strips trailing commas and slashes
+(a pasted `https://build.issebya.com,` works) and keeps it when it is an `http(s)` URL; otherwise
+it uses `https://${VERCEL_PROJECT_PRODUCTION_URL}` when Vercel sets that, else
+`http://localhost:3000`. The layout also sets `openGraph.siteName` to `SITE_NAME`
+("Sviatlana Buben", the header's brand). Metadata merges shallowly, so a page that sets its own
+`openGraph` (a post) replaces the layout's whole and repeats `siteName`. `SITE_URL` is read when
+the layout module is evaluated, so for a prerendered page (`/writing`, a post) it is the value in
+the build's environment; it is server only and needs no `NEXT_PUBLIC_` prefix. The 1200x630 PNG comes from
 `src/app/writing/[slug]/opengraph-image.tsx` (`ImageResponse`, the title plus the author's name,
 default bundled font, no fetch, no external fonts or images). It uses `generateImageMetadata`
 because that is the only way to give each image a per-post alt (the post title), and that puts the
@@ -101,3 +113,6 @@ shared by the list and the post page (see `app_docs/clock-and-prerender.md`).
   the `_` placeholder), and `generateImageMetadata` never returns an empty list for the slug-less
   build call (keep the `og` fallback id).
 - Every post is registered in `POST_ENTRIES` with a string-literal import.
+- Metadata URLs (`canonical`, `openGraph.url`, images) are relative paths; never hardcode a host.
+  The host comes only from `metadataBase`, that is from `siteUrl` in `src/lib/site-url.ts`.
+- A page that sets its own `openGraph` repeats `siteName: SITE_NAME`.

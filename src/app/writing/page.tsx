@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "Writing",
   description:
     "Writing by Sviatlana Buben on product engineering and AI that takes work off your plate.",
+  alternates: { canonical: "/writing" },
 };
 
 const WRITING_INTRO =

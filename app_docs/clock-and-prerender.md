@@ -46,13 +46,13 @@ needs no snapshot, and its cache scope exists for the tag, not for a
 clock-read permission.
 
 There is a second argument-less clock read: `utcDay(Date.now())` in the
-summary page's `requestToday` (`src/app/watch/page.tsx`), which turns the request
+summary page's `requestToday` (`src/app/(dashboard)/projects/log/page.tsx`), which turns the request
 time into today's UTC date. It runs only after `await connection()`, so only at
 request time, never in a prerender pass and never in client render, and the
 day it yields is passed down as an argument (see `app_docs/summary.md`).
 
 The intro page `/` (`src/app/page.tsx`) reads no clock: it is prerendered
-whole and has no live figure, so moving the summary to `/watch` did not change
+whole and has no live figure, so moving the summary to `/watch` and then to `/projects/log` did not change
 the count of argument-less clock sites (see `app_docs/home.md`).
 `/writing` and its post pages read no clock either (a post's date is its
 `meta.date` through `formatDay`), so the blog leaves the count of clock sites
@@ -83,7 +83,7 @@ server snapshot is data-free.
   after its `await connection()`, so only at request time (in
   the browser it runs as a `queryFn` on a cache miss and in the realtime
   catch-up, where a clock read is fine), and `utcDay(Date.now())` in the
-  summary page's `requestToday` (`src/app/watch/page.tsx`, a plain function, not a
+  summary page's `requestToday` (`src/app/(dashboard)/projects/log/page.tsx`, a plain function, not a
   component body, which `react-hooks/purity` forbids), directly after its
   `await connection()`, so only at request time, never in a prerender pass and
   never in client render. Its day is passed down as an argument; nothing below

@@ -7,7 +7,7 @@
 ## Overview
 
 `/` (`src/app/page.tsx`) is a static intro page that sits outside `(dashboard)`: an `h1`, the intro
-paragraphs, the ADW line with its "Watch me build" link to `/watch`, and two door cards into
+paragraphs, the ADW line with its "Watch me build" link to `/projects`, and two door cards into
 `/hire?offer=product-engineer` and `/hire?offer=ai-consulting`. No sidebar, no connection pill.
 
 ## How it works
@@ -29,7 +29,7 @@ slug table (`OFFER_SLUG`) lives there too, and `/hire` maps the slug back to the
 
 `HomePage` is not async and takes no props: the whole page is the static shell and is prerendered
 whole. It has no live ADW figure on purpose: one would be a third argument-less clock read (see
-`app_docs/clock-and-prerender.md`). The static link to `/watch` is the teaser instead.
+`app_docs/clock-and-prerender.md`). The static link to `/projects` is the teaser instead.
 
 ## Rules
 

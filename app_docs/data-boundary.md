@@ -120,7 +120,7 @@ HistoryCursor | null }` and `HistoryCursor` is `{ direction: "after" |
 "before"; cursor: string }` (from `src/lib/history-bookmark.ts`)
 - `getQueue(slug): Promise<QueueItem[]>`
 
-The summary page (`/watch`) reads two more, `getSummaryPast(today, days)` and
+The summary page (`/projects/log`) reads two more, `getSummaryPast(today, days)` and
 `getSummaryToday(today)` (see `app_docs/summary.md`).
 
 Nothing under `src/app/` or `src/components/` imports from anywhere else for
@@ -371,7 +371,7 @@ on the server no channel is ever subscribed, so no socket is opened there.
   miss, which means a second fetch in the browser. There is no per-project
   runs key. The slug is part of the queue key's hash; the slug is assembled once in the page; pass it as is.
 - `makeQueryClient()` in `src/data/query-client.ts` is the one `QueryClient`
-  factory. Every server prefetch, `Providers` and `SummaryProviders` build from it; do not call
+  factory. Every server prefetch and `Providers` build from it; do not call
   `new QueryClient()` anywhere else, or the dehydrate rule drifts between sides.
 - `prefetch(queryKey, queryFn)` in the same file is the one server prefetch.
   Every `"use cache"` state function (the layout's `getProjectsState`, the

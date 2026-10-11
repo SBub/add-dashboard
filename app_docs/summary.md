@@ -10,13 +10,13 @@
 
 ## Overview
 
-The summary at `/watch` (`src/app/watch/page.tsx`): finished runs per UTC day across projects, split into today's card (a React Query entry with a Refresh button) and the past days, each from its own cache scope. The report is shaped in `src/lib/daily-summary.ts` and drawn with inline charts.
+The summary, the daily log at `/projects/log` (`src/app/(dashboard)/projects/log/page.tsx`), reached from the sidebar's Daily log entry: finished runs per UTC day across projects, split into today's card (a React Query entry with a Refresh button) and the past days, each from its own cache scope. The report is shaped in `src/lib/daily-summary.ts` and drawn with inline charts.
 
 ## How it works
 
 ### Summary
 
-`/watch` shows what the toolkit finished per UTC day, newest first, today on top
+`/projects/log` shows what the toolkit finished per UTC day, newest first, today on top
 in its own card with a Refresh button: runs
 completed and failed, then three bordered chart
 cards, in one row from 1024px and stacked below, each with a title and a
@@ -54,7 +54,7 @@ Tokens in, Cache read, Tokens out, Cost) that ends in a Total row with the
 column sums; its Classes column keeps a compact stacked class bar. There are
 no filters (issue #97).
 
-**Page copy.** `/watch` is the summary page (the landing page is the intro at `/`,
+**Page copy.** `/projects/log` is the summary page (the landing page is the intro at `/`,
 `app_docs/home.md`), and its static shell opens with the
 `h1` "What an AI developer workflow gets done" and an intro paragraph saying
 what ADW is and that the page is the public ledger of finished runs; the
@@ -114,7 +114,7 @@ table's Total row are `day.totals`, the sum of the table's own rows
 (`dayTotals` in `src/lib/daily-summary.ts`), passed to `ProjectBreakdownTable`
 as a prop. Nothing is a median.
 
-**Cache.** Two `"use cache"` scopes in `src/app/watch/page.tsx`, both called only
+**Cache.** Two `"use cache"` scopes in `src/app/(dashboard)/projects/log/page.tsx`, both called only
 below the island's `await connection()`, so both are request-time holes (see
 "What is prerendered and what is not"). Unlike History, which reads
 `searchParams`, the island has no other request-time read, so the
@@ -130,10 +130,21 @@ expire: 172800 })`. `today` is in the cache key, so every request in one UTC
 - `getTodayState(today)`, tagged `summary:today` (`summaryTodayTag()`), with
   `cacheLife({ stale: 60, revalidate: 60, expire: 300 })`, a one-liner around
   `prefetch(queryKeys.summaryToday(today), () => getSummaryToday(today))`. Its
-  dehydrated state is hydrated into `SummaryProviders`
-  (`src/app/watch/summary-providers.tsx`, a bare `QueryClientProvider` over
-  `makeQueryClient()`, no Realtime), mounted only around the today island, so
-  the today card (`TodaySummary`) is in the server HTML.
+  dehydrated state is hydrated into the `(dashboard)` layout's `Providers`
+  client through the island's `HydrationBoundary`, exactly like a project
+  page's islands, so the today card (`TodaySummary`) is in the server HTML.
+
+**Shared query client.** The page is inside `(dashboard)`, so it renders under
+`Providers` (sidebar, pill, worker widget, Realtime) and reuses its one
+`QueryClient`; it mounts no provider of its own. Sharing is safe: the today
+key `["summary-today", day]` (`queryKeys.summaryToday`) shares no prefix with
+`projects`, `active-runs` or `queue`; the Realtime listener writes only those
+keys through `setQueryData`, and its catch-up enumerates only the `queue`
+prefix (`src/data/realtime.ts`), so nothing in `Providers` touches the summary
+entry. `TodaySummary` is `staleTime: "static"` and `refetchOnMount: false`, so
+the shared client never refetches it; Refresh is still its own `refetch()`. A
+nested second `QueryClientProvider` would shadow the layout's client for that
+subtree for no benefit.
 
 **Refresh.** The today card's Refresh button calls `refetch()` on its own
 query and nothing else: `getSummaryToday(today)` runs in the browser through
@@ -153,21 +164,23 @@ the completion. The model and phase rows are read in the same scopes as the day 
 and lifetimes cover them. The 60-second `revalidate`
 of the today scope and the Refresh button bound both. The router cache's
 `staleTimes.dynamic` (300 seconds) is above that `stale`, so a client
-navigation back to `/watch` within five minutes may show the router-cached today
-card; Refresh is the remedy. The page has no Realtime listener: it is outside
-`(dashboard)`.
+navigation back to `/projects/log` within five minutes may show the router-cached today
+card; Refresh is the remedy. The channel is open on this page but has no
+listener for the summary: a completion's `revalidateHistory` drops
+`summary:today`, but `router.refresh()` runs only on that project's page, so an
+open daily log updates through Refresh or the next visit.
 
 ## Rules
 
-- The summary is `/watch`, `src/app/watch/page.tsx`, outside
-  `(dashboard)`. Its report is split on today's UTC date, read once by the
+- The summary is `/projects/log`, `src/app/(dashboard)/projects/log/page.tsx`,
+  inside `(dashboard)`. Its report is split on today's UTC date, read once by the
   `SummaryContent` island through `requestToday` (`await connection()`, then
   the clock) and passed to both
   halves, each under its own `SectionBoundary`, today first:
   - `getTodayState(today)` is `"use cache"`, tagged `summaryTodayTag()`, with
     `cacheLife({ stale: 60, revalidate: 60, expire: 300 })`, a one-liner
     around `prefetch(queryKeys.summaryToday(today), ...)`. Its state is
-    hydrated into `SummaryProviders` and read by `TodaySummary`.
+    hydrated into the layout's `Providers` client and read by `TodaySummary`.
   - `getPastDays(today)` is `"use cache"`, tagged `summaryPastTag()`, with
     `cacheLife({ stale: 300, revalidate: 86400, expire: 172800 })`. `today`
     in its key is the midnight rollover; no completion drops this tag, and
@@ -178,13 +191,13 @@ card; Refresh is the remedy. The page has no Realtime listener: it is outside
     marker and is required (the History rule against it does not apply here).
     One tag per half; never a per-project, per-day or per-window summary tag,
     and never an `expire` under 5 minutes.
-- The `h1` and the intro paragraph of `/watch` are static copy in the page body
+- The `h1` and the intro paragraph of `/projects/log` are static copy in the page body
   (the shell), and the title comes from `metadata`; none of them reads the
   report. The reading note about UTC and metrics is a `<p>` in the page body
   directly under the intro, also in the shell, outside the `SectionBoundary`.
   `e2e/test_connection_indicator_scope.md` and `e2e/test_landing_no_filters.md`
   assert the `h1` text, so change them together.
-- `/watch` has no filters (issue #97): it always shows every public project over
+- `/projects/log` has no filters (issue #97): it always shows every public project over
   `SUMMARY_DEFAULT_DAYS` days and reads no search parameter.
 - The window is anchored on today's UTC date (`utcDay` of the island's one
   clock read), not on the newest row in `adw.daily_summary`: the past days are
@@ -244,14 +257,19 @@ card; Refresh is the remedy. The page has no Realtime listener: it is outside
   the row fits a one-third card at `lg` and a stacked card at 375px; the plot box is 180px
   (`h-45`) and the value placement (inside the bar or above it) comes only
   from `barValueInside`.
-- The today card is a React Query entry under `SummaryProviders`, but not a
-  live section: no Realtime reducer, no catch-up read and no `setQueryData`
-  touch it. Its Refresh button calls `refetch()` on that query only; never
+- The today card is a React Query entry in the layout's `Providers` client, but
+  not a live section: no Realtime reducer, no catch-up read and no
+  `setQueryData` touch it. Do not mount a second `QueryClientProvider` for it,
+  and do not give it a key that shares a prefix with `projects`,
+  `active-runs` or `queue`. Its Refresh button calls `refetch()` on that query only; never
   `router.refresh()`, a server action or a navigation from it. A failed
   refetch keeps the last figures (no error boundary takes over). The past
   days never enter the query cache. Completions reach the page only through
   the `summary:today` tag in `historyTags(slug)`; the past days tag is never
   dropped.
+- The sidebar's Daily log entry (`DailyLogLink`) is static and reads no query:
+  it sits outside every data boundary, in a plain `Suspense` (for
+  `usePathname`) whose fallback is the same link inactive.
 - `staleTimes.dynamic` (300 seconds) is above `getTodayState`'s `stale` (60)
   on purpose: the rule tying them is for History, which has no in-place
   refresh. A revisit within five minutes may show the router-cached today

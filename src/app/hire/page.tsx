@@ -138,7 +138,7 @@ async function HireStatus({ searchParams }: { searchParams: SearchParams }) {
 }
 
 // Not async: the heading, the intro and the LinkedIn link are the static
-// shell, the status and the form are the hole. Outside (dashboard), like "/" and "/watch":
+// shell, the status and the form are the hole. Outside (dashboard), like "/" and "/writing":
 // no Providers, no Realtime, no sidebar.
 export default function HirePage({ searchParams }: { searchParams: SearchParams }) {
   return (

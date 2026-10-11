@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import { headerSection } from "./header-section";
 
 describe("headerSection", () => {
-  it("is watch for the summary at /watch", () => {
-    expect(headerSection("/watch")).toBe("watch");
-    expect(headerSection("/watch/")).toBe("watch");
+  it("is watch for the daily log at /projects/log", () => {
+    expect(headerSection("/projects/log")).toBe("watch");
+    expect(headerSection("/projects/log/")).toBe("watch");
   });
 
   it("is watch for the overview and a project page", () => {
@@ -20,7 +20,7 @@ describe("headerSection", () => {
 
   it("is home for the root only", () => {
     expect(headerSection("/")).toBe("home");
-    expect(headerSection("/watch")).not.toBe("home");
+    expect(headerSection("/projects/log")).not.toBe("home");
     expect(headerSection("/projects")).not.toBe("home");
     expect(headerSection("/hire")).not.toBe("home");
   });
@@ -28,6 +28,8 @@ describe("headerSection", () => {
   it("is null for near misses and routes in no section", () => {
     expect(headerSection("/projectsx")).toBeNull();
     expect(headerSection("/projects-old")).toBeNull();
+    expect(headerSection("/watch")).toBeNull();
+    expect(headerSection("/watch/")).toBeNull();
     expect(headerSection("/watchx")).toBeNull();
     expect(headerSection("/watch-old")).toBeNull();
     expect(headerSection("/watch/anything")).toBeNull();
@@ -57,9 +59,9 @@ describe("headerSection", () => {
     expect(headerSection("/hire-me")).toBeNull();
   });
 
-  it("never puts the root, /watch or the overview in the hire section", () => {
+  it("never puts the root, the daily log or the overview in the hire section", () => {
     expect(headerSection("/")).not.toBe("hire");
-    expect(headerSection("/watch")).not.toBe("hire");
+    expect(headerSection("/projects/log")).not.toBe("hire");
     expect(headerSection("/projects")).not.toBe("hire");
   });
 

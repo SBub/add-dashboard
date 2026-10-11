@@ -1,7 +1,8 @@
 import { HydrationBoundary } from "@tanstack/react-query";
 import { cacheTag } from "next/cache";
-import type { ReactNode } from "react";
+import { type ReactNode, Suspense } from "react";
 import { ConnectionIndicator } from "@/components/ConnectionIndicator";
+import { DailyLogLink, DailyLogLinkFallback } from "@/components/DailyLogLink";
 import { ProjectNavSkeleton } from "@/components/LoadingSkeletons";
 import { ProjectNav } from "@/components/ProjectNav";
 import { QueryBoundary } from "@/components/QueryBoundary";
@@ -64,7 +65,8 @@ async function SidebarActiveRuns() {
   );
 }
 
-// Master-detail shell shared by "/projects" and "/projects/[owner]/[repo]". The project
+// Master-detail shell shared by "/projects", the daily log at "/projects/log"
+// and "/projects/[owner]/[repo]". The project
 // list is prefetched once here, in a server layout, into a React Query cache
 // that is dehydrated into the HTML and hydrated in the browser, and the Active
 // entry is read per request by the sidebar island, so the sidebar renders
@@ -81,8 +83,8 @@ export default async function DashboardLayout({ children }: { children: ReactNod
         <aside className="flex shrink-0 flex-col gap-2 md:sticky md:top-[calc(var(--header-height)+1.5rem)] md:h-[calc(100vh-var(--header-height)-3rem)] md:w-72">
           {/* The connection pill lives here, not in the root header, because
               the channel it describes is opened by Providers in this layout.
-              The summary at /watch, the intro page at / and /hire have no
-              channel and no pill. It reads no query, so it sits outside the sidebar's boundaries and their fallbacks. */}
+              The intro page at /, /writing and /hire have no channel and no
+              pill; the daily log at /projects/log is in this group. It reads no query, so it sits outside the sidebar's boundaries and their fallbacks. */}
           <div className="flex shrink-0 items-center justify-between gap-2 px-1">
             <h2 className="text-xs font-medium uppercase tracking-wide text-neutral-500 dark:text-neutral-400">
               Projects
@@ -111,8 +113,19 @@ export default async function DashboardLayout({ children }: { children: ReactNod
               </SectionBoundary>
             </HydrationBoundary>
           </div>
+          {/* The Daily log entry is static and reads no query, so like the
+              worker widget it sits outside every boundary. shrink-0 and
+              outside the scroll wrapper, so it stays in view from md up; on
+              mobile it follows the project strip. The plain Suspense is for
+              usePathname, which suspends while prerendering a project page
+              outside generateStaticParams (as in SectionNav). */}
+          <div className="shrink-0">
+            <Suspense fallback={<DailyLogLinkFallback />}>
+              <DailyLogLink />
+            </Suspense>
+          </div>
           {/* The worker widget is here because the (dashboard) layout is the
-              operator's view; /, /watch and /hire have no sidebar and no widget. It reads no
+              operator's view; /, /writing and /hire have no sidebar and no widget. It reads no
               query (it polls its own store in the browser), so it sits
               outside every boundary and never inside a fallback. On mobile
               it follows the project strip. */}

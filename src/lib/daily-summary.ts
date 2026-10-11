@@ -1,4 +1,4 @@
-// Everything that shapes the summary page (`/watch`), pure: today's UTC day from a
+// Everything that shapes the summary page (`/projects/log`), pure: today's UTC day from a
 // time the caller read, the past window that ends the day before it, the
 // report and the today card assembled from adw.daily_summary rows (and the
 // adw.daily_model_summary rows, summed per model by sumModelUsage in
@@ -33,7 +33,7 @@ function pad2(value: number): string {
 /**
  * The UTC calendar day (`YYYY-MM-DD`) of an epoch in milliseconds. Pure: the
  * caller passes the time. It is the one place the summary page's request-time
- * clock read (SummaryContent in src/app/watch/page.tsx) becomes a day, so the past
+ * clock read (SummaryContent in src/app/(dashboard)/projects/log/page.tsx) becomes a day, so the past
  * days and the today card split on the same UTC midnight.
  */
 export function utcDay(ms: number): string {

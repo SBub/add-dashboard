@@ -19,7 +19,7 @@ import { isProjectSlug } from "@/lib/slug";
  * per request and patched in the browser):
  *
  * - history:<slug>, the "use cache" scope the page renders History from.
- * - the summary page's (`/watch`) today tag (summaryTodayTag), the "use cache"
+ * - the summary page's (`/projects/log`) today tag (summaryTodayTag), the "use cache"
  *   scope of the today card, so today's counts include the run. The past days
  *   tag (summaryPastTag) is never dropped: those days are over.
  *
@@ -40,7 +40,7 @@ import { isProjectSlug } from "@/lib/slug";
  * call it with any string. So it validates the slug strictly (isProjectSlug,
  * src/lib/slug.ts) and does nothing else: no database write, no read, no
  * return value worth having. The worst a caller can do is make the next
- * render of one project page, and of the summary page's (`/watch`) today card, read the
+ * render of one project page, and of the summary page's (`/projects/log`) today card, read the
  * database once.
  */
 export async function revalidateHistory(slug: string): Promise<void> {

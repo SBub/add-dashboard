@@ -161,5 +161,7 @@ lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every c
   `/hire?error=<code>` states, which open directly by URL; never submit a valid form to reach them.
 - A route handler (`src/app/api/revalidate`), a server action, a reducer or a helper has no rendered
   surface: no visual review, evidence is the diff, the tests and the spec's commands.
-- Browser automation is the Playwright MCP server in `.mcp.json`, configured by
-  `playwright-mcp-config.json` (headless chromium, 1920x1080).
+- Browser automation is the Playwright MCP server in `.mcp.json`: the devDependency
+  `@playwright/mcp`, pinned to exactly `0.0.81`, run from `node_modules` through
+  `yarn playwright-mcp` (no `yarn dlx`), configured by `playwright-mcp-config.json` (headless
+  chromium, 1920x1080). An upgrade is a change to that pin in `package.json`.

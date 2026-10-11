@@ -7,41 +7,57 @@
 
 ## Overview
 
-`/hire` (`src/app/hire/page.tsx`) is the contact page reached from the header's Work with me button: a heading ("Work with me"), an intro, a LinkedIn link and a form that sends one plain-text email to `hire@issebya.com` through Resend after a Cloudflare Turnstile check. It sits outside `(dashboard)`: no sidebar, no `Providers`, no Realtime, no connection pill.
+`/hire` (`src/app/hire/page.tsx`) is the contact page reached from the header's Work with me button: a heading ("Work with me"), the location line, a LinkedIn link and a form that sends one plain-text email to `hire@issebya.com` through Resend after a Cloudflare Turnstile check. It sits outside `(dashboard)`: no sidebar, no `Providers`, no Realtime, no connection pill.
 
 ## How it works
 
 ### The page
 
-`HirePage` is not async: the heading, the `HIRE_INTRO` paragraphs and the
-LinkedIn link are the static shell. `HireStatus` is the one request-time
-island: it awaits `searchParams` and turns them into a status with
-`hireStatus` (`src/lib/hire-request.ts`), under a `SectionBoundary` whose
-fallback reads "Loading form...". `?sent=1` replaces the form with a
-thank-you; `?error=<code>` shows the fixed message from
-`HIRE_ERROR_MESSAGES` above the form. Anything else (an unknown code, a
-repeated parameter) shows the plain form.
+`HirePage` is not async: the heading, the `LOCATION` line ("Remote, Lisbon",
+from `src/content/site.ts`, shared with `/`) and the LinkedIn link are the
+static shell. `HireStatus` is the one request-time island: it awaits
+`searchParams` and turns them into a status with `hireStatus`
+(`src/lib/hire-request.ts`), under a `SectionBoundary` whose fallback reads
+"Loading form...". `?sent=1` replaces the form with a
+thank-you; `?error=<code>` shows the fixed message from `HIRE_ERROR_MESSAGES`
+above the form. Anything else (an unknown code, a repeated parameter) shows the
+plain page.
 
-`HireStatus` also maps `?offer=` through `hireOfferFromSlug` into the offer
-select's `defaultValue`: `product-engineer` to `Product engineer`,
-`ai-consulting` to `AI consulting`, anything else (missing, unknown, an array,
-a prototype key, an `OFFERS` value) the first option. The slugs are
-deliberately not the `OFFERS` values, so the visible labels, the values the
-subject carries and the URLs stay independent. `hireOfferHref` builds the
-links of the doors on `/` (see `app_docs/home.md`).
+### Offers and `?offer=`
+
+`HireStatus` maps `?offer=` through `hireOfferFromSlug` to an `Offer` or null:
+`product-engineer` to `Product engineer`, `ai-consulting` to `AI consulting`,
+anything else (missing, unknown, an array, a prototype key, an `OFFERS` value)
+null. The page shows no per-offer copy; the offer only shapes the form:
+
+- No valid `?offer`: a form with the offer select; the textarea is labelled
+  with `OFFER_PROMPTS` of the selected offer and changes as the visitor picks
+  another (`src/components/HireOfferFields.tsx`, a client leaf for that alone).
+- A valid `?offer`: a form without the select; the offer goes in a hidden
+  `offer` input carrying its `OFFERS` value, and the textarea is labelled with
+  `OFFER_PROMPTS[offer]` (`src/content/hire.ts`).
+
+The slugs are deliberately not the `OFFERS` values, so the visible labels, the
+values the subject carries and the URLs stay independent. `hireOfferHref`
+builds the links of the doors on `/` (see `app_docs/home.md`). The form is
+keyed by the offer (`offer ?? "choose"`): cacheComponents keeps a visited
+`/hire` mounted, and a mounted select ignores a new `defaultValue`, so a second
+door would otherwise land on the first door's form.
 
 ### The form
 
 The form posts to the `sendHireRequest` server action. Its fields:
 
-- `offer`: a select over `OFFERS`, required, labelled "What brings you here?".
-  Each option's value is the `OFFERS` entry (`Product engineer`, `AI
-consulting`); its visible text is `OFFER_LABELS[offer]` ("I need a product
-  engineer (contract or full-time)", "I want to structure and automate my processes with AI").
+- `offer`: with no valid `?offer`, a select over `OFFERS`, required, labelled
+  "What brings you here?", defaulting to `Product engineer`. Each option's
+  value is the `OFFERS` entry (`Product engineer`, `AI consulting`); its
+  visible text is `OFFER_LABELS[offer]` ("I need a product engineer", "I want
+  to structure and automate my processes with AI"). With a valid `?offer`, a
+  hidden input carrying that offer's `OFFERS` value.
 - `email`: required, at most `EMAIL_MAX` (254) characters.
 - `name`: optional, at most `NAME_MAX` (100) characters.
-- `motivation`: labelled "What's eating your time, or what are you
-  building?", required, `MOTIVATION_MIN` (20) to `MOTIVATION_MAX` (4000)
+- `motivation`: labelled `OFFER_PROMPTS[offer]` for the fixed or selected
+  offer ("What are you building?" or "Tell me about your business"), required, `MOTIVATION_MIN` (20) to `MOTIVATION_MAX` (4000)
   characters.
 - The Turnstile widget: a `cf-turnstile` div carrying `data-sitekey`,
   rendered by `TurnstileScript` (`src/components/TurnstileScript.tsx`) on
@@ -92,8 +108,9 @@ holds placeholders.
 
 ### Changing the copy
 
-The offers and their labels (`OFFER_LABELS`), the intro paragraphs and the LinkedIn URL live only in
-`src/content/hire.ts`; the error messages are `HIRE_ERROR_MESSAGES` in
+The offers, their labels (`OFFER_LABELS`), their prompts (`OFFER_PROMPTS`)
+and the LinkedIn URL live only in
+`src/content/hire.ts`; the location line is `LOCATION` in `src/content/site.ts`; the error messages are `HIRE_ERROR_MESSAGES` in
 `src/lib/hire-request.ts`.
 
 ### Testing locally
@@ -124,10 +141,15 @@ covered by `src/lib/hire-request.test.ts` and
 - Never render the status part under a bare `Suspense`: `HireStatus` stays
   under its `SectionBoundary`.
 - No clock reads on the page, in the action or in `src/lib/hire-request.ts`.
-- The page's copy lives only in `src/content/hire.ts`.
+- The page's copy lives only in `src/content/hire.ts`, except `LOCATION`,
+  shared with `/` from `src/content/site.ts`.
 - Every change to `parseHireRequest` goes with a test case in
   `src/lib/hire-request.test.ts`.
-- Never render the raw `?offer` value; the page only ever uses the `Offer`
-  `hireOfferFromSlug` returns.
-- Every change to the slug table goes with a test case in
-  `src/lib/hire-request.test.ts`.
+- Never render the raw `?offer` value; the page only ever uses the `Offer` or
+  null `hireOfferFromSlug` returns. The hidden `offer` input carries only an
+  `OFFERS` value.
+- Every change to the slug table or to `hireOfferFromSlug` goes with a test
+  case in `src/lib/hire-request.test.ts`.
+- `/hire` shows no offer blocks: no per-offer title or description, only the
+  form. A valid `?offer` changes the form (hidden input, that offer's prompt),
+  never the copy around it.

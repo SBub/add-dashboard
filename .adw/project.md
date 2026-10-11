@@ -151,7 +151,7 @@ lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every c
   Refresh button above the past day cards with their What I worked on, Tokens by model and What each step cost chart cards, per-project tables), `/projects` (project sidebar, with the Daily log entry and the worker status widget at its bottom, plus every active run
   grouped by project under a `Building now` heading, or "No runs in progress." when none) and `/projects/SBub/issebya-homes-ai-system` (header, Building now, Up next and
   Shipped sections), or the first project the sidebar lists if that slug is 404, and
-  `/hire` (heading, intro, LinkedIn link, the form with the two offers, the Turnstile widget, the
+  `/hire` (heading, the Remote, Lisbon line, LinkedIn link, the form with the offer select, the Turnstile widget, the
   fuchsia Send button; no sidebar, no pill), `/writing` (heading, intro, the first post with its
   audience tag; no sidebar, no pill) and `/writing/my-moat` (title, date, tag, body ending with
   its Watch me build live link to `/projects`), `/projects/changelog` (the sidebar with Changelog current below Daily log, heading,

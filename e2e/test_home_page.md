@@ -1,7 +1,7 @@
 # E2E Test: Home Page
 
 Checks the intro page at `/`: its heading, intro, the ADW line with a `Watch me build` link to
-`/projects`, and the two door cards into `/hire`, each preselecting its offer through `?offer=`;
+`/projects`, and the two door cards into `/hire`, each opening its offer through `?offer=`;
 that the header marks the brand on `/` and `Watch me build` on `/projects`; and that the doors sit side by
 side at desktop and stack at 375px with no horizontal scroll. It never submits the `/hire` form.
 
@@ -26,10 +26,15 @@ want proof
    link in the `Sections` navigation has none.
 6. Take a full-page screenshot at 1920x1080. With `browser_evaluate`, **Verify** the two door links'
    `getBoundingClientRect().top` are equal (one row).
-7. Click the first door. **Verify** the URL is `/hire?offer=product-engineer` and, with
-   `browser_evaluate`, the select's `value` is `Product engineer`.
-8. Go back, click the second door. **Verify** the URL is `/hire?offer=ai-consulting` and the
-   select's `value` is `AI consulting`.
+7. Click the first door.
+   **Verify** the URL is `/hire?offer=product-engineer`, there is no `select`, with
+   `browser_evaluate` the hidden `offer` input's `value` is `Product engineer`, the textarea is
+   labelled `What are you building?`, and there is no offer block
+   (no level-2 heading on the page).
+8. Go back, click the second door. **Verify** the URL is `/hire?offer=ai-consulting`,
+   there is no `select`, the hidden `offer` input's `value` is `AI consulting`, the textarea is
+   labelled `Tell me about your business`, and there is no offer block (no text
+   `Structure and automate your processes with AI`).
 9. Navigate to `/` and click the ADW line's `Watch me build` link. **Verify** the URL is `/projects`,
    the `Building now` heading (level 2) is present, the header's `Watch me build`
    link has `aria-current="page"` and the brand link has none.
@@ -41,7 +46,8 @@ want proof
 
 - `/` shows the heading, the intro, the ADW line with `Watch me build` linking to `/projects`, and both
   doors with the exact hrefs `/hire?offer=product-engineer` and `/hire?offer=ai-consulting`.
-- Each door lands on `/hire` with its offer preselected.
+- Each door lands on `/hire` with the form set to that offer: no select, the offer in a hidden
+  input and the offer's prompt as the textarea label; no offer block.
 - The brand is current on `/`; `Watch me build` is current on `/projects`.
 - `/` has no run rows, no sidebar and no connection indicator.
 - The doors sit side by side at 1920px and stack at 375px with no horizontal scroll.

@@ -1,23 +1,17 @@
 import type { Metadata } from "next";
+import { HireOfferFields } from "@/components/HireOfferFields";
 import { SectionBoundary } from "@/components/SectionBoundary";
 import { SubmitButton } from "@/components/SubmitButton";
 import { TurnstileScript } from "@/components/TurnstileScript";
-import { HIRE_INTRO, LINKEDIN_URL, type Offer, OFFER_LABELS, OFFERS } from "@/content/hire";
-import {
-  EMAIL_MAX,
-  HIRE_ERROR_MESSAGES,
-  hireOfferFromSlug,
-  hireStatus,
-  MOTIVATION_MAX,
-  MOTIVATION_MIN,
-  NAME_MAX,
-} from "@/lib/hire-request";
+import { LINKEDIN_URL, type Offer } from "@/content/hire";
+import { LOCATION } from "@/content/site";
+import { HIRE_ERROR_MESSAGES, hireOfferFromSlug, hireStatus } from "@/lib/hire-request";
 import { sendHireRequest } from "../actions/send-hire-request";
 
 export const metadata: Metadata = {
   title: "Work with me",
   description:
-    "Work with Sviatlana Buben: product engineering on contract or full-time, or structuring and automating business processes with AI.",
+    "Work with Sviatlana Buben: product engineering, or structuring and automating business processes with AI.",
 };
 
 type SearchParams = Promise<{
@@ -26,79 +20,20 @@ type SearchParams = Promise<{
   offer?: string | string[];
 }>;
 
-const LABEL = "block text-sm font-medium";
-const FIELD =
-  "mt-1 block w-full rounded-md border border-neutral-300 bg-background px-3 py-2 text-sm dark:border-neutral-700";
-
+const TEXT_LINK = "underline underline-offset-2 hover:text-neutral-900 dark:hover:text-neutral-100";
 // The form. It posts to the server action, which redirects back here with
 // ?sent=1 or ?error=<code>; the browser's own validation mirrors the server's
-// bounds, which are the ones that count. `defaultOffer` preselects the select
-// from ?offer=; it is always an OFFERS member, never the raw query value. The
-// select is keyed by it: cacheComponents keeps a visited /hire mounted, and a
-// mounted select ignores a new defaultValue, so a second door would otherwise
-// land on the first door's offer.
-function HireForm({ defaultOffer }: { defaultOffer: Offer }) {
+// bounds, which are the ones that count. `offer` comes from ?offer= through
+// hireOfferFromSlug, always an OFFERS member or null, never the raw query
+// value. HireOfferFields sends a fixed offer in a hidden input, or lets the
+// visitor pick one, and asks the picked offer's prompt either way. HireStatus
+// keys the form by the offer: cacheComponents keeps a visited /hire mounted,
+// and a mounted form keeps its picked offer and typed text, so a second door would
+// otherwise land on the first door's form.
+function HireForm({ offer }: { offer: Offer | null }) {
   return (
     <form action={sendHireRequest} className="mt-4 max-w-xl space-y-4">
-      <div>
-        <label htmlFor="hire-offer" className={LABEL}>
-          What brings you here?
-        </label>
-        <select
-          key={defaultOffer}
-          id="hire-offer"
-          name="offer"
-          required
-          defaultValue={defaultOffer}
-          className={FIELD}
-        >
-          {OFFERS.map((offer) => (
-            <option key={offer} value={offer}>
-              {OFFER_LABELS[offer]}
-            </option>
-          ))}
-        </select>
-      </div>
-      <div>
-        <label htmlFor="hire-email" className={LABEL}>
-          Your email
-        </label>
-        <input
-          id="hire-email"
-          type="email"
-          name="email"
-          required
-          maxLength={EMAIL_MAX}
-          autoComplete="email"
-          className={FIELD}
-        />
-      </div>
-      <div>
-        <label htmlFor="hire-name" className={LABEL}>
-          Your name <span className="font-normal text-neutral-500">(optional)</span>
-        </label>
-        <input
-          id="hire-name"
-          name="name"
-          maxLength={NAME_MAX}
-          autoComplete="name"
-          className={FIELD}
-        />
-      </div>
-      <div>
-        <label htmlFor="hire-motivation" className={LABEL}>
-          What&apos;s eating your time, or what are you building?
-        </label>
-        <textarea
-          id="hire-motivation"
-          name="motivation"
-          required
-          minLength={MOTIVATION_MIN}
-          maxLength={MOTIVATION_MAX}
-          rows={6}
-          className={FIELD}
-        />
-      </div>
+      <HireOfferFields fixedOffer={offer} />
       <div
         className="cf-turnstile"
         data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ""}
@@ -110,12 +45,13 @@ function HireForm({ defaultOffer }: { defaultOffer: Offer }) {
 }
 
 // The request-time island: awaiting searchParams makes it the hole under its
-// SectionBoundary. A sent request replaces the form; an error sits above it.
-// ?offer=<slug> preselects the form's offer through hireOfferFromSlug.
+// SectionBoundary. ?offer=<slug> picks the offer through hireOfferFromSlug:
+// a form for it, or with no valid slug a form with the select. A sent request
+// shows only the thank-you; an error sits above the form.
 async function HireStatus({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
   const status = hireStatus(params);
-  const defaultOffer = hireOfferFromSlug(params.offer);
+  const offer = hireOfferFromSlug(params.offer);
 
   if (status?.kind === "sent") {
     return (
@@ -132,30 +68,21 @@ async function HireStatus({ searchParams }: { searchParams: SearchParams }) {
           {HIRE_ERROR_MESSAGES[status.code]}
         </p>
       )}
-      <HireForm defaultOffer={defaultOffer} />
+      <HireForm key={offer ?? "choose"} offer={offer} />
     </div>
   );
 }
 
-// Not async: the heading, the intro and the LinkedIn link are the static
-// shell, the status and the form are the hole. Outside (dashboard), like "/" and "/writing":
-// no Providers, no Realtime, no sidebar.
+// Not async: the heading, the location line and the LinkedIn link are the
+// static shell; the status and the form are the hole. Outside (dashboard),
+// like "/" and "/writing": no Providers, no Realtime, no sidebar.
 export default function HirePage({ searchParams }: { searchParams: SearchParams }) {
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
       <h1 className="text-2xl font-semibold tracking-tight">Work with me</h1>
-      <div className="mt-2 max-w-[70ch] space-y-2 text-base text-neutral-700 dark:text-neutral-300">
-        {HIRE_INTRO.map((paragraph) => (
-          <p key={paragraph}>{paragraph}</p>
-        ))}
-      </div>
+      <p className="mt-1 text-sm text-neutral-600 dark:text-neutral-400">{LOCATION}</p>
       <p className="mt-3 text-sm">
-        <a
-          href={LINKEDIN_URL}
-          target="_blank"
-          rel="noreferrer"
-          className="underline underline-offset-2 hover:text-neutral-900 dark:hover:text-neutral-100"
-        >
+        <a href={LINKEDIN_URL} target="_blank" rel="noreferrer" className={TEXT_LINK}>
           LinkedIn profile
         </a>
       </p>

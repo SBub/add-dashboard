@@ -23,7 +23,7 @@ description.
 
 Each door is a link whose href is `hireOfferHref(door.offer)` (`src/lib/hire-request.ts`). The
 slug table (`OFFER_SLUG`) lives there too, and `/hire` maps the slug back to the offer with
-`hireOfferFromSlug` to preselect it in the form (see `app_docs/hire.md`).
+`hireOfferFromSlug` to show a form for that offer (no select, its prompt as the textarea label) (see `app_docs/hire.md`).
 
 ### Prerendering
 

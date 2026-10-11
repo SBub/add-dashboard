@@ -193,14 +193,12 @@ describe("hireOfferFromSlug", () => {
     ["the prototype key", "__proto__"],
     ["script-like", "<script>"],
     ["repeated", ["ai-consulting", "product-engineer"]],
-  ])("is the first option for a slug that is %s", (_label, slug) => {
-    const result = hireOfferFromSlug(slug);
-    expect(result).toBe(OFFERS[0]);
-    expect(OFFERS).toContain(result);
+  ])("is null for a slug that is %s", (_label, slug) => {
+    expect(hireOfferFromSlug(slug)).toBeNull();
   });
 
   it("never echoes the raw value", () => {
-    expect(hireOfferFromSlug("<script>")).not.toContain("<script>");
+    expect(hireOfferFromSlug("<script>")).toBeNull();
   });
 });
 

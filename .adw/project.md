@@ -145,8 +145,8 @@ lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every c
 
 ## Review
 
-- Open at `http://localhost:$PORT`: `/` (the intro page: heading, intro, the ADW line with its
-  Watch me build link to `/projects`, two door cards into `/hire?offer=...`; no sidebar, no pill),
+- Open at `http://localhost:$PORT`: `/` (the intro page: heading, the Remote, Lisbon line, intro with its issebya.com link,
+  two door cards into `/hire?offer=...`; no sidebar, no pill),
   `/projects/log` (the summary: the sidebar with Daily log current, the pill and the worker widget, then heading, intro, note, the today card with a
   Refresh button above the past day cards with their What I worked on, Tokens by model and What each step cost chart cards, per-project tables), `/projects` (project sidebar, with the Daily log entry and the worker status widget at its bottom, plus every active run
   grouped by project under a `Building now` heading, or "No runs in progress." when none) and `/projects/SBub/issebya-homes-ai-system` (header, Building now, Up next and

@@ -53,6 +53,9 @@ From the worktree root, in order. The main checkout is two directories up from `
    the four `/hire` form variables (`NEXT_PUBLIC_TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`,
    `RESEND_API_KEY`, `RESEND_FROM_EMAIL`, see `.env.example`). They are optional for `yarn build`:
    the page builds with an empty site key and the action answers `?error=send` when unconfigured.
+   `SITE_URL` (the public address for Open Graph and canonical URLs, see `.env.example`) is
+   optional too: unset, metadata URLs fall back to the Vercel production domain or
+   `http://localhost:3000`.
 2. `yarn install --immutable` (`postinstall` runs `lefthook install`). An install that would change
    `yarn.lock` is a finding, not something to paper over with a mutable install.
 3. Verify with `yarn build` (see Build). A build, not a typecheck: only a build loads `.env.local`

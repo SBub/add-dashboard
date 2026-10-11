@@ -279,7 +279,8 @@ Next does not read `.env.development` for a production build or `next start`
 `.env.local` as well: it is loaded in every mode and gitignored. Keep the two
 files identical. `.gitignore` ignores `.env` and `.env.*` and un-ignores
 `.env.example`. The four `/hire` form variables (Turnstile and Resend) are
-described in `app_docs/hire.md`.
+described in `app_docs/hire.md`; `SITE_URL`, the public address the page
+metadata is built on (optional, with fallbacks), in `app_docs/writing.md`.
 
 ### The client
 
@@ -397,7 +398,8 @@ on the server no channel is ever subscribed, so no socket is opened there.
   the `NEXT_PUBLIC_` prefix: `ADW_REVALIDATE_SECRET` is read only in the
   route handler (`src/app/api/revalidate/route.ts`); `RESEND_API_KEY`,
   `RESEND_FROM_EMAIL` and `TURNSTILE_SECRET_KEY` are read only in
-  `src/app/actions/send-hire-request.ts`. `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
+  `src/app/actions/send-hire-request.ts`; `SITE_URL` is read only in the root
+  layout (`src/app/layout.tsx`), through `siteUrl`. `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
   is public by design (the Turnstile widget needs it in the browser) and is
   read only in `src/app/hire/page.tsx`. `.env.example` is tracked with
   placeholders; `.env.development` (dev) and `.env.local` (all modes,

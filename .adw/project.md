@@ -149,8 +149,8 @@ lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every c
   grouped by project under a `Building now` heading, or "No runs in progress." when none) and `/projects/SBub/issebya-homes-ai-system` (header, Building now, Up next and
   Shipped sections), or the first project the sidebar lists if that slug is 404, and
   `/hire` (heading, intro, LinkedIn link, the form with the two offers, the Turnstile widget, the
-  fuchsia Send button; no sidebar, no pill), `/writing` (heading, intro, the seed post with its
-  audience tag; no sidebar, no pill) and `/writing/hello` (title, date, tag, body, Work with me
+  fuchsia Send button; no sidebar, no pill), `/writing` (heading, intro, the first post with its
+  audience tag; no sidebar, no pill) and `/writing/my-moat` (title, date, tag, body, Work with me
   link), `/projects/changelog` (the sidebar with Changelog current below Daily log, heading,
   intro, entries newest first with date, title and counts) and one entry such as
   `/projects/changelog/2026-10-09-pr163` (date, title, production PR link, opening paragraph, the

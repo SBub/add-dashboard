@@ -25,7 +25,7 @@ export interface Post {
   Content: MDXContent;
 }
 
-/** Lowercase letters, digits and inner hyphens: "hello", "ai-at-work-2". */
+/** Lowercase letters, digits and inner hyphens: "my-moat", "ai-at-work-2". */
 export function isPostSlug(slug: string): boolean {
   return /^[a-z0-9-]+$/.test(slug) && !slug.startsWith("-") && !slug.endsWith("-");
 }

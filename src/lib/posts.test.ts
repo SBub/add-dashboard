@@ -18,7 +18,7 @@ const VALID = {
 
 describe("parsePostMeta", () => {
   it("parses a valid meta to exactly the five fields", () => {
-    expect(parsePostMeta("hello", { ...VALID, extra: 1 })).toEqual(VALID);
+    expect(parsePostMeta("my-moat", { ...VALID, extra: 1 })).toEqual(VALID);
   });
 
   const bad: [string, unknown][] = [
@@ -36,14 +36,14 @@ describe("parsePostMeta", () => {
   ];
 
   it.each(bad)("throws naming the post and the field %s", (field, raw) => {
-    expect(() => parsePostMeta("hello", raw)).toThrow(/"hello"/);
-    expect(() => parsePostMeta("hello", raw)).toThrow(field);
+    expect(() => parsePostMeta("my-moat", raw)).toThrow(/"my-moat"/);
+    expect(() => parsePostMeta("my-moat", raw)).toThrow(field);
   });
 });
 
 describe("isPostSlug", () => {
   it("accepts lowercase slugs with inner hyphens", () => {
-    expect(isPostSlug("hello")).toBe(true);
+    expect(isPostSlug("my-moat")).toBe(true);
     expect(isPostSlug("ai-at-work-2")).toBe(true);
   });
 

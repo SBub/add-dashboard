@@ -1,6 +1,7 @@
 "use client";
 
 import { useSuspenseQuery } from "@tanstack/react-query";
+import posthog from "posthog-js";
 import { getSummaryToday } from "@/data";
 import { queryKeys } from "@/data/query-keys";
 import { formatDay } from "@/lib/format-date";
@@ -33,6 +34,11 @@ export function TodaySummary({ today }: { today: string }) {
     refetchOnMount: false,
   });
 
+  function refresh(trigger: "button" | "retry") {
+    posthog.capture("today_summary_refreshed", { trigger });
+    void refetch();
+  }
+
   const title = (
     <>
       Today, <time dateTime={today}>{formatDay(today)}</time>
@@ -41,7 +47,7 @@ export function TodaySummary({ today }: { today: string }) {
   const actions = (
     <button
       type="button"
-      onClick={() => void refetch()}
+      onClick={() => refresh("button")}
       disabled={isFetching}
       aria-busy={isFetching}
       className="ml-auto rounded-md border border-neutral-300 px-2.5 py-1 text-sm font-medium hover:bg-neutral-100 disabled:opacity-60 disabled:text-neutral-500 disabled:hover:bg-transparent dark:border-neutral-700 dark:hover:bg-neutral-800 dark:disabled:text-neutral-400"
@@ -52,7 +58,7 @@ export function TodaySummary({ today }: { today: string }) {
   const failed = isRefetchError && !isFetching && (
     <p role="status" className={`text-sm ${STATUS_COLORS.failed.text}`}>
       Refresh failed. Showing the last loaded figures.{" "}
-      <button type="button" onClick={() => void refetch()} className="font-medium underline">
+      <button type="button" onClick={() => refresh("retry")} className="font-medium underline">
         Retry
       </button>
     </p>

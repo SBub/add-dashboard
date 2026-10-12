@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 import { useState } from "react";
 import { useDebouncedCallback } from "@/hooks/use-debounced-callback";
 import { historyHref } from "@/lib/history-bookmark";
@@ -32,9 +33,13 @@ export function HistorySearch({ slug, initial }: HistorySearchProps) {
   const { startTransition, releaseHeight } = useHistoryTransition();
 
   function navigate(next: string) {
+    const query = readHistoryQuery(next);
+    if (query) {
+      posthog.capture("run_history_searched", { query_length: query.length });
+    }
     startTransition(() => {
       releaseHeight();
-      router.replace(historyHref(slug, null, readHistoryQuery(next)), { scroll: false });
+      router.replace(historyHref(slug, null, query), { scroll: false });
     });
   }
 

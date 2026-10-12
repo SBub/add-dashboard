@@ -401,6 +401,8 @@ on the server no channel is ever subscribed, so no socket is opened there.
   `src/app/actions/send-hire-request.ts`; `SITE_URL` is read only in the root
   layout (`src/app/layout.tsx`), through `siteUrl`. `NEXT_PUBLIC_TURNSTILE_SITE_KEY`
   is public by design (the Turnstile widget needs it in the browser) and is
-  read only in `src/app/hire/page.tsx`. `.env.example` is tracked with
+  read only in `src/components/HireRequestForm.tsx`. `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN`
+  and `NEXT_PUBLIC_POSTHOG_HOST` are public by design and read only in
+  `instrumentation-client.ts` (see `app_docs/analytics.md`). `.env.example` is tracked with
   placeholders; `.env.development` (dev) and `.env.local` (all modes,
   including build and start) hold the real values and are gitignored.

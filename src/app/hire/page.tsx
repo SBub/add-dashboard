@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
-import { HireOfferFields } from "@/components/HireOfferFields";
+import { HireRequestForm } from "@/components/HireRequestForm";
 import { SectionBoundary } from "@/components/SectionBoundary";
-import { SubmitButton } from "@/components/SubmitButton";
-import { TurnstileScript } from "@/components/TurnstileScript";
 import { LINKEDIN_URL, type Offer } from "@/content/hire";
 import { LOCATION } from "@/content/site";
 import { HIRE_ERROR_MESSAGES, hireOfferFromSlug, hireStatus } from "@/lib/hire-request";
@@ -31,17 +29,7 @@ const TEXT_LINK = "underline underline-offset-2 hover:text-neutral-900 dark:hove
 // and a mounted form keeps its picked offer and typed text, so a second door would
 // otherwise land on the first door's form.
 function HireForm({ offer }: { offer: Offer | null }) {
-  return (
-    <form action={sendHireRequest} className="mt-4 max-w-xl space-y-4">
-      <HireOfferFields fixedOffer={offer} />
-      <div
-        className="cf-turnstile"
-        data-sitekey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? ""}
-      />
-      <TurnstileScript />
-      <SubmitButton />
-    </form>
-  );
+  return <HireRequestForm action={sendHireRequest} offer={offer} />;
 }
 
 // The request-time island: awaiting searchParams makes it the hole under its

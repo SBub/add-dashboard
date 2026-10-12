@@ -33,6 +33,8 @@ null. The page shows no per-offer copy; the offer only shapes the form:
 - No valid `?offer`: a form with the offer select; the textarea is labelled
   with `OFFER_PROMPTS` of the selected offer and changes as the visitor picks
   another (`src/components/HireOfferFields.tsx`, a client leaf for that alone).
+  The form itself is `src/components/HireRequestForm.tsx`, a client component
+  only to send `hire_request_submitted` to PostHog on submit (see `app_docs/analytics.md`).
 - A valid `?offer`: a form without the select; the offer goes in a hidden
   `offer` input carrying its `OFFERS` value, and the textarea is labelled with
   `OFFER_PROMPTS[offer]` (`src/content/hire.ts`).
@@ -96,7 +98,7 @@ message in `HIRE_ERROR_MESSAGES`. The URL carries the code only.
 
 | variable                         | kind        | read only in                           |
 | -------------------------------- | ----------- | -------------------------------------- |
-| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | public      | `src/app/hire/page.tsx`                |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | public      | `src/components/HireRequestForm.tsx`   |
 | `TURNSTILE_SECRET_KEY`           | server-only | `src/app/actions/send-hire-request.ts` |
 | `RESEND_API_KEY`                 | server-only | `src/app/actions/send-hire-request.ts` |
 | `RESEND_FROM_EMAIL`              | server-only | `src/app/actions/send-hire-request.ts` |

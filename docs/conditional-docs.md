@@ -16,4 +16,5 @@ One line per feature doc in `app_docs/`, saying when to read it; read the lines 
 - `app_docs/hire.md`: read when changing `/hire`, its form, the `sendHireRequest` action, `src/content/hire.ts`, the Turnstile or Resend configuration, the Work with me header button, the offer prompts or `?offer=`.
 - `app_docs/home.md`: read when changing `/`, its copy in `src/content/home.ts`, `LOCATION` in `src/content/site.ts` or its two doors into `/hire`.
 - `app_docs/writing.md`: read when adding or changing a post under `src/content/posts/`, the registry, `src/lib/posts.ts`, `/writing`, a post page, its Open Graph image or `src/mdx-components.tsx`.
+- `app_docs/analytics.md`: read when adding, renaming or removing a PostHog event, changing `instrumentation-client.ts` or `src/app/global-error.tsx`, or touching the PostHog environment variables.
 - `app_docs/changelog.md`: read when adding or changing a changelog entry under `src/content/changelog/`, its registry, `src/lib/changelog.ts`, `src/lib/changelog-backfill.ts`, `scripts/backfill-changelog.ts`, `src/components/ChangelogStats.tsx` (the stats strip), `/projects/changelog` or the sidebar's Changelog entry.

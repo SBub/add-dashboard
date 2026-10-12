@@ -10,10 +10,13 @@ hydrates. There is no server-side tracking.
 
 ### Initialisation
 
-`posthog.init` runs only when both `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` and
-`NEXT_PUBLIC_POSTHOG_HOST` are set. Both are public and inlined at build time,
-so a change to either needs a new deploy. Without them (local dev, ADW
-worktrees, e2e) nothing is initialised and every `posthog.capture` is a no-op.
+`posthog.init` runs only on the production deploy: when
+`NEXT_PUBLIC_VERCEL_ENV` is `production` and both
+`NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` and `NEXT_PUBLIC_POSTHOG_HOST` are set.
+`NEXT_PUBLIC_VERCEL_ENV` is a Vercel system variable, absent in local builds,
+so local dev, ADW worktrees, e2e and preview deploys never send events, even
+with a token in `.env.local`. All three are inlined at build time, so a change
+needs a new deploy. Elsewhere every `posthog.capture` is a no-op.
 
 `defaults: "2026-01-30"` turns on PostHog's default capture: pageviews and
 page leaves on client-side navigation, and autocapture of clicks.
@@ -41,3 +44,5 @@ the offer came from `?offer=` rather than the select.
 - `posthog-js` is imported only in client components, `instrumentation-client.ts`
   and `src/app/global-error.tsx`.
 - `instrumentation-client.ts` never throws when a variable is missing.
+- Never initialise PostHog outside the production deploy: keep the
+  `NEXT_PUBLIC_VERCEL_ENV === "production"` check.

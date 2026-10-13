@@ -6,14 +6,14 @@ the card is in the server-rendered HTML, and that its Refresh button refetches o
 
 ## User Story
 
-As a visitor reading the ADW public ledger on `/projects/log`
+As a visitor reading the ADW daily log on `/projects/log`
 I want to refresh today's figures in place
 So that I can follow today's work without reloading the page
 
 ## Test Steps
 
 1. Navigate to `/projects/log` under the `Application URL`.
-2. **Verify** the `What an AI developer workflow gets done` heading (level 1) is present, followed
+2. **Verify** the `Daily log` heading (level 1) is present, followed
    by an `article` whose level-2 heading starts with `Today,` and which holds a `button` named
    `Refresh`, followed by past day cards (or the text `No finished runs in the previous 30 days.`).
    When the window line is present, **Verify** it ends with `all projects` and that the today

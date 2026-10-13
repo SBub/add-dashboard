@@ -26,7 +26,7 @@ So that I can switch between the projects and the daily log without leaving the 
    and that each one's `getBoundingClientRect().top` is greater than the previous one's.
 4. **Verify** the `Daily log` link has no `aria-current`. Take a screenshot of `/projects`.
 5. Click the `Daily log` link. **Verify** the URL is `/projects/log`, the
-   `What an AI developer workflow gets done` heading (level 1) is present, an `article` whose
+   `Daily log` heading (level 1) is present, an `article` whose
    level-2 heading starts with `Today,` is present, followed by at least one past day card (an
    `article` with a level-2 date heading) or the text `No finished runs in the previous 30 days.`
 6. **Verify** the `Daily log` link has `aria-current="page"`, no link in the `Projects` navigation

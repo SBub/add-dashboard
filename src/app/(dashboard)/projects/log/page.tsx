@@ -13,7 +13,8 @@ import { SUMMARY_DEFAULT_DAYS, utcDay } from "@/lib/daily-summary";
 import { summaryPastTag, summaryTodayTag } from "@/lib/history-tags";
 
 export const metadata: Metadata = {
-  title: "Sviatlana Buben: what an AI developer workflow ships",
+  title: "Daily log",
+  description: "What my AI developer workflow shipped each day, and what it cost.",
 };
 
 /**
@@ -135,15 +136,9 @@ async function SummaryContent() {
 export default function SummaryPage() {
   return (
     <div>
-      <h1 className="text-2xl font-semibold tracking-tight">
-        What an AI developer workflow gets done
-      </h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Daily log</h1>
       <p className="mt-2 max-w-[70ch] text-base text-neutral-700 dark:text-neutral-300">
-        ADW is an autonomous pipeline that takes a GitHub issue and plans, builds, tests, reviews
-        and documents the change, then opens a pull request and merges it once checks are green.
-        This page is its public ledger: every finished run per day across the connected
-        repositories, what kind of work it was, how long it took, how many tokens it used and what
-        it cost.
+        What my AI developer workflow shipped each day, and what it cost.
       </p>
       <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">
         Times are UTC. Tokens and cost count runs that published metrics.

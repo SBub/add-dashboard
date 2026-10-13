@@ -65,9 +65,8 @@ no filters (issue #97).
 shipped each day, and what it cost."; the document title is "Daily log" and the
 meta description repeats the intro sentence, matching Changelog's plain title
 plus one-line description.
-Both sit in the page body and `metadata`, outside the report hole. The
-reading notes ("Times are UTC. Tokens and cost count runs that published
-metrics.") are a muted line directly under the intro, also in the shell.
+Both sit in the page body and `metadata`, outside the report hole. There is
+no reading note under the intro.
 
 **Data.** The toolkit's `adw.daily_summary` view (its migration
 `supabase/migrations/*_run_metrics.sql`) holds one row per project per UTC day
@@ -199,8 +198,7 @@ open daily log updates through Refresh or the next visit.
     and never an `expire` under 5 minutes.
 - The `h1` and the intro paragraph of `/projects/log` are static copy in the page body
   (the shell), and the title and description come from `metadata`; none of them reads the
-  report. The reading note about UTC and metrics is a `<p>` in the page body
-  directly under the intro, also in the shell, outside the `SectionBoundary`.
+  report.
   `e2e/test_connection_indicator_scope.md` and `e2e/test_landing_no_filters.md`
   assert the `h1` text, so change them together.
 - `/projects/log` has no filters (issue #97): it always shows every public project over

@@ -1,7 +1,7 @@
 # E2E Test: Landing Page Without Filters
 
 Checks that the summary at `/projects/log` has no Project or Window filter: it shows the heading, the
-intro, the reading note directly under the intro and the day cards for all projects over the fixed
+intro and the day cards for all projects over the fixed
 30-day window, ignores `?days` and `?project`, and that the old `/summary` and `/watch` addresses
 render the not-found page (no redirect).
 
@@ -16,8 +16,8 @@ So that the report reads straight through and ignores old filter parameters
 1. Navigate to `/projects/log` under the `Application URL`.
 2. **Verify** the `Daily log` heading (level 1) is present, followed
    by the intro paragraph `What my AI developer workflow shipped each day, and what it cost.`
-3. **Verify** the text `Times are UTC. Tokens and cost count runs that published metrics.` follows
-   the intro paragraph and precedes the first day card.
+3. **Verify** the page has no text `Times are UTC` and no text `published metrics` outside the day
+   cards: the intro paragraph is followed directly by the report.
 4. **Verify** at least one past day card is present (an `article` with a level-2 date heading,
    below the today card whose heading starts `Today,`) and that it holds a per-project table whose `Project` cells are plain text (no links in the Project
    column).
@@ -36,7 +36,7 @@ So that the report reads straight through and ignores old filter parameters
 
 ## Success Criteria
 
-- `/projects/log` shows the heading, the intro, the reading note directly under the intro and the day cards.
+- `/projects/log` shows the heading, the intro and the day cards, with no reading note.
 - No `<select>`, no Apply button and no form on `/projects/log`.
 - Project names in the per-project tables are plain text.
 - `/projects/log?days=7&project=x` renders the same 30-day, all-projects report as `/projects/log`.

@@ -209,7 +209,7 @@ below). They are the only readers of `searchParams` (for
 marker), so the shell stays the same for every page of History. The build's
 route table shows the project pages as "Partial Prerender" for this reason.
 
-The summary (`/projects/log`) is built the same way: its heading, intro and reading note
+The summary (`/projects/log`) is built the same way: its heading and intro
 are the static shell, and the report island awaits `connection()` before it
 reads today's UTC date and calls its two `"use cache"` scopes (`getTodayState`,
 tag `summary:today`, and `getPastDays`, tag `summary:past`); it reads no

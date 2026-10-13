@@ -76,14 +76,15 @@ the site
     `body > header`'s box.
 23. Navigate to `/` at 375x667. With `browser_evaluate`, **Verify** the `Work with me` link
     (`a[href="/hire"]`) is visible, its computed `position` is `fixed`, and
-    `innerWidth - rect.right` and `innerHeight - rect.bottom` are each 16px within 2px
-    (bottom-right corner).
+    `innerWidth - rect.right` is 16 within 2, and `innerHeight - rect.bottom` equals the height
+    of the radio region (`[role="region"][aria-label="NTS Slow Focus radio"]`) plus 16 within 2
+    (bottom-right corner, 16px above the fixed radio footer).
 
 ## Success Criteria
 
 - At 1920x1080 the `Work with me` link is in the header on `/`, `/projects`, a project page and
   `/hire`, and is marked `aria-current="page"` only on `/hire`.
-- At 375x667 the `Work with me` link floats in the bottom-right corner on `/` and is hidden on
+- At 375x667 the `Work with me` link floats in the bottom-right corner on `/`, 16px above the radio footer, and is hidden on
   `/hire`.
 - `/hire` shows the `Work with me` heading, `Remote, Lisbon`, the LinkedIn link and a form whose select (`What brings you here?`) has exactly the two
   offers, labelled `I need a product engineer` and

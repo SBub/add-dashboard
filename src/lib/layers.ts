@@ -23,3 +23,12 @@ export const HEADER_LAYER = "z-40";
  * Written out in full so Tailwind sees it.
  */
 export const FLOATING_LAYER = "z-30";
+
+/**
+ * The radio bar's z-index class: the footer fixed to the bottom of the
+ * viewport. Below `FLOATING_LAYER`, so the phone-only floating buttons (and
+ * the header and the section tooltip above them) draw over it, and above
+ * every other `z-<n>` in `src/`, so content scrolls under it. Pinned by
+ * `layers.test.ts`. Written out in full so Tailwind sees it.
+ */
+export const FOOTER_LAYER = "z-20";

@@ -13,8 +13,7 @@
  * classes by scanning source text: never interpolate a hue name.
  *
  * The sidebar's connection pill (ConnectionIndicator) keeps its own colours on
- * purpose: it describes the socket, not a run. The radio bar's red live dot
- * (RadioBar) describes a broadcast. They are the two exemptions in
+ * purpose: it describes the socket, not a run. It is the one exemption in
  * status-colors.test.ts. Issue class badges are not states and use hues
  * outside this palette.
  */

@@ -1,0 +1,39 @@
+- generic [active] [ref=f2e1]:
+    - banner [ref=f2e2]:
+        - generic [ref=f2e3]:
+            - generic [ref=f2e4]:
+                - link "Sviatlana Buben, building in public" [ref=f2e5] [cursor=pointer]:
+                    - /url: /
+                - navigation "Sections" [ref=f2e6]:
+                    - link "Watch me build" [ref=f2e7] [cursor=pointer]:
+                        - /url: /projects
+                    - link "Writing" [ref=f2e8] [cursor=pointer]:
+                        - /url: /writing
+            - generic [ref=f2e9]:
+                - generic [ref=f2e10]: Built with ADW, my AI developer workflow
+                - link "Work with me" [ref=f2e11] [cursor=pointer]:
+                    - /url: /hire
+    - main [ref=f2e12]:
+        - generic [ref=f2e13]:
+            - complementary [ref=f2e14]:
+                - generic [ref=f2e15]:
+                    - heading "Projects" [level=2] [ref=f2e16]
+                    - status [ref=f2e17]: connecting
+                - status "Loading projects" [ref=f2e22]:
+                    - list [ref=f2e23]:
+                        - listitem [ref=f2e24]
+                        - listitem [ref=f2e35]
+                        - listitem [ref=f2e46]
+                - generic [ref=f2e57]:
+                    - link "Daily log" [ref=f2e58] [cursor=pointer]:
+                        - /url: /projects/log
+                    - link "Changelog" [ref=f2e60] [cursor=pointer]:
+                        - /url: /projects/changelog
+                - generic [ref=f2e62]: Checking status...
+            - generic [ref=f2e67]:
+                - heading "What an AI developer workflow gets done" [level=1] [ref=f2e68]
+                - paragraph [ref=f2e69]: "ADW is an autonomous pipeline that takes a GitHub issue and plans, builds, tests, reviews and documents the change, then opens a pull request and merges it once checks are green. This page is its public ledger: every finished run per day across the connected repositories, what kind of work it was, how long it took, how many tokens it used and what it cost."
+                - paragraph [ref=f2e70]: Times are UTC. Tokens and cost count runs that published metrics.
+                - paragraph [ref=f2e71]: Loading summary...
+    - button "Open Next.js Dev Tools" [ref=f2e77] [cursor=pointer]
+    - alert [ref=f2e81]

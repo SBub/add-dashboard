@@ -1,0 +1,45 @@
+- generic [active] [ref=f5e1]:
+    - banner [ref=f5e2]:
+        - generic [ref=f5e3]:
+            - generic [ref=f5e4]:
+                - link "Sviatlana Buben, building in public" [ref=f5e5] [cursor=pointer]:
+                    - /url: /
+                - navigation "Sections" [ref=f5e6]:
+                    - link "Watch me build" [ref=f5e7] [cursor=pointer]:
+                        - /url: /projects
+                    - link "Writing" [ref=f5e8] [cursor=pointer]:
+                        - /url: /writing
+            - generic [ref=f5e9]:
+                - generic [ref=f5e10]: Built with ADW, my AI developer workflow
+                - link "Work with me" [ref=f5e11] [cursor=pointer]:
+                    - /url: /hire
+    - main [ref=f5e12]:
+        - generic [ref=f5e13]:
+            - complementary [ref=f5e14]:
+                - generic [ref=f5e15]:
+                    - heading "Projects" [level=2] [ref=f5e16]
+                    - status [ref=f5e17]: connecting
+                - status "Loading projects" [ref=f5e22]:
+                    - list [ref=f5e23]:
+                        - listitem [ref=f5e24]
+                        - listitem [ref=f5e35]
+                        - listitem [ref=f5e46]
+                - generic [ref=f5e57]:
+                    - link "Daily log" [ref=f5e58] [cursor=pointer]:
+                        - /url: /projects/log
+                    - link "Changelog" [ref=f5e60] [cursor=pointer]:
+                        - /url: /projects/changelog
+                - generic [ref=f5e63]:
+                    - generic [ref=f5e85]: Ready to build
+                    - generic [ref=f5e86]:
+                        - text: last beat
+                        - time [ref=f5e87]: 13.10.2026 11:37 UTC
+            - generic [ref=f5e67]:
+                - heading "What an AI developer workflow gets done" [level=1] [ref=f5e68]
+                - paragraph [ref=f5e69]: "ADW is an autonomous pipeline that takes a GitHub issue and plans, builds, tests, reviews and documents the change, then opens a pull request and merges it once checks are green. This page is its public ledger: every finished run per day across the connected repositories, what kind of work it was, how long it took, how many tokens it used and what it cost."
+                - paragraph [ref=f5e70]: Times are UTC. Tokens and cost count runs that published metrics.
+                - generic [ref=f5e71]:
+                    - paragraph [ref=f5e72]: Loading today...
+                    - paragraph [ref=f5e73]: Loading past days...
+    - button "Open Next.js Dev Tools" [ref=f5e79] [cursor=pointer]
+    - alert [ref=f5e83]

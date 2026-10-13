@@ -11,7 +11,9 @@ const components: MDXComponents = {
   h1: (props) => <h1 className="text-2xl font-semibold tracking-tight" {...props} />,
   h2: (props) => <h2 className="mt-8 text-xl font-semibold tracking-tight" {...props} />,
   h3: (props) => <h3 className="mt-6 text-lg font-semibold" {...props} />,
-  p: (props) => <p className="mt-4 text-base text-neutral-700 dark:text-neutral-300" {...props} />,
+  p: (props) => (
+    <p className="mt-6 text-base leading-8 text-neutral-700 dark:text-neutral-300" {...props} />
+  ),
   // A site path is a client-side navigation; anything else is a plain link.
   a: ({ href, ...props }) =>
     href?.startsWith("/") ? (
@@ -32,6 +34,25 @@ const components: MDXComponents = {
     />
   ),
   li: (props) => <li className="pl-1" {...props} />,
+  // Screenshots in a post live under public/writing/<slug>/. The markdown title
+  // (![alt](src "caption")) is shown as a visible caption under the image.
+  // Spans, not figure/figcaption: MDX wraps a lone image in a <p>, and a
+  // figure inside a p is invalid HTML.
+  img: ({ alt, title, ...props }) => (
+    <span className="my-12 block">
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        alt={alt ?? ""}
+        className="w-full rounded-md border border-neutral-200 dark:border-neutral-800"
+        {...props}
+      />
+      {title ? (
+        <span className="mt-3 block text-sm leading-6 text-neutral-500 dark:text-neutral-400">
+          {title}
+        </span>
+      ) : null}
+    </span>
+  ),
   blockquote: (props) => (
     <blockquote
       className="mt-4 border-l-2 border-neutral-300 pl-4 text-neutral-600 dark:border-neutral-700 dark:text-neutral-400"

@@ -1,0 +1,28 @@
+export const meta = {
+  title: "Shipping confidently with feature flags when AI writes the code",
+  description:
+    "How I roll a feature out with PostHog feature flags: to myself first, then my team, then everyone.",
+  date: "2026-10-13",
+  audience: "product-engineer",
+  draft: false,
+};
+
+One of the greatest characteristics of feature flags is the possibility to test in production strategically. Strategies for using feature flags are infinite.
+
+One that we can all grasp easily: roll a feature out to production for myself and verify that it all works; then roll it out to my teammates, verify it's still functional and also gather some behavioural information; if it's still functional and user behaviour matches what is expected, roll it out to a larger group, increasing the number of metrics you look at with each rollout.
+
+Could you start the other way around, and define what you are measuring from your final intended user and the metrics you'd like to see? Yes, but hypothetically, and that should rather not be considered a benchmark. Progressive monitoring spends less time on hypotheses, and that time can go into strategic monitoring with each rollout.
+
+Now, let's look at an example. Let's say I turn the [Watch me build](/projects) page into a SaaS product. Currently ADW runs on my machine, and I am developing a feature to add more workers per tenant, meaning the possibility to onboard more machines to run AI developer workflows. The whole functionality, "onboard a new machine to run ADW", will ship as its own feature.
+
+When I am ready for the production release, I will wrap that functionality in a feature flag with myself already added as its user, but with the flag turned off. Once it's in production, I will turn the flag on and test it.
+
+![PostHog feature flag machine-onboarding: one condition set, person property email equals sveta@issebya.com, rolled out to 100%](/writing/feature-flags/flag-owner-only.png "PostHog: the machine-onboarding feature flag, released to me only (my email, 100%).")
+
+If all is well, I roll it out to my teammates by adding a new condition set with my Team cohort to the same feature flag.
+
+![PostHog cohort Team: people with an @issebya.com email](/writing/feature-flags/team-cohort.png "PostHog: the Team cohort, everyone with an @issebya.com email.")
+
+![PostHog feature flag machine-onboarding: Set 1 on my email OR Set 2 on the Team cohort, both at 100%](/writing/feature-flags/flag-team-cohort.png "PostHog: the same flag with a second condition set for the Team cohort. Me OR my team.")
+
+This time I want to observe its usability through session replays and see how users behave. Depending on my findings, I might amend something in the feature and repeat the process. I don't create a new feature flag for that: I narrow the same flag back to myself, ship the fix behind it, and widen it again.

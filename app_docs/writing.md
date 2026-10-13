@@ -3,6 +3,7 @@
 **Specifications:**
 
 - specs/issue-170-adw-d5ef5a75-sdlc_planner-add-mdx-writing-blog.md
+- specs/issue-200-adw-c1f03790-sdlc_planner-add-post-breadcrumb.md
 
 ## Overview
 

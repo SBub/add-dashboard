@@ -165,8 +165,8 @@ projects. `/`, the landing page, is a static intro (see `app_docs/home.md`).
   which reads the pathname to mark the sidebar's Daily log and Changelog entries, and `TodaySummary`, which reads today's
   card from the query cache and refetches it, `SubmitButton`, which reads its
   form's pending state, `TurnstileScript`, which renders the Turnstile
-  widget on mount, and `PostMinimapViewport`, which reads the window's scroll
-  to frame the visible part of a post's minimap). `HistoryLinks`,
+  widget on mount, and `PostMinimapViewport`, which measures the post and reads
+  the window's scroll to draw a post's minimap and frame its visible part). `HistoryLinks`,
   `RunHistoryList`, `SectionNav`,
   `DailySummaryList`, `SummaryDayCard`, `DayCharts`, `ColumnChart`,
   `ClassColumnChart`, `ModelColumnChart`, `PhaseColumnChart`,

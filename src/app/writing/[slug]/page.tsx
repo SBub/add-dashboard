@@ -52,7 +52,7 @@ export default async function PostPage({ params }: PostPageProps) {
   const { meta, Content } = post;
   return (
     <article className="mx-auto max-w-6xl px-4 py-6">
-      <div className="max-w-[70ch]">
+      <div className="max-w-[62ch]">
         <h1 className="text-2xl font-semibold tracking-tight">{meta.title}</h1>
         <PostMetaLine meta={meta} />
         <Content />

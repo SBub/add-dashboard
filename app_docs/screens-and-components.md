@@ -11,6 +11,7 @@
 - specs/issue-152-adw-a6b99270-sdlc_planner-fix-between-phase-complete-label.md
 - specs/issue-158-adw-a58f07d8-sdlc_planner-worker-status-widget.md
 - specs/issue-164-adw-cf1087b2-sdlc_planner-hire-me-page-contact-form.md
+- specs/issue-211-adw-c1f6991d-sdlc_planner-nts-slow-focus-radio-bar.md
 
 ## Overview
 
@@ -152,7 +153,8 @@ projects. `/`, the landing page, is a static intro (see `app_docs/home.md`).
   `QueueView`, which reads the queued items from the query cache,
   `ConnectionIndicator`, which subscribes to its store, `WorkerStatus`, which
   subscribes to its polling store, `IdentifyButton`, which subscribes to
-  PostHog's feature flags and distinct id, `HeaderLink`, which
+  PostHog's feature flags and distinct id, `RadioBar`, which holds the player
+  state and the `<audio>`, `HeaderLink`, which
   reads the pathname to mark the header's current section, `HistorySearch`, which
   holds the search box's local text and calls the router, and
   `HistoryPageLink`, which navigates the History pages inside the shared
@@ -212,7 +214,9 @@ projects. `/`, the landing page, is a static intro (see `app_docs/home.md`).
 - The root header in `src/app/layout.tsx` is `sticky top-0` with
   `HEADER_LAYER` (`src/lib/layers.ts`, below `TOOLTIP_LAYER` and above every
   other z-index in `src/`, pinned by `src/lib/layers.test.ts`), on every route
-  and at every width. The document keeps scrolling as a whole: never make
+  and at every width. The radio bar (`app_docs/radio.md`) sits above it in
+  normal flow, as the first child of `body`, and scrolls away while the header
+  stays pinned at `top: 0`. The document keeps scrolling as a whole: never make
   `main`, `body` or a layout shell an `overflow` scroll container (scroll
   restoration, scroll-to-top on navigation, pull-to-refresh and the mobile
   address bar depend on window scroll). Its single-row height has one source,

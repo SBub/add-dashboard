@@ -8,6 +8,7 @@
 - specs/issue-174-adw-d7f72f46-sdlc_planner-summary-chart-core-class-columns.md
 - specs/issue-175-adw-fe4916f8-sdlc_planner-gray-model-phase-charts.md
 - specs/issue-182-adw-00da532e-sdlc_planner-move-summary-to-projects-log.md
+- specs/issue-207-adw-7ac1bc18-sdlc_planner-narrow-bars-tilted-values.md
 
 ## Overview
 

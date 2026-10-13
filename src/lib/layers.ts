@@ -14,3 +14,12 @@ export const TOOLTIP_LAYER = "z-50";
  * out in full so Tailwind sees it.
  */
 export const HEADER_LAYER = "z-40";
+
+/**
+ * The z-index class of the phone-only floating buttons (Work with me, and the
+ * owner's Login / Logout above it) below `sm`. Below `HEADER_LAYER`, so the
+ * header and the section tooltip draw over them, and above every other `z-<n>`
+ * in `src/`, so content scrolls under them. Pinned by `layers.test.ts`.
+ * Written out in full so Tailwind sees it.
+ */
+export const FLOATING_LAYER = "z-30";

@@ -13,9 +13,9 @@ So that the owner's PostHog identify control never appears where its flag cannot
 
 ## Test Steps
 
-1. Navigate to the `Application URL` (`/`).
+1. Resize the browser to 1920x1080 and navigate to the `Application URL` (`/`).
 2. **Verify** the header has no button or link named `Login` or `Logout`, and the `Work with me`
-   link (`href="/hire"`) is present.
+   link (`href="/hire"`) is present in the document and inside `body > header`'s box.
 3. Take a screenshot of `/` at 1920x1080.
 4. Navigate to `/projects`. **Verify** the header has no button or link named `Login` or `Logout`,
    and the `Work with me` link (`href="/hire"`) is present.
@@ -23,9 +23,13 @@ So that the owner's PostHog identify control never appears where its flag cannot
    and the `Work with me` link (`href="/hire"`) is present.
 6. Navigate to `/hire`. **Verify** the header has no button or link named `Login` or `Logout`, and
    the `Work with me` link (`href="/hire"`) is present.
+7. Resize to 375x667 and navigate to `/`. **Verify** no button or link named `Login` or `Logout`
+   exists anywhere in the document (below 640px the button would float outside the header), and
+   the `Work with me` link (`a[href="/hire"]`) is present.
 
 ## Success Criteria
 
 - `/`, `/projects`, `/writing` and `/hire` show no `Login` or `Logout` in the header.
-- The `Work with me` link is present on each.
+- The `Work with me` link is present on each, in the header at 1920x1080.
+- At 375x667, `/` has no `Login` or `Logout` anywhere and the `Work with me` link is present.
 - 1 screenshot is taken.

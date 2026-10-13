@@ -14,7 +14,8 @@ the site
 
 ## Test Steps
 
-1. Navigate to the `Application URL` (`/`).
+1. Resize the browser to 1920x1080 (steps 1 to 20 run at this width; below 640px the button
+   floats outside the header) and navigate to the `Application URL` (`/`).
 2. **Verify** the header has a `Work with me` link with `href="/hire"` and no `aria-current`.
 3. Navigate to `/projects` and **Verify** the same `Work with me` link is in the header.
 4. Click the first project link in the sidebar's `Projects` navigation and **Verify** the same
@@ -67,14 +68,23 @@ the site
     on the page.
 20. Navigate to `/hire` and take a full-page screenshot at 1920x1080.
 21. Resize to 375x667 and take a full-page screenshot.
-22. **Verify** at 375 that the header shows `Sviatlana Buben`, `Watch me build` and
-    `Work with me`, does not show `building in public` (that part of the brand is hidden below
-    `sm`), that `Remote, Lisbon` is visible, and with `browser_evaluate` that `document.documentElement.scrollWidth <= 375`.
+22. **Verify** at 375 that the header shows `Sviatlana Buben` and `Watch me build`, does not
+    show `building in public` (that part of the brand is hidden below `sm`), that
+    `Remote, Lisbon` is visible, and with `browser_evaluate` that
+    `document.documentElement.scrollWidth <= 375`. **Verify** that on `/hire` the `Work with me`
+    link is not visible (computed `display` is `none`) and its box is not inside
+    `body > header`'s box.
+23. Navigate to `/` at 375x667. With `browser_evaluate`, **Verify** the `Work with me` link
+    (`a[href="/hire"]`) is visible, its computed `position` is `fixed`, and
+    `innerWidth - rect.right` and `innerHeight - rect.bottom` are each 16px within 2px
+    (bottom-right corner).
 
 ## Success Criteria
 
-- The `Work with me` link is in the header on `/`, `/projects`, a project page and `/hire`, and is
-  marked `aria-current="page"` only on `/hire`.
+- At 1920x1080 the `Work with me` link is in the header on `/`, `/projects`, a project page and
+  `/hire`, and is marked `aria-current="page"` only on `/hire`.
+- At 375x667 the `Work with me` link floats in the bottom-right corner on `/` and is hidden on
+  `/hire`.
 - `/hire` shows the `Work with me` heading, `Remote, Lisbon`, the LinkedIn link and a form whose select (`What brings you here?`) has exactly the two
   offers, labelled `I need a product engineer` and
   `I want to structure and automate my processes with AI` with values `Product engineer` and

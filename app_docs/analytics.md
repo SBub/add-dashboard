@@ -4,6 +4,7 @@
 
 - specs/issue-195-adw-dd62c7aa-sdlc_planner-login-logout-header-flag.md
 - specs/issue-206-adw-2b58cbdf-sdlc_planner-separate-internal-automated-analytics.md
+- specs/issue-214-adw-b4882b73-sdlc_planner-header-one-row-floating-hire.md
 
 ## Overview
 
@@ -59,7 +60,9 @@ The `login` flag is a boolean flag created and targeted by hand in PostHog (by
 the owner's email). It gates the header's Login / Logout button,
 `src/components/IdentifyButton.tsx`, whose store is `createIdentityStore` in
 `src/lib/analytics.ts`: a `useSyncExternalStore` store, with `posthog` passed
-in as an `IdentityClient`.
+in as an `IdentityClient`. From `sm` up the button sits in the header just
+before Work with me; below `sm` it floats in the bottom-right corner, stacked
+above the floating Work with me button.
 
 Login calls `identify(OWNER_EMAIL, { email: OWNER_EMAIL })`; Logout calls
 `reset()`. The label comes from `get_distinct_id()` (Logout when it equals

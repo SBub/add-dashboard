@@ -12,6 +12,7 @@
 - specs/issue-158-adw-a58f07d8-sdlc_planner-worker-status-widget.md
 - specs/issue-164-adw-cf1087b2-sdlc_planner-hire-me-page-contact-form.md
 - specs/issue-211-adw-c1f6991d-sdlc_planner-nts-slow-focus-radio-bar.md
+- specs/issue-214-adw-b4882b73-sdlc_planner-header-one-row-floating-hire.md
 
 ## Overview
 
@@ -222,6 +223,20 @@ projects. `/`, the landing page, is a static intro (see `app_docs/home.md`).
   address bar depend on window scroll). Its single-row height has one source,
   `--header-height` in `src/app/globals.css`; a change to the header's padding
   or line height updates it.
+- The header is one row (57px) at every width from 320px. The tagline ("Built
+  with ADW, my AI developer workflow") shows only from `lg`. Below `sm` the
+  Work with me button floats in the bottom-right corner (`fixed`, 1rem from the
+  right and bottom edges plus the safe-area inset, at least 44px tall, with a
+  soft shadow), the owner's Login / Logout button floats above it, the right
+  group is `display: contents` so it takes no room in the row, and the left
+  group's `min-h-8` keeps the row at the `--header-height` it has from `sm` up.
+  Both floating buttons take `FLOATING_LAYER` (`src/lib/layers.ts`, `z-30`):
+  below `HEADER_LAYER`, so the header and the section tooltip draw over them,
+  and above every other z-index in `src/`, pinned by `src/lib/layers.test.ts`.
+  Below `sm`, `main` takes a bottom padding of 5rem plus the inset so the last
+  line of every page clears the button when scrolled to the end. Never render
+  a second Work with me link for phones (the one `HireLink` changes position
+  by width), and never put the floating buttons at or above `HEADER_LAYER`.
 - Status colours come only from `STATUS_COLORS` in `src/lib/status-colors.ts`
   (queued amber, running emerald with the pulse dot, completed sky, failed
   rose, `neutral` for zeros), written as full literal class strings so

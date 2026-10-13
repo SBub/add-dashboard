@@ -13,8 +13,10 @@
   /*
    * The sticky root header's single-row height (`py-3`, the Work with me
    * button's 2rem box, the tallest item in the row, and the 1px bottom
-   * border), the one source the sidebar's sticky offset reads. The header wraps to two
-   * rows only below `md`, where the sidebar is not sticky.
+   * border), the one source the sidebar's sticky offset reads. The header is
+   * one row at every width from 320px: below `sm` the Work with me button
+   * floats bottom-right and the left group's `min-h-8` keeps the row at 2rem;
+   * the tagline shows only from `lg`.
    */
   --header-height: 3.5625rem;
   /*

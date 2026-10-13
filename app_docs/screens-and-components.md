@@ -29,7 +29,8 @@ projects. `/`, the landing page, is a static intro (see `app_docs/home.md`).
   breakpoint it becomes a horizontal strip above the detail. From `md` up it
   is sticky: it sits `--header-height` + 1.5rem from the top, below the
   sticky root header, and it is a full-height column (its height subtracts the
-  header height and both 1.5rem gaps): the project list scrolls inside it and
+  header height, the radio bar's `--radio-bar-height` and both 1.5rem gaps, so
+  it fits the viewport at scroll 0): the project list scrolls inside it and
   the Daily log and Changelog entries (`SidebarEntryLink`, links to
   `/projects/log` and `/projects/changelog` styled like a project entry; Daily
   log current only on its page, Changelog on its index and every entry) and

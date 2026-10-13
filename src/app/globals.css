@@ -17,6 +17,12 @@
    * rows only below `md`, where the sidebar is not sticky.
    */
   --header-height: 3.5625rem;
+  /*
+   * The radio bar above the header (`h-9` and its 1px bottom border). It
+   * scrolls away, so the sidebar's sticky offset ignores it, but the sidebar's
+   * height subtracts it so the column fits the viewport at scroll 0.
+   */
+  --radio-bar-height: 2.3125rem;
 }
 
 @media (prefers-color-scheme: dark) {

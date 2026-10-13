@@ -3,13 +3,18 @@
 **Specifications:**
 
 - specs/issue-170-adw-d5ef5a75-sdlc_planner-add-mdx-writing-blog.md
+- specs/issue-200-adw-c1f03790-sdlc_planner-add-post-breadcrumb.md
+- specs/issue-203-adw-e2642e8f-sdlc_planner-enforce-post-og-metadata.md
+- specs/issue-204-adw-5be2aec6-sdlc_planner-post-minimap.md
 
 ## Overview
 
 `/writing` (`src/app/writing/page.tsx`) lists the visible posts newest first: each with its title
 linking to the post, its `DD.MM.YYYY` date, its audience tag and its description.
 `/writing/[slug]` (`src/app/writing/[slug]/page.tsx`) renders one post: title, date, tag and the MDX
-body, which ends with the post's own last line (no call to action is added after it). Both sit outside `(dashboard)`: no sidebar, no `Providers`, no
+body, which ends with the post's own last line (no call to action is added after it). Above the title the post page renders a breadcrumb
+(`src/components/Breadcrumb.tsx`, server only): `Writing`, linking to `/writing`, then the post
+title as the current page, truncated to one line on narrow screens. `/writing` has no breadcrumb. From the `xl` breakpoint the post page also shows a minimap in the right gutter, outside the article: a scaled-down copy of the post with a frame around the part in the viewport (`src/components/PostMinimap.tsx`, see Minimap below). Both sit outside `(dashboard)`: no sidebar, no `Providers`, no
 Realtime, no pill. Posts are MDX modules under `src/content/posts/`, compiled by `@next/mdx`
 (`createMDX()` in `next.config.ts`) and styled by `src/mdx-components.tsx` (server only).
 
@@ -58,6 +63,32 @@ caption under it. It uses spans, not `figure`/`figcaption`, because MDX wraps a 
 caption names its source (for example "PostHog: ..."). The post column is `max-w-[62ch]` and
 paragraphs use `leading-8` with `mt-6`, for long-form reading.
 
+### Minimap
+
+From the `xl` breakpoint up (`hidden xl:block`) the post page shows a minimap in the right gutter
+beside the post column; below `xl` (375x667 included) there is none. It sits outside the
+`article`, as its sibling in `src/app/writing/[slug]/page.tsx`.
+
+`PostMinimap` (a server component) renders a second, server-rendered copy of the post's MDX
+`Content` with the `MINIMAP_COMPONENTS` overrides, which replace links, headings and other
+focusable or landmark elements with plain inert markup. The copy is a `w-[62ch]` column scaled with
+CSS `zoom` at `MINIMAP_SCALE` (0.25, in `src/lib/minimap.ts`); `zoom`, unlike a transform, shrinks
+the layout box too, so the panel's height is the scaled height. The panel is sticky below the
+header (`top-[calc(var(--header-height)+1.5rem)]`) and capped at `60vh`
+(`max-h-[60vh] overflow-hidden`). When the miniature is taller than the panel it slides
+proportionally: as the reader scrolls from the top of the post to its end, the miniature's offset
+moves from 0 to its overflow, so the frame stays inside the panel.
+
+`PostMinimapViewport` (`src/components/PostMinimapViewport.tsx`) is the one client leaf. It reads
+`window.scrollY`, `innerHeight`, the column's box (from its `h1` to its bottom) and the panel's
+height on scroll, resize and column resize (images loading), and passes them to the pure
+`minimapFrame` in `src/lib/minimap.ts`, which returns the frame's top and height and the slide
+offset (unit-tested in `src/lib/minimap.test.ts`). The frame starts null, so the server markup and
+the first client render match and nothing shifts on hydration.
+
+The minimap is visual only: the panel is `aria-hidden="true"`, `inert`, `pointer-events-none` and
+`select-none`, with no click-to-jump, no drag, no keyboard behaviour and no focus stop.
+
 ### The LinkedIn companion
 
 An optional `src/content/posts/<slug>.linkedin.md` beside a post holds its LinkedIn text. It is
@@ -104,6 +135,36 @@ params do not inherit the page's). That call only collects ids, and an empty lis
 under `cacheComponents`, so it returns the one id `og` with the fallback alt "Sviatlana Buben,
 writing". `Image` still answers 404 for a slug that is no post.
 
+### The metadata check
+
+`yarn check:og` (`vitest run --config vitest.og.config.ts`) runs
+`scripts/check-post-metadata.test.ts` after `yarn build`. For every non-draft post it reads the
+prerendered `.next/server/app/writing/<slug>.html`, exactly what production serves, and asserts
+`<title>` and the description equal `meta.title` and `meta.description`; the canonical link and
+`og:url` end in `/writing/<slug>`; `og:title`, `og:description`, `og:type` (`article`) and
+`og:site_name` (`SITE_NAME`); `og:image` points at `/writing/<slug>/opengraph-image/` with
+`og:image:width` 1200, `og:image:height` 630, `og:image:type` `image/png` and a non-empty
+`og:image:alt`; and `twitter:card` is `summary_large_image`. URLs are checked by suffix, so the
+check passes for any host (`SITE_URL` unset in CI gives `http://localhost:3000`). A missing HTML
+file fails with "run yarn build first". It reads local files only: no fetch, no server, no port.
+
+Posts come from `POST_ENTRIES` through `getPosts()`, with drafts skipped (vitest runs with
+`NODE_ENV=test`, where `getPosts()` keeps drafts, so the check filters them itself). A new post is
+covered with no edit to the check, and a first test asserts the count of checked posts equals the
+count of non-draft entries and prints it (`check:og: <n> posts checked`).
+
+The check has its own `vitest.og.config.ts`, with `@mdx-js/rollup` so it can load each post's
+`meta` through the registry and the `@/` alias mirrored from `tsconfig.json`.
+`vitest.config.ts` includes only `src/**/*.test.ts`, so `yarn test` never runs it and stays
+build-free.
+
+It checks the built HTML rather than calling `generateMetadata` because several of the tags are
+produced by Next, not by the function: there is no `twitter` key in `generateMetadata` (the
+twitter tags are Next's fallback from `openGraph`), and the `og:image*` tags come from the
+`opengraph-image.tsx` file convention. A unit test of the function could not assert them.
+
+CI (`.github/workflows/ci.yml`) runs `yarn check:og` right after `yarn build`.
+
 ### Clock and prerendering
 
 Both pages and the image read no clock and nothing at request time. A post's date is its
@@ -116,7 +177,8 @@ shared by the list and the post page (see `app_docs/clock-and-prerender.md`).
 - No `fs` at runtime; only `registry.test.ts` reads the directory.
 - Never set `pageExtensions` for `md` or `mdx`: posts are modules, never routes.
 - No client components, data fetching or env reads in a post; `src/mdx-components.tsx` stays
-  server only (no `"use client"`).
+  server only (no `"use client"`). The post page's one client component is `PostMinimapViewport`,
+  a leaf outside the `article`.
 - No clock reads in `/writing`, a post page, the Open Graph image or `src/lib/posts.ts`.
 - Never import a `.linkedin.md` file from `src/`, and never list one in the registry.
 - `generateStaticParams` in `src/app/writing/[slug]/page.tsx` never returns an empty array (keep
@@ -128,3 +190,13 @@ shared by the list and the post page (see `app_docs/clock-and-prerender.md`).
 - A page that sets its own `openGraph` repeats `siteName: SITE_NAME`.
 - A post page never adds a call to action (a Work with me link, a hire box) after the MDX body: a
   post ends with its own last line.
+- The breadcrumb on a post page is a server component; its link is `/writing` and its last item is
+  `meta.title` with `aria-current="page"`. `/writing` has no breadcrumb, and the `h1` stays the
+  post's only `h1`.
+- Every non-draft post must pass `yarn check:og`. Never hardcode a slug list in
+  `scripts/check-post-metadata.test.ts` (posts come only from `getPosts()`), and a change to what
+  a post's metadata tags contain changes the check in the same commit.
+- The minimap stays outside the `article`, `aria-hidden` and `inert`, with no links, headings or
+  focusable elements (its copy renders through `MINIMAP_COMPONENTS`).
+- Never add click-to-jump, drag or keyboard stops to the minimap: it is visual only.
+- The minimap appears only on `/writing/[slug]`: never on `/writing` or any other route.

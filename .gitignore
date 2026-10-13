@@ -33,3 +33,5 @@ next-env.d.ts
 
 # Playwright MCP writes snapshots and console logs here during ADW reviews; never commit them
 .playwright-mcp/
+# browser_snapshot dumps saved to the repo root by a test or review journey (s9.yml, s18b.yml)
+/s[0-9]*.yml

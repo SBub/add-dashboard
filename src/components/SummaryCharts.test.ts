@@ -61,9 +61,7 @@ describe("ClassColumnChart", () => {
     });
 
     it("places a zero above the baseline with a 0% share", () => {
-      expect(choresOnly).toContain(
-        '<span data-value-placement="above" class="mb-1 text-xs tabular-nums">0</span>',
-      );
+      expect(choresOnly).toMatch(/<span data-value-placement="above" class="[^"]*">0<\/span>/);
       expect(choresOnly).toContain('<dd class="text-right tabular-nums">0%</dd>');
     });
   });
@@ -93,5 +91,71 @@ describe("PhaseColumnChart", () => {
     );
     expect(markup).toContain('<p class="sr-only">What each step cost: Plan $1.25</p>');
     expect(markup).not.toContain("Cost by phase");
+  });
+});
+
+describe("ColumnChart values", () => {
+  const classMarkup = renderToStaticMarkup(
+    createElement(ClassColumnChart, {
+      counts: { runs: 3, features: 2, bugs: 1, chores: 0, patches: 0 },
+      day: DAY,
+    }),
+  );
+  const phaseMarkup = renderToStaticMarkup(
+    createElement(PhaseColumnChart, { phases: [plan], day: DAY }),
+  );
+  const values = (markup: string) => [
+    ...markup.matchAll(/<span data-value-placement="above" class="([^"]*)">([^<]*)<\/span>/g),
+  ];
+  const columnCount = (markup: string) => (markup.match(/<li /g) ?? []).length;
+
+  it.each([
+    ["class", classMarkup],
+    ["phase", phaseMarkup],
+  ])("places every %s value above its bar", (_, markup) => {
+    expect(columnCount(markup)).toBeGreaterThan(0);
+    expect(values(markup)).toHaveLength(columnCount(markup));
+    expect(markup).not.toContain('data-value-placement="inside"');
+  });
+
+  it.each([
+    ["class", classMarkup],
+    ["phase", phaseMarkup],
+  ])("shows every %s value in regular weight and the text colour", (_, markup) => {
+    for (const [, className] of values(markup)) {
+      expect(className).not.toMatch(/font-semibold|font-medium|text-white|text-neutral-950/);
+    }
+  });
+
+  it("tilts every phase value", () => {
+    for (const [, className] of values(phaseMarkup)) {
+      expect(className).toContain("[transform:rotate(-45deg)]");
+      expect(className).toContain("origin-bottom-left");
+    }
+  });
+
+  it("keeps every class value upright and centred over its bar", () => {
+    for (const [, className] of values(classMarkup)) {
+      expect(className).not.toContain("rotate");
+      expect(className).toContain("-translate-x-1/2");
+    }
+  });
+
+  it("includes the tallest bar's value and the zero", () => {
+    const labels = values(classMarkup).map(([, , label]) => label);
+    expect(labels).toEqual(["2", "0", "1"]);
+  });
+
+  it.each([
+    ["class", classMarkup],
+    ["phase", phaseMarkup],
+  ])("keeps every %s bar empty and capped at 28px", (_, markup) => {
+    expect(markup.match(/style="height:[^"]*"><\/span>/g)).toHaveLength(columnCount(markup));
+    expect(markup).toContain("max-w-7");
+    expect(markup).not.toContain("max-w-14");
+  });
+
+  it("shows the phase cost above its bar", () => {
+    expect(values(phaseMarkup).map(([, , label]) => label)).toEqual(["$1.25"]);
   });
 });

@@ -25,6 +25,7 @@ How each feature works, and the rules it follows, is in one doc per feature unde
 - [Home page](app_docs/home.md)
 - [Writing](app_docs/writing.md)
 - [Changelog](app_docs/changelog.md)
+- [Radio bar](app_docs/radio.md)
 
 ## Running it
 

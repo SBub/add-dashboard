@@ -77,10 +77,13 @@ In the order the test phase runs them, all from the root, unfiltered: lint `yarn
 `yarn typecheck` (`next typegen` then `tsc --noEmit`; `tsconfig.json` excludes `trees` and
 `agents`; it rewrites the gitignored `next-env.d.ts`, never stage it); dead code `yarn knip` (scans `src/**`, see `knip.json`);
 format `yarn format:check` (write `yarn format`); unit `yarn test` (vitest, `src/**/*.test.ts`
-only, see `vitest.config.ts`); build `yarn build`.
+only, see `vitest.config.ts`); build `yarn build`; then the post metadata check `yarn check:og`
+(vitest under `vitest.og.config.ts`, reads the built `.next/server/app/writing/<slug>.html`, so it
+runs only after a build).
 
 The one test layer is `src/**/*.test.ts`: pure reducers in `src/data/`, helpers in `src/lib/` and the
-pinned hydration rule. There is no component test layer and no Playwright suite; a user-visible
+pinned hydration rule. The one exception is `scripts/check-post-metadata.test.ts`, run by
+`yarn check:og` after the build, never by `yarn test`. There is no component test layer and no Playwright suite; a user-visible
 change gets its browser evidence from the review phase's screenshots, not from a test.
 
 E2E code suite: `none` (no `@playwright/test` specs). `e2e/*.md` holds agent-driven journeys
@@ -93,7 +96,8 @@ E2E code suite: `none` (no `@playwright/test` specs). `e2e/*.md` holds agent-dri
 `e2e/test_run_row_phase_label.md`, `e2e/test_history_card_fields.md`,
 `e2e/test_history_page_turn.md`, `e2e/test_worker_status_widget.md`, `e2e/test_hire_page.md`,
 `e2e/test_home_page.md`, `e2e/test_writing.md`, `e2e/test_daily_log_sidebar.md`,
-`e2e/test_changelog.md` and `e2e/test_header_login_hidden.md`) that the test
+`e2e/test_changelog.md`, `e2e/test_header_login_hidden.md`,
+`e2e/test_post_minimap.md`, `e2e/test_radio_bar.md` and `e2e/test_header_mobile.md`) that the test
 phase runs through the Playwright MCP server.
 
 lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every commit and
@@ -155,11 +159,13 @@ lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every c
   `/hire` (heading, the Remote, Lisbon line, LinkedIn link, the form with the offer select, the Turnstile widget, the
   fuchsia Send button; no sidebar, no pill), `/writing` (heading, intro, the first post with its
   audience tag; no sidebar, no pill) and `/writing/my-moat` (title, date, tag, body ending with
-  its Watch me build live link to `/projects`), `/projects/changelog` (the sidebar with Changelog current below Daily log, heading,
+  its Watch me build live link to `/projects`; at 1920x1080 the minimap in the right gutter, none at
+  375x667), `/projects/changelog` (the sidebar with Changelog current below Daily log, heading,
   intro, entries newest first with date, title, stats strip and counts) and one entry such as
   `/projects/changelog/2026-10-09-pr163` (date, title, the stats strip with the PR link, diff,
-  commits, files and comments, the description, the Features, Fixes and Chores lists). The fuchsia Work with me button is in the header on every
-  route. Capture each at desktop 1920x1080 and mobile
+  commits, files and comments, the description, the Features, Fixes and Chores lists). The fuchsia Work with me button is in the header from 640px up
+  and floats bottom-right below it (hidden on `/hire` there). The radio footer (a rounded box with `∞`, the play button and `NTS · SLOW FOCUS`) is fixed to the bottom of the viewport on
+  every route, below the floating Work with me button on phones, and is idle on load; do not press play during review unless the spec is about the bar. Capture each at desktop 1920x1080 and mobile
   375x667, full page, into `agents/<adw_id>/<agent_name>/review_img/` in the worktree.
 - The sidebar's connection indicator (dashboard routes only; `/`, `/writing` and `/hire` have none) moves from `connecting` to `live` once the Realtime channel
   joins; wait for `live` in a `browser_snapshot` before judging live data, and do not report

@@ -11,6 +11,9 @@
 - specs/issue-152-adw-a6b99270-sdlc_planner-fix-between-phase-complete-label.md
 - specs/issue-158-adw-a58f07d8-sdlc_planner-worker-status-widget.md
 - specs/issue-164-adw-cf1087b2-sdlc_planner-hire-me-page-contact-form.md
+- specs/issue-211-adw-c1f6991d-sdlc_planner-nts-slow-focus-radio-bar.md
+- specs/issue-214-adw-b4882b73-sdlc_planner-header-one-row-floating-hire.md
+- specs/issue-216-adw-155628ce-sdlc_planner-radio-bar-sticky-footer.md
 
 ## Overview
 
@@ -29,7 +32,8 @@ projects. `/`, the landing page, is a static intro (see `app_docs/home.md`).
   breakpoint it becomes a horizontal strip above the detail. From `md` up it
   is sticky: it sits `--header-height` + 1.5rem from the top, below the
   sticky root header, and it is a full-height column (its height subtracts the
-  header height and both 1.5rem gaps): the project list scrolls inside it and
+  header height, the radio footer's `--radio-bar-height` and both 1.5rem gaps, so
+  the column ends above the footer): the project list scrolls inside it and
   the Daily log and Changelog entries (`SidebarEntryLink`, links to
   `/projects/log` and `/projects/changelog` styled like a project entry; Daily
   log current only on its page, Changelog on its index and every entry) and
@@ -151,7 +155,8 @@ projects. `/`, the landing page, is a static intro (see `app_docs/home.md`).
   `QueueView`, which reads the queued items from the query cache,
   `ConnectionIndicator`, which subscribes to its store, `WorkerStatus`, which
   subscribes to its polling store, `IdentifyButton`, which subscribes to
-  PostHog's feature flags and distinct id, `HeaderLink`, which
+  PostHog's feature flags and distinct id, `RadioBar`, which holds the player
+  state and the `<audio>`, `HeaderLink`, which
   reads the pathname to mark the header's current section, `HistorySearch`, which
   holds the search box's local text and calls the router, and
   `HistoryPageLink`, which navigates the History pages inside the shared
@@ -159,12 +164,13 @@ projects. `/`, the landing page, is a static intro (see `app_docs/home.md`).
   `useTransition` the box, the arrows and `HistoryResults` share, `SidebarEntryLink`,
   which reads the pathname to mark the sidebar's Daily log and Changelog entries, and `TodaySummary`, which reads today's
   card from the query cache and refetches it, `SubmitButton`, which reads its
-  form's pending state, and `TurnstileScript`, which renders the Turnstile
-  widget on mount). `HistoryLinks`,
+  form's pending state, `TurnstileScript`, which renders the Turnstile
+  widget on mount, and `PostMinimapViewport`, which reads the window's scroll
+  to frame the visible part of a post's minimap). `HistoryLinks`,
   `RunHistoryList`, `SectionNav`,
   `DailySummaryList`, `SummaryDayCard`, `DayCharts`, `ColumnChart`,
   `ClassColumnChart`, `ModelColumnChart`, `PhaseColumnChart`,
-  `ClassDistributionBar`, `ProjectBreakdownTable`, `Skeleton` and the
+  `ClassDistributionBar`, `ProjectBreakdownTable`, `PostMinimap`, `Skeleton` and the
   skeletons in `LoadingSkeletons.tsx` are components with no
   state; do not put
   `"use client"` on them or give them a filter that needs one.
@@ -202,28 +208,46 @@ projects. `/`, the landing page, is a static intro (see `app_docs/home.md`).
   painted only on `html` and `body`. `html` must keep it: the canvas, the
   scrollbar gutter and the overscroll area are painted from the root. No
   page-level wrapper (`body` classes, `main`, a layout shell, a page root)
-  takes a `bg-` class, with one exception: the sticky root header takes
-  `bg-background` so content does not show through while scrolling under it;
-  `html` keeps painting the canvas. That header, and any element that must
+  takes a `bg-` class, with two exceptions: the sticky root header and the
+  radio footer take `bg-background` so content does not show through while
+  scrolling under them; `html` keeps painting the canvas. Those two, and any element that must
   match the page colour (the queue rail's hollow marker), uses
   `bg-background`, never a copied `bg-white dark:bg-neutral-950`.
 - The root header in `src/app/layout.tsx` is `sticky top-0` with
   `HEADER_LAYER` (`src/lib/layers.ts`, below `TOOLTIP_LAYER` and above every
   other z-index in `src/`, pinned by `src/lib/layers.test.ts`), on every route
-  and at every width. The document keeps scrolling as a whole: never make
+  and at every width. The radio bar (`app_docs/radio.md`) is a footer fixed
+  to the bottom of the viewport on `FOOTER_LAYER`, rendered after `main`;
+  `body` reserves its height. The document keeps scrolling as a whole: never make
   `main`, `body` or a layout shell an `overflow` scroll container (scroll
   restoration, scroll-to-top on navigation, pull-to-refresh and the mobile
   address bar depend on window scroll). Its single-row height has one source,
   `--header-height` in `src/app/globals.css`; a change to the header's padding
   or line height updates it.
+- The header is one row (57px) at every width from 320px. The tagline ("Built
+  with ADW, my AI developer workflow") shows only from `lg`. Below `sm` the
+  Work with me button floats in the bottom-right corner (`fixed`, 1rem from the
+  right edge and 1rem above the radio footer, that is `--radio-bar-height` +
+  1rem + the safe-area inset from the bottom, at least 44px tall, with a soft
+  shadow), the owner's Login / Logout button floats above it, the right
+  group is `display: contents` so it takes no room in the row, and the left
+  group's `min-h-8` keeps the row at the `--header-height` it has from `sm` up.
+  Both floating buttons take `FLOATING_LAYER` (`src/lib/layers.ts`, `z-30`):
+  below `HEADER_LAYER`, so the header and the section tooltip draw over them,
+  and above `FOOTER_LAYER` and every other z-index in `src/`, pinned by
+  `src/lib/layers.test.ts`. Below `sm`, `main` takes a bottom padding of 5rem
+  on top of the body's footer padding so the last line of every page clears
+  the button when scrolled to the end. Never render
+  a second Work with me link for phones (the one `HireLink` changes position
+  by width), and never put the floating buttons at or above `HEADER_LAYER`.
 - Status colours come only from `STATUS_COLORS` in `src/lib/status-colors.ts`
   (queued amber, running emerald with the pulse dot, completed sky, failed
   rose, `neutral` for zeros), written as full literal class strings so
   Tailwind sees them; never interpolate a hue name. No component writes an
   `emerald`, `amber`, `sky`, `rose` or `red` class inline;
   `src/lib/status-colors.test.ts` scans `src/` and fails on one. The
-  connection pill in `ConnectionIndicator` is the one exemption (it describes
-  the socket, not a run). The worker widget takes its colours from the map
+  connection pill in `ConnectionIndicator` (it describes the socket, not a
+  run) is the one exemption. The worker widget takes its colours from the map
   (`running` online, `failed` offline, `neutral` unknown), not an exemption,
   and has no `role="status"`: the pill is the one status element. Issue class badges are not states and use hues
   outside the palette. The summary's class chart uses the badge hues; its model

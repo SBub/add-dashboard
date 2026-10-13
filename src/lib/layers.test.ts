@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { HEADER_LAYER, TOOLTIP_LAYER } from "./layers";
+import { FLOATING_LAYER, FOOTER_LAYER, HEADER_LAYER, TOOLTIP_LAYER } from "./layers";
 
 // The layer's own module and this test name the class; every other file is scanned.
 const EXEMPT = new Set(["/src/lib/layers.ts", "/src/lib/layers.test.ts"]);
@@ -22,6 +22,8 @@ function zIndexes(source: string): { cls: string; value: number }[] {
 
 const tooltipValue = Number(TOOLTIP_LAYER.slice("z-".length));
 const headerValue = Number(HEADER_LAYER.slice("z-".length));
+const floatingValue = Number(FLOATING_LAYER.slice("z-".length));
+const footerValue = Number(FOOTER_LAYER.slice("z-".length));
 
 describe("TOOLTIP_LAYER", () => {
   it("is a numeric z-index class", () => {
@@ -71,6 +73,57 @@ describe("HEADER_LAYER", () => {
       if (EXEMPT.has(path)) continue;
       for (const { cls, value } of zIndexes(source)) {
         if (value >= headerValue) found.push(`${path}: ${cls}`);
+      }
+    }
+    expect(found).toEqual([]);
+  });
+});
+
+describe("FLOATING_LAYER", () => {
+  it("is a numeric z-index class below the header's layer", () => {
+    expect(FLOATING_LAYER).toMatch(/^z-\d+$/);
+    expect(floatingValue).toBeLessThan(headerValue);
+  });
+
+  it.each(["/src/components/SectionNav.tsx", "/src/components/IdentifyButton.tsx"])(
+    "is the floating layer of %s",
+    (file) => {
+      const source = SOURCES.find(([path]) => path === file)?.[1];
+      expect(source).toContain("FLOATING_LAYER");
+      expect(zIndexes(source ?? "")).toEqual([]);
+    },
+  );
+
+  it("is above every other z-index in src", () => {
+    const found: string[] = [];
+    for (const [path, source] of SOURCES) {
+      if (EXEMPT.has(path)) continue;
+      for (const { cls, value } of zIndexes(source)) {
+        if (value >= floatingValue) found.push(`${path}: ${cls}`);
+      }
+    }
+    expect(found).toEqual([]);
+  });
+});
+
+describe("FOOTER_LAYER", () => {
+  it("is a numeric z-index class below the floating layer", () => {
+    expect(FOOTER_LAYER).toMatch(/^z-\d+$/);
+    expect(footerValue).toBeLessThan(floatingValue);
+  });
+
+  it("is the radio bar's layer", () => {
+    const source = SOURCES.find(([path]) => path === "/src/components/RadioBar.tsx")?.[1];
+    expect(source).toContain("FOOTER_LAYER");
+    expect(zIndexes(source ?? "")).toEqual([]);
+  });
+
+  it("is above every other z-index in src", () => {
+    const found: string[] = [];
+    for (const [path, source] of SOURCES) {
+      if (EXEMPT.has(path)) continue;
+      for (const { cls, value } of zIndexes(source)) {
+        if (value >= footerValue) found.push(`${path}: ${cls}`);
       }
     }
     expect(found).toEqual([]);

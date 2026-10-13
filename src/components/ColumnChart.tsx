@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
-import { barValueInside, columnHeights } from "@/lib/daily-summary";
+import { columnHeights } from "@/lib/daily-summary";
 
 export interface ChartColumn {
   key: string;
   value: number;
-  /** The value as text, inside the bar or just above a bar too short for it. */
+  /** The value as text, above its bar. */
   valueLabel: string;
   /** The column's name, under the plot, beside a colour dot when the chart has dots. */
   name: ReactNode;
@@ -29,8 +29,8 @@ interface ColumnChartProps {
   empty?: ReactNode;
   /** A dot of the bar's colour beside each name; off when every bar is the same gray. */
   dots?: boolean;
-  /** Text colour of a value inside its bar, a full literal class string from src/lib/chart-colors.ts. */
-  valueClass?: string;
+  /** Values tilted 45 degrees (the default); upright and centred when false, for short counts. */
+  tiltValues?: boolean;
 }
 
 /** The guide lines, in percent of the plot height from its baseline. */
@@ -45,13 +45,17 @@ function idPart(value: string): string {
  * A chart card: a bordered figure with a title and a muted subtitle, then
  * CSS columns on a 180px plot (`h-45`) over faint dotted guide lines, each
  * scaled to the chart's own maximum (columnHeights), with rounded tops and
- * a capped width. The value sits inside the bar in `valueClass` (white by
- * default) when barValueInside says the bar holds it, otherwise just above
- * the bar; the name sits under the plot, beside a dot of the bar's colour
- * when `dots` (the default). Every column
- * takes an equal grid slot of at most 80px (`minmax(0, 5rem)`), never sized
- * from its name; the bar is capped at 56px and centred in its slot, so
- * adjacent bars are equally spaced. A name wider than its slot wraps (under
+ * a capped width. Every value sits above its bar, never inside it, in the
+ * card's text colour and regular weight, rotated 45 degrees up to the right
+ * from the bar's top centre (upright and centred over the bar when
+ * `tiltValues` is false, for short counts), in a 56px band (`pt-14`) above the plot that
+ * holds the tallest bar's value inside the card; the row keeps 16px of
+ * right padding (`pr-4`) so the last column's tilted value stays inside the
+ * card too. The rotation is a `transform`, not the `rotate` property. The name sits under the
+ * plot, beside a dot of the bar's colour when `dots` (the default). Every
+ * column takes an equal grid slot of at most 80px (`minmax(0, 5rem)`), never
+ * sized from its name; the bar is capped at 28px (`max-w-7`) and centred in
+ * its slot, so adjacent bars are equally spaced. A name wider than its slot wraps (under
  * its dot when there is one) and then inside the word, never widening the slot; five or more
  * columns take a 4px gap, so the row fits a one-third card at 1024px and a
  * stacked card at 375px. A column with
@@ -68,7 +72,7 @@ export function ColumnChart({
   summary,
   empty,
   dots = true,
-  valueClass = "text-white",
+  tiltValues = true,
 }: ColumnChartProps) {
   const heights = columnHeights(columns.map((column) => column.value));
   const gap = columns.length >= 5 ? "gap-1" : "gap-2 sm:gap-4";
@@ -81,12 +85,12 @@ export function ColumnChart({
       </figcaption>
       <p className="sr-only">{summary}</p>
       {columns.length === 0 ? (
-        <div className="flex h-45 items-center justify-center text-xs text-neutral-500 dark:text-neutral-400">
+        <div className="flex h-59 items-center justify-center text-xs text-neutral-500 dark:text-neutral-400">
           {empty}
         </div>
       ) : (
         <div className="relative">
-          <div aria-hidden="true" className="absolute inset-x-0 top-0 h-45">
+          <div aria-hidden="true" className="absolute inset-x-0 top-14 h-45">
             {GUIDES.map((guide) => (
               <span
                 key={guide}
@@ -96,7 +100,7 @@ export function ColumnChart({
             ))}
           </div>
           <ul
-            className={`relative grid items-start justify-center ${gap}`}
+            className={`relative grid items-start justify-center pr-4 ${gap}`}
             style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 5rem))` }}
           >
             {columns.map((column, i) => {
@@ -104,7 +108,6 @@ export function ColumnChart({
                 ? `${idPart(idPrefix)}-${idPart(column.key)}-detail`
                 : undefined;
               const height = heights[i] ?? 0;
-              const inside = barValueInside(height);
               return (
                 <li
                   key={column.key}
@@ -113,25 +116,19 @@ export function ColumnChart({
                   tabIndex={column.detail ? 0 : undefined}
                   className="group relative flex min-w-0 flex-col items-center rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-500"
                 >
-                  <span className="flex h-45 w-full flex-col items-center justify-end">
-                    {!inside && (
-                      <span data-value-placement="above" className="mb-1 text-xs tabular-nums">
+                  <span className="box-content flex h-45 w-full flex-col items-center justify-end pt-14">
+                    <span className="relative h-0 w-full">
+                      <span
+                        data-value-placement="above"
+                        className={`absolute bottom-1 left-1/2 text-xs whitespace-nowrap tabular-nums ${tiltValues ? "origin-bottom-left [transform:rotate(-45deg)]" : "-translate-x-1/2"}`}
+                      >
                         {column.valueLabel}
                       </span>
-                    )}
-                    <span
-                      className={`flex min-h-px w-full max-w-14 items-center justify-center rounded-t-md ${column.colorClass}`}
-                      style={{ height: `${height}%` }}
-                    >
-                      {inside && (
-                        <span
-                          data-value-placement="inside"
-                          className={`text-xs font-semibold tabular-nums ${valueClass}`}
-                        >
-                          {column.valueLabel}
-                        </span>
-                      )}
                     </span>
+                    <span
+                      className={`flex min-h-px w-full max-w-7 rounded-t-md ${column.colorClass}`}
+                      style={{ height: `${height}%` }}
+                    />
                   </span>
                   <span className="mt-2 flex w-full min-w-0 flex-wrap items-center justify-center gap-1 text-center text-xs">
                     {dots && (

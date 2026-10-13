@@ -14,7 +14,7 @@ technology announces the current page link
 
 ## Test Steps
 
-1. Navigate to the `Application URL` (`/`).
+1. Resize the browser to 1920x1080 and navigate to the `Application URL` (`/`).
 2. **Verify** the brand link in the header (text `Sviatlana Buben, building in public`, `href="/"`)
    has `aria-current="page"` and the `Watch me build` link in the `Sections` navigation has
    `href="/projects"` and no `aria-current`.
@@ -33,7 +33,7 @@ technology announces the current page link
 11. Navigate to `/watch`, then to `/watchx`. On each, **Verify** the not-found page renders (the
     `Not found` heading) and no header link (brand, `Watch me build`, `Work with me`) has
     `aria-current`. Then navigate to `/hire`.
-12. **Verify** the header's `Work with me` link (`href="/hire"`) has `aria-current="page"` and
+12. At 1920x1080, **Verify** the header's `Work with me` link (`href="/hire"`) has `aria-current="page"` and
     neither the `Sviatlana Buben` brand link nor the `Watch me build` link has `aria-current`.
 
 ## Success Criteria

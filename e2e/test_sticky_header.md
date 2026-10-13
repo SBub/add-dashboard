@@ -45,12 +45,14 @@ So that I can reach the navigation without scrolling back to the top
 8. Resize to 375x667 and repeat steps 2 and 3 on `/projects/log` (below `sm` the brand reads only
    `Sviatlana Buben`), then the header checks of step 6 (header
    `top` is `0`, brand and navigation visible, opaque) on the project page; the sidebar checks do
-   not apply below `md`. Take a screenshot of each page.
+   not apply below `md`. On `/projects/log` also **Verify** the header's height is 57px (within
+   1px) and the brand, `Watch me build` and `Writing` links' boxes are inside the header's box.
+   Take a screenshot of each page.
 
 ## Success Criteria
 
 - The header is pinned at `top: 0` after scrolling on `/projects/log` and on a project page, at 1280px and at
-  375px.
+  375px, where it is one row, 57px tall.
 - The header is opaque and paints the same colour as `body`.
 - A section tooltip draws over the header.
 - On desktop the sidebar sticks below the header, its last item is reachable and the worker

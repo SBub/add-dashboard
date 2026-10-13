@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { IdentifyButton } from "@/components/IdentifyButton";
+import { RadioBar } from "@/components/RadioBar";
 import { BrandLink, HireLink, SectionNav } from "@/components/SectionNav";
 import { HEADER_LAYER } from "@/lib/layers";
 import { SITE_NAME, siteUrl } from "@/lib/site-url";
@@ -27,17 +28,17 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className="min-h-screen antialiased">
+      <body className="min-h-screen pb-[calc(var(--radio-bar-height)+env(safe-area-inset-bottom,0px))] antialiased">
         <header
           className={`sticky top-0 ${HEADER_LAYER} border-b border-neutral-200 bg-background dark:border-neutral-800`}
         >
           <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
-            <div className="flex items-center gap-3 sm:gap-6">
+            <div className="flex min-h-8 items-center gap-2 sm:gap-6">
               <BrandLink />
               <SectionNav />
             </div>
-            <div className="ml-auto flex items-center gap-3">
-              <span className="hidden text-xs text-neutral-500 sm:inline dark:text-neutral-400">
+            <div className="ml-auto flex items-center gap-3 max-sm:contents">
+              <span className="hidden text-xs text-neutral-500 lg:inline dark:text-neutral-400">
                 Built with ADW, my AI developer workflow
               </span>
               <IdentifyButton />
@@ -45,7 +46,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </div>
           </div>
         </header>
-        <main>{children}</main>
+        <main className="max-sm:pb-20">{children}</main>
+        <RadioBar />
       </body>
     </html>
   );

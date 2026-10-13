@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { PostMetaLine } from "@/components/PostMetaLine";
+import { PostMinimap } from "@/components/PostMinimap";
 import { getPost, getPosts } from "@/lib/posts";
 import { SITE_NAME } from "@/lib/site-url";
+
+// The article's id, so the minimap's client leaf can measure the column.
+const POST_COLUMN_ID = "post";
 
 interface PostPageProps {
   params: Promise<{ slug: string }>;
@@ -51,12 +56,14 @@ export default async function PostPage({ params }: PostPageProps) {
   if (!post) notFound();
   const { meta, Content } = post;
   return (
-    <article className="mx-auto max-w-6xl px-4 py-6">
-      <div className="max-w-[62ch]">
+    <div className="mx-auto max-w-6xl px-4 py-6 xl:flex xl:items-start xl:justify-between xl:gap-12">
+      <article id={POST_COLUMN_ID} className="max-w-[62ch] min-w-0">
+        <Breadcrumb title={meta.title} />
         <h1 className="text-2xl font-semibold tracking-tight">{meta.title}</h1>
         <PostMetaLine meta={meta} />
         <Content />
-      </div>
-    </article>
+      </article>
+      <PostMinimap meta={meta} Content={Content} columnId={POST_COLUMN_ID} />
+    </div>
   );
 }

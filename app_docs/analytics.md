@@ -38,12 +38,17 @@ page leaves on client-side navigation, and autocapture of clicks.
 | event                     | sent from                            | properties                                |
 | ------------------------- | ------------------------------------ | ----------------------------------------- |
 | `hire_request_submitted`  | `src/components/HireRequestForm.tsx` | `offer` (the `OFFERS` value), `from_door` |
+| `radio_played`            | `src/components/RadioBar.tsx`        | none                                      |
+| `radio_stopped`           | `src/components/RadioBar.tsx`        | none                                      |
 | `run_history_searched`    | `src/components/HistorySearch.tsx`   | `query_length`                            |
 | `today_summary_refreshed` | `src/components/TodaySummary.tsx`    | `trigger` (`button` or `retry`)           |
 
 `hire_request_submitted` fires on submit, before the server action validates
 the form, so it counts attempts, not delivered emails. `from_door` is true when
 the offer came from `?offer=` rather than the select.
+
+`radio_played` and `radio_stopped` fire on the visitor's click, not when the
+stream actually starts or fails.
 
 `src/app/global-error.tsx` sends an error that takes down the root layout with
 `posthog.captureException`.

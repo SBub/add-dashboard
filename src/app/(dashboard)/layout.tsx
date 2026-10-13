@@ -80,7 +80,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   return (
     <Providers>
       <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-6 md:flex-row md:items-start md:gap-8">
-        <aside className="flex shrink-0 flex-col gap-2 md:sticky md:top-[calc(var(--header-height)+1.5rem)] md:h-[calc(100vh-var(--header-height)-3rem)] md:w-72">
+        <aside className="flex shrink-0 flex-col gap-2 md:sticky md:top-[calc(var(--header-height)+1.5rem)] md:h-[calc(100vh-var(--header-height)-var(--radio-bar-height)-3rem)] md:w-72">
           {/* The connection pill lives here, not in the root header, because
               the channel it describes is opened by Providers in this layout.
               The intro page at /, /writing and /hire have no channel and no

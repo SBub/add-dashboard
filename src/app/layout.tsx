@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { IdentifyButton } from "@/components/IdentifyButton";
+import { RadioBar } from "@/components/RadioBar";
 import { BrandLink, HireLink, SectionNav } from "@/components/SectionNav";
 import { HEADER_LAYER } from "@/lib/layers";
 import { SITE_NAME, siteUrl } from "@/lib/site-url";
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body className="min-h-screen antialiased">
+        <RadioBar />
         <header
           className={`sticky top-0 ${HEADER_LAYER} border-b border-neutral-200 bg-background dark:border-neutral-800`}
         >

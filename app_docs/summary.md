@@ -256,8 +256,10 @@ open daily log updates through Refresh or the next visit.
   with five or more columns uses `gap-1` so
   the row fits a one-third card at `lg` and a stacked card at 375px; the plot box is 180px
   (`h-45`). Every value sits above its bar, never inside it, in regular
-  weight, rotated -45 degrees from the bar's top centre, in the 56px band
-  (`pt-14`) above the 180px plot (`h-45`). Never bold a value, never put it
+  weight, rotated -45 degrees from the bar's top centre (a `transform`, not
+  the `rotate` property), in the 56px band (`pt-14`) above the 180px plot
+  (`h-45`); the column row keeps 16px of right padding (`pr-4`) so the last
+  column's tilted value stays inside the card. Never bold a value, never put it
   inside a bar.
 - The today card is a React Query entry in the layout's `Providers` client, but
   not a live section: no Realtime reducer, no catch-up read and no

@@ -123,7 +123,7 @@ describe("ColumnChart values", () => {
     ["phase", phaseMarkup],
   ])("tilts every %s value in regular weight and the text colour", (_, markup) => {
     for (const [, className] of values(markup)) {
-      expect(className).toContain("-rotate-45");
+      expect(className).toContain("[transform:rotate(-45deg)]");
       expect(className).toContain("origin-bottom-left");
       expect(className).not.toMatch(/font-semibold|font-medium|text-white|text-neutral-950/);
     }

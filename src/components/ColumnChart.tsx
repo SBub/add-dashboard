@@ -46,7 +46,9 @@ function idPart(value: string): string {
  * a capped width. Every value sits above its bar, never inside it, in the
  * card's text colour and regular weight, rotated 45 degrees up to the right
  * from the bar's top centre, in a 56px band (`pt-14`) above the plot that
- * holds the tallest bar's value inside the card. The name sits under the
+ * holds the tallest bar's value inside the card; the row keeps 16px of
+ * right padding (`pr-4`) so the last column's tilted value stays inside the
+ * card too. The rotation is a `transform`, not the `rotate` property. The name sits under the
  * plot, beside a dot of the bar's colour when `dots` (the default). Every
  * column takes an equal grid slot of at most 80px (`minmax(0, 5rem)`), never
  * sized from its name; the bar is capped at 28px (`max-w-7`) and centred in
@@ -94,7 +96,7 @@ export function ColumnChart({
             ))}
           </div>
           <ul
-            className={`relative grid items-start justify-center ${gap}`}
+            className={`relative grid items-start justify-center pr-4 ${gap}`}
             style={{ gridTemplateColumns: `repeat(${columns.length}, minmax(0, 5rem))` }}
           >
             {columns.map((column, i) => {
@@ -114,7 +116,7 @@ export function ColumnChart({
                     <span className="relative h-0 w-full">
                       <span
                         data-value-placement="above"
-                        className="absolute bottom-1 left-1/2 origin-bottom-left -rotate-45 text-xs whitespace-nowrap tabular-nums"
+                        className="absolute bottom-1 left-1/2 origin-bottom-left [transform:rotate(-45deg)] text-xs whitespace-nowrap tabular-nums"
                       >
                         {column.valueLabel}
                       </span>

@@ -150,7 +150,8 @@ projects. `/`, the landing page, is a static intro (see `app_docs/home.md`).
   project list from the query cache on `/projects`,
   `QueueView`, which reads the queued items from the query cache,
   `ConnectionIndicator`, which subscribes to its store, `WorkerStatus`, which
-  subscribes to its polling store, `HeaderLink`, which
+  subscribes to its polling store, `IdentifyButton`, which subscribes to
+  PostHog's feature flags and distinct id, `HeaderLink`, which
   reads the pathname to mark the header's current section, `HistorySearch`, which
   holds the search box's local text and calls the router, and
   `HistoryPageLink`, which navigates the History pages inside the shared

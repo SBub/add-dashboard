@@ -95,7 +95,9 @@ no `Providers`, no Realtime and no pill (see `app_docs/hire.md`).
 (`src/app/writing/[slug]/page.tsx`) also sit outside `(dashboard)`. They are
 static (prerendered from the post registry), with no `Providers`, no Realtime
 and no pill; an empty production post list yields the placeholder slug `_`,
-which 404s (see `app_docs/writing.md`).
+which 404s (see `app_docs/writing.md`). A post page carries an in-page
+breadcrumb back to `/writing` (see `app_docs/writing.md`); it does not change
+the header's current-section marking.
 
 ## Rules
 

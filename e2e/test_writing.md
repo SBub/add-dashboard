@@ -2,8 +2,9 @@
 
 Checks the blog at `/writing`: the list with the first post, its title link, date and audience tag;
 the post page at `/writing/my-moat` with its title, Open Graph tags and its own closing
-`Watch me build live` link to `/projects`, with no `Work with me` link inside the article; that the header marks `Writing` as current on both; and that
-neither page scrolls horizontally at 375px. It never submits the `/hire` form.
+`Watch me build live` link to `/projects`, with no `Work with me` link inside the article; that the post page has a
+`Breadcrumb` navigation above its heading leading back to `/writing`, and `/writing` has none; that the header marks `Writing` as current on both; and that
+neither page scrolls horizontally at 390px. It never submits the `/hire` form.
 
 ## User Story
 
@@ -18,22 +19,33 @@ So that I can read it and follow it to the live build in one click
    `My moat as a Product Engineer`, and the tag `For product teams`.
 3. **Verify** the `Writing` link in the `Sections` navigation has `aria-current="page"` and the
    `Watch me build` link has none.
-4. **Verify** the page has no element with role `status` (no connection indicator) and no
-   `navigation` named `Projects`. Take a full-page screenshot.
+4. **Verify** the page has no element with role `status` (no connection indicator), no
+   `navigation` named `Projects` and no `navigation` named `Breadcrumb`. Take a full-page
+   screenshot.
 5. Click the post link. **Verify** the URL is `/writing/my-moat`, the heading (level 1) is
    `My moat as a Product Engineer`, and the `Writing` header link still has
    `aria-current="page"`.
-6. With `browser_evaluate`, **Verify** the last link inside the `article` has text
+6. **Verify** a `navigation` named `Breadcrumb` exists. With `browser_evaluate`, **Verify** that
+   `nav[aria-label="Breadcrumb"]` precedes the `h1` in document order
+   (`nav.compareDocumentPosition(h1) & Node.DOCUMENT_POSITION_FOLLOWING` is non-zero), its
+   `Writing` link has `href="/writing"`, and its last list item's `[aria-current="page"]` element
+   has text `My moat as a Product Engineer` (the `/` separator is `aria-hidden="true"`). Take a
+   screenshot.
+7. Click the breadcrumb's `Writing` link. **Verify** the URL is `/writing` and the heading
+   (level 1) is `Writing`. Navigate back to `/writing/my-moat`.
+8. With `browser_evaluate`, **Verify** the last link inside the `article` has text
    `Watch me build live` and `href="/projects"`, and no link inside the `article` has text
    `Work with me`. Take a full-page screenshot.
-7. With `browser_evaluate`, **Verify**
+9. With `browser_evaluate`, **Verify**
    `document.querySelector('meta[property="og:title"]').content` is
    `My moat as a Product Engineer` and
    `document.querySelector('meta[property="og:image"]').content` is non-empty.
-8. Resize to 375x667 and navigate to `/writing`. With `browser_evaluate`, **Verify**
-   `document.documentElement.scrollWidth <= 375`. Take a full-page screenshot.
-9. Navigate to `/writing/my-moat`. With `browser_evaluate`, **Verify**
-   `document.documentElement.scrollWidth <= 375`. Take a full-page screenshot.
+10. Resize to 390x844 and navigate to `/writing`. With `browser_evaluate`, **Verify**
+    `document.documentElement.scrollWidth <= 390`. Take a full-page screenshot.
+11. Navigate to `/writing/my-moat`. With `browser_evaluate`, **Verify**
+    `document.documentElement.scrollWidth <= 390` and that the breadcrumb's
+    `[aria-current="page"]` element has `getComputedStyle(el).whiteSpace === "nowrap"`. Take a
+    full-page screenshot.
 
 ## Success Criteria
 
@@ -41,6 +53,9 @@ So that I can read it and follow it to the live build in one click
 - `/writing/my-moat` shows the post title as its heading, carries `og:title` and a non-empty
   `og:image`, and ends with its own `Watch me build live` link to `/projects`; the article has
   no `Work with me` link.
+- `/writing/my-moat` has a `Breadcrumb` navigation above its heading: `Writing` linking to
+  `/writing`, then the post title with `aria-current="page"`, on one line at 390px. `/writing`
+  has no breadcrumb.
 - `Writing` is current in the header on both pages; neither has a sidebar or connection indicator.
-- Neither page scrolls horizontally at 375px.
-- 4 screenshots are taken.
+- Neither page scrolls horizontally at 390px.
+- 5 screenshots are taken.

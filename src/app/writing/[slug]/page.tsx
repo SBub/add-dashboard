@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Breadcrumb } from "@/components/Breadcrumb";
 import { PostMetaLine } from "@/components/PostMetaLine";
 import { getPost, getPosts } from "@/lib/posts";
 import { SITE_NAME } from "@/lib/site-url";
@@ -53,6 +54,7 @@ export default async function PostPage({ params }: PostPageProps) {
   return (
     <article className="mx-auto max-w-6xl px-4 py-6">
       <div className="max-w-[62ch]">
+        <Breadcrumb title={meta.title} />
         <h1 className="text-2xl font-semibold tracking-tight">{meta.title}</h1>
         <PostMetaLine meta={meta} />
         <Content />

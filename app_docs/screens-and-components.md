@@ -223,8 +223,9 @@ projects. `/`, the landing page, is a static intro (see `app_docs/home.md`).
   Tailwind sees them; never interpolate a hue name. No component writes an
   `emerald`, `amber`, `sky`, `rose` or `red` class inline;
   `src/lib/status-colors.test.ts` scans `src/` and fails on one. The
-  connection pill in `ConnectionIndicator` is the one exemption (it describes
-  the socket, not a run). The worker widget takes its colours from the map
+  connection pill in `ConnectionIndicator` (it describes the socket, not a
+  run) and the red live dot in `RadioBar` (it describes a broadcast) are the
+  two exemptions. The worker widget takes its colours from the map
   (`running` online, `failed` offline, `neutral` unknown), not an exemption,
   and has no `role="status"`: the pill is the one status element. Issue class badges are not states and use hues
   outside the palette. The summary's class chart uses the badge hues; its model

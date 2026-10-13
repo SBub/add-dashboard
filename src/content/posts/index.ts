@@ -11,4 +11,7 @@ export interface PostEntry {
   load: () => Promise<{ default: MDXContent; meta?: unknown }>;
 }
 
-export const POST_ENTRIES: PostEntry[] = [{ slug: "my-moat", load: () => import("./my-moat.mdx") }];
+export const POST_ENTRIES: PostEntry[] = [
+  { slug: "my-moat", load: () => import("./my-moat.mdx") },
+  { slug: "feature-flags", load: () => import("./feature-flags.mdx") },
+];

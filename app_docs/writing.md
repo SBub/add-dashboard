@@ -48,6 +48,16 @@ recognisable from its `meta`, so its module is imported, then `getPost` returns 
 calls `notFound()`. `NODE_ENV` is set and inlined by Next itself: it is not a new environment
 variable, needs no `.env*` entry and does not touch the data boundary's list of variables.
 
+### Screenshots and typography
+
+A post's images live under `public/writing/<slug>/` and are written as
+`![alt](/writing/<slug>/<file>.png "caption")`. `src/mdx-components.tsx` renders the image full
+width with a border and generous space above and below, and shows the markdown title as a visible
+caption under it. It uses spans, not `figure`/`figcaption`, because MDX wraps a lone image in a
+`<p>` and a figure inside a paragraph is invalid HTML. The alt says what the image shows; the
+caption names its source (for example "PostHog: ..."). The post column is `max-w-[62ch]` and
+paragraphs use `leading-8` with `mt-6`, for long-form reading.
+
 ### The LinkedIn companion
 
 An optional `src/content/posts/<slug>.linkedin.md` beside a post holds its LinkedIn text. It is
@@ -58,7 +68,8 @@ never listed in the registry, imported, routed or rendered; it is copied into Li
 `sortPostsNewestFirst` orders by date descending, equal dates by slug. `postAudienceLabel` gives
 "For product teams", "For business owners" or "For everyone". The audience only picks the tag: the
 post page links nowhere after the body, so a post that wants a next step writes it as its own last
-line (`my-moat` ends with `[Watch me build live](/projects)`).
+line (`my-moat` ends with `[Watch me build live](/projects)`), or links in context
+(`feature-flags` links "Watch me build" inline).
 
 ### Static params and the \_ placeholder
 

@@ -260,20 +260,6 @@ export function columnHeights(values: readonly number[]): number[] {
   return values.map((value) => (max === 0 ? 0 : (value / max) * 100));
 }
 
-/** The column charts' plot height in pixels (`h-45`). */
-const CHART_PLOT_PX = 180;
-
-/** The smallest bar, in pixels, that holds its value: one `text-xs` line plus padding. */
-const BAR_VALUE_MIN_PX = 20;
-
-/**
- * Whether a column of `heightPercent` (columnHeights' output) is tall enough
- * to show its value inside the bar; otherwise the value sits just above it.
- */
-export function barValueInside(heightPercent: number): boolean {
-  return (heightPercent / 100) * CHART_PLOT_PX >= BAR_VALUE_MIN_PX;
-}
-
 /** A class key as a chart label, without its leading slash ("/feature" is "feature"). */
 export function classLabel(key: ClassKey): string {
   return key.startsWith("/") ? key.slice(1) : key;

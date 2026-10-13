@@ -8,6 +8,7 @@
 - specs/issue-174-adw-d7f72f46-sdlc_planner-summary-chart-core-class-columns.md
 - specs/issue-175-adw-fe4916f8-sdlc_planner-gray-model-phase-charts.md
 - specs/issue-182-adw-00da532e-sdlc_planner-move-summary-to-projects-log.md
+- specs/issue-207-adw-7ac1bc18-sdlc_planner-narrow-bars-tilted-values.md
 
 ## Overview
 
@@ -34,11 +35,12 @@ per-project table's class bar, both in the same order), `Haiku`, `Sonnet`, `Opus
 (`sumModelUsage`), and `Plan`, `Build`, `Test`, `Review`, `Docs`
 (`sumPhaseUsage`; CI has no cost and is never shown); absent models, phases
 and optional classes (`patch`, `other`) are omitted. The plot is 180px high with faint dotted guide lines and bars with
-rounded tops and a capped width; every column takes the same slot width
-whatever its name, so the bars are evenly spaced; the value (run count, token label or cost in
-dollars) sits inside its bar (white on the class colours; on the gray model
-and phase bars near-black in light mode and white in dark mode), or just above
-a bar too short for it (`barValueInside`). Under each bar is its name (the
+rounded tops, narrow (capped at 28px); every column takes the same slot width
+whatever its name, so the bars are evenly spaced; every value (run count, token label or cost in
+dollars) sits above its bar in the normal text colour and regular weight,
+tilted 45 degrees up to the right from the bar's top centre, in a band
+reserved above the 180px plot so the tallest bar's value stays inside the
+card. Under each bar is its name (the
 class without its slash, the short model name or the phase name). The class
 chart's names sit beside a dot of the bar's colour (the class hue, matching the
 badges); the model and phase bars are one neutral gray with no dot, the name
@@ -220,13 +222,11 @@ open daily log updates through Refresh or the next visit.
   charting library. Class colours come only from `CLASS_FILL`/`CLASS_BG` in
   `src/lib/chart-colors.ts` and match `IssueClassBadge`. Model and phase bars
   come only from `MODEL_BG`/`PHASE_BG` there, which hold one neutral gray
-  (`bg-neutral-400 dark:bg-neutral-500`) for every key, with in-bar text from
-  `NEUTRAL_BAR_VALUE` (AA on that gray in both themes, pinned in
-  `src/lib/chart-colors.test.ts`). Never give a model or a phase its own hue,
+  (`bg-neutral-400 dark:bg-neutral-500`) for every key. Never give a model or a phase its own hue,
   and never drop the class chart's dots or change class hues here. Completed
   and failed counts use `STATUS_COLORS`.
   The column geometry and labels (`classCounts`, `classColumns`, `columnHeights`,
-  `barValueInside`, `classLabel`, `shareLabel`) live in
+  `classLabel`, `shareLabel`) live in
   `src/lib/daily-summary.ts`; each chart scales to its own maximum.
 - All three chart orders are fixed and come from the data shape, never from a
   sort by value in a component: classes `feature`, `chore`, `bug` always,
@@ -251,13 +251,17 @@ open daily log updates through Refresh or the next visit.
   `adw.daily_summary` and `adw.daily_phase_summary` on `finished_at`; a day
   with model or phase rows but no finished run gets no card. Every column takes an equal grid slot
   (`repeat(n, minmax(0, 5rem))`, never sized from its content), and the bar
-  is capped (`max-w-14`) and centred in it, so adjacent bars are equally
+  is capped (`max-w-7`) and centred in it, so adjacent bars are equally
   spaced. A name never widens its slot and is never cut (no `truncate`): it
   wraps (under its dot in the class chart) and then inside the word (`wrap-anywhere`). A chart
   with five or more columns uses `gap-1` so
   the row fits a one-third card at `lg` and a stacked card at 375px; the plot box is 180px
-  (`h-45`) and the value placement (inside the bar or above it) comes only
-  from `barValueInside`.
+  (`h-45`). Every value sits above its bar, never inside it, in regular
+  weight, rotated -45 degrees from the bar's top centre (a `transform`, not
+  the `rotate` property), in the 56px band (`pt-14`) above the 180px plot
+  (`h-45`); the column row keeps 16px of right padding (`pr-4`) so the last
+  column's tilted value stays inside the card. Never bold a value, never put it
+  inside a bar.
 - The today card is a React Query entry in the layout's `Providers` client, but
   not a live section: no Realtime reducer, no catch-up read and no
   `setQueryData` touch it. Do not mount a second `QueryClientProvider` for it,

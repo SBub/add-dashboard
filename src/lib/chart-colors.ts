@@ -42,6 +42,3 @@ export const PHASE_BG: Record<PhaseKey, string> = {
   adw_review_iso: "bg-neutral-400 dark:bg-neutral-500",
   adw_document_iso: "bg-neutral-400 dark:bg-neutral-500",
 };
-
-/** The value text inside a neutral bar; white fails AA on neutral-400. */
-export const NEUTRAL_BAR_VALUE = "text-neutral-950 dark:text-white";

@@ -9,7 +9,9 @@
 `/writing` (`src/app/writing/page.tsx`) lists the visible posts newest first: each with its title
 linking to the post, its `DD.MM.YYYY` date, its audience tag and its description.
 `/writing/[slug]` (`src/app/writing/[slug]/page.tsx`) renders one post: title, date, tag and the MDX
-body, which ends with the post's own last line (no call to action is added after it). Both sit outside `(dashboard)`: no sidebar, no `Providers`, no
+body, which ends with the post's own last line (no call to action is added after it). Above the title the post page renders a breadcrumb
+(`src/components/Breadcrumb.tsx`, server only): `Writing`, linking to `/writing`, then the post
+title as the current page, truncated to one line on narrow screens. `/writing` has no breadcrumb. Both sit outside `(dashboard)`: no sidebar, no `Providers`, no
 Realtime, no pill. Posts are MDX modules under `src/content/posts/`, compiled by `@next/mdx`
 (`createMDX()` in `next.config.ts`) and styled by `src/mdx-components.tsx` (server only).
 
@@ -117,3 +119,6 @@ shared by the list and the post page (see `app_docs/clock-and-prerender.md`).
 - A page that sets its own `openGraph` repeats `siteName: SITE_NAME`.
 - A post page never adds a call to action (a Work with me link, a hire box) after the MDX body: a
   post ends with its own last line.
+- The breadcrumb on a post page is a server component; its link is `/writing` and its last item is
+  `meta.title` with `aria-current="page"`. `/writing` has no breadcrumb, and the `h1` stays the
+  post's only `h1`.

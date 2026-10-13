@@ -97,7 +97,7 @@ E2E code suite: `none` (no `@playwright/test` specs). `e2e/*.md` holds agent-dri
 `e2e/test_history_page_turn.md`, `e2e/test_worker_status_widget.md`, `e2e/test_hire_page.md`,
 `e2e/test_home_page.md`, `e2e/test_writing.md`, `e2e/test_daily_log_sidebar.md`,
 `e2e/test_changelog.md`, `e2e/test_header_login_hidden.md`,
-`e2e/test_post_minimap.md` and `e2e/test_radio_bar.md`) that the test
+`e2e/test_post_minimap.md`, `e2e/test_radio_bar.md` and `e2e/test_header_mobile.md`) that the test
 phase runs through the Playwright MCP server.
 
 lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every commit and
@@ -163,8 +163,8 @@ lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every c
   375x667), `/projects/changelog` (the sidebar with Changelog current below Daily log, heading,
   intro, entries newest first with date, title, stats strip and counts) and one entry such as
   `/projects/changelog/2026-10-09-pr163` (date, title, the stats strip with the PR link, diff,
-  commits, files and comments, the description, the Features, Fixes and Chores lists). The fuchsia Work with me button is in the header on every
-  route. The radio bar (`LIVE NOW`, the play button, `NTS · SLOW FOCUS`) sits above the header on
+  commits, files and comments, the description, the Features, Fixes and Chores lists). The fuchsia Work with me button is in the header from 640px up
+  and floats bottom-right below it (hidden on `/hire` there). The radio bar (`LIVE NOW`, the play button, `NTS · SLOW FOCUS`) sits above the header on
   every route and is idle on load; do not press play during review unless the spec is about the bar. Capture each at desktop 1920x1080 and mobile
   375x667, full page, into `agents/<adw_id>/<agent_name>/review_img/` in the worktree.
 - The sidebar's connection indicator (dashboard routes only; `/`, `/writing` and `/hire` have none) moves from `connecting` to `live` once the Realtime channel

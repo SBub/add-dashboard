@@ -34,12 +34,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           className={`sticky top-0 ${HEADER_LAYER} border-b border-neutral-200 bg-background dark:border-neutral-800`}
         >
           <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-3">
-            <div className="flex items-center gap-3 sm:gap-6">
+            <div className="flex min-h-8 items-center gap-2 sm:gap-6">
               <BrandLink />
               <SectionNav />
             </div>
-            <div className="ml-auto flex items-center gap-3">
-              <span className="hidden text-xs text-neutral-500 sm:inline dark:text-neutral-400">
+            <div className="ml-auto flex items-center gap-3 max-sm:contents">
+              <span className="hidden text-xs text-neutral-500 lg:inline dark:text-neutral-400">
                 Built with ADW, my AI developer workflow
               </span>
               <IdentifyButton />
@@ -47,7 +47,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </div>
           </div>
         </header>
-        <main>{children}</main>
+        <main className="max-sm:pb-[calc(5rem+env(safe-area-inset-bottom,0px))]">{children}</main>
       </body>
     </html>
   );

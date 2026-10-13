@@ -4,10 +4,11 @@
 
 - specs/issue-164-adw-cf1087b2-sdlc_planner-hire-me-page-contact-form.md
 - specs/issue-169-adw-98e70d08-sdlc_planner-who-you-are-home-page.md
+- specs/issue-214-adw-b4882b73-sdlc_planner-header-one-row-floating-hire.md
 
 ## Overview
 
-`/hire` (`src/app/hire/page.tsx`) is the contact page reached from the header's Work with me button: a heading ("Work with me"), the location line, a LinkedIn link and a form that sends one plain-text email to `hire@issebya.com` through Resend after a Cloudflare Turnstile check. It sits outside `(dashboard)`: no sidebar, no `Providers`, no Realtime, no connection pill.
+`/hire` (`src/app/hire/page.tsx`) is the contact page reached from the header's Work with me button: a heading ("Work with me"), the location line, a LinkedIn link and a form that sends one plain-text email to `hire@issebya.com` through Resend after a Cloudflare Turnstile check. It sits outside `(dashboard)`: no sidebar, no `Providers`, no Realtime, no connection pill. Below `sm` (640px) the Work with me button floats in the bottom-right corner of every other page and is hidden on `/hire` itself.
 
 ## How it works
 

@@ -8,6 +8,7 @@
 - specs/issue-169-adw-98e70d08-sdlc_planner-who-you-are-home-page.md
 - specs/issue-170-adw-d5ef5a75-sdlc_planner-add-mdx-writing-blog.md
 - specs/issue-173-adw-3fe1f775-sdlc_planner-production-changelog-backfill.md
+- specs/issue-214-adw-b4882b73-sdlc_planner-header-one-row-floating-hire.md
 
 ## Overview
 
@@ -22,9 +23,12 @@ The header's brand, "Sviatlana Buben, building in public" (below `sm` only
 "Sviatlana Buben", the rest in a `hidden sm:inline` span), links to `/`, the
 intro page; its "Watch me build" link goes to `/projects`, and its "Writing"
 link goes to `/writing` and is emphasised on `/writing` and every post below it. At the
-header's right, on every route, the Work with me button
+header's right, on every route from `sm` (640px), the Work with me button
 (`HireLink`) is a solid fuchsia button linking to `/hire`; it carries
-`aria-current="page"` only on `/hire`. Just before it, a small neutral Login /
+`aria-current="page"` only on `/hire`. Below `sm` the same link floats in the
+bottom-right corner of the viewport, and on `/hire` it is hidden there through
+its active state (`max-sm:hidden`), since the page is the form it leads to;
+`aria-current="page"` is unchanged. Just before it, a small neutral Login /
 Logout button (`IdentifyButton`) appears only when the `login` PostHog flag is
 on (see `app_docs/analytics.md`); it is absent from the prerendered HTML. The link of the current section carries `aria-current="page"`, and
 "Watch me build" is emphasised on `/projects`, `/projects/log`, `/projects/changelog` and its

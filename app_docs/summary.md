@@ -37,8 +37,10 @@ per-project table's class bar, both in the same order), `Haiku`, `Sonnet`, `Opus
 and optional classes (`patch`, `other`) are omitted. The plot is 180px high with faint dotted guide lines and bars with
 rounded tops, narrow (capped at 28px); every column takes the same slot width
 whatever its name, so the bars are evenly spaced; every value (run count, token label or cost in
-dollars) sits above its bar in the normal text colour and regular weight,
-tilted 45 degrees up to the right from the bar's top centre, in a band
+dollars) sits above its bar in the normal text colour and regular weight;
+token labels and costs are tilted 45 degrees up to the right from the bar's
+top centre, while run counts in "What I worked on" stand upright, centred
+over their bar; all sit in a band
 reserved above the 180px plot so the tallest bar's value stays inside the
 card. Under each bar is its name (the
 class without its slash, the short model name or the phase name). The class
@@ -258,7 +260,8 @@ open daily log updates through Refresh or the next visit.
   the row fits a one-third card at `lg` and a stacked card at 375px; the plot box is 180px
   (`h-45`). Every value sits above its bar, never inside it, in regular
   weight, rotated -45 degrees from the bar's top centre (a `transform`, not
-  the `rotate` property), in the 56px band (`pt-14`) above the 180px plot
+  the `rotate` property) in the model and phase charts, and upright, centred
+  over the bar (`tiltValues={false}`) in the class chart, in the 56px band (`pt-14`) above the 180px plot
   (`h-45`); the column row keeps 16px of right padding (`pr-4`) so the last
   column's tilted value stays inside the card. Never bold a value, never put it
   inside a bar.

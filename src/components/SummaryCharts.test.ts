@@ -121,11 +121,23 @@ describe("ColumnChart values", () => {
   it.each([
     ["class", classMarkup],
     ["phase", phaseMarkup],
-  ])("tilts every %s value in regular weight and the text colour", (_, markup) => {
+  ])("shows every %s value in regular weight and the text colour", (_, markup) => {
     for (const [, className] of values(markup)) {
+      expect(className).not.toMatch(/font-semibold|font-medium|text-white|text-neutral-950/);
+    }
+  });
+
+  it("tilts every phase value", () => {
+    for (const [, className] of values(phaseMarkup)) {
       expect(className).toContain("[transform:rotate(-45deg)]");
       expect(className).toContain("origin-bottom-left");
-      expect(className).not.toMatch(/font-semibold|font-medium|text-white|text-neutral-950/);
+    }
+  });
+
+  it("keeps every class value upright and centred over its bar", () => {
+    for (const [, className] of values(classMarkup)) {
+      expect(className).not.toContain("rotate");
+      expect(className).toContain("-translate-x-1/2");
     }
   });
 

@@ -3,7 +3,8 @@
 Checks that every day card on the summary at `/projects/log` shows three separate chart cards directly under
 its header, "What I worked on", "Tokens by model" and "What each step cost", in one row on desktop
 and stacked on mobile; that classes, models and phases come in a fixed order; that every value
-sits above its bar, regular weight, tilted 45 degrees, inside its card; that class labels carry a colour dot while model and phase labels are
+sits above its bar, regular weight, inside its card, tilted 45 degrees in the model and phase
+charts and upright in the class chart; that class labels carry a colour dot while model and phase labels are
 text only, the model and phase bars a neutral gray; that status badges and the Work with me button
 keep their colours; that the tooltips show the token split with cost, the phase usage with time and
 runs, and the class count with its share; and that the per-project table keeps its compact class bars.
@@ -46,8 +47,10 @@ which column
    `background-color` is a neutral gray (equal R, G and B). Then, with `browser_evaluate`, for every
    figure of today's card and of one past day's card, **Verify** that every column (`li`) has
    exactly one `[data-value-placement="above"]` element; that its computed `font-weight` is `400`;
-   that its computed `transform` is a matrix with `a` about `0.7071` and `b` about `-0.7071` (a -45
-   degree rotation, within 0.01); that it is not a descendant of the bar (the element with an
+   in the model and phase figures, that its computed `transform` is a matrix with `a` about
+   `0.7071` and `b` about `-0.7071` (a -45 degree rotation, within 0.01); in the class figure
+   ("What I worked on"), that its computed `transform` is `none` and its horizontal centre is
+   within 1px of its bar's horizontal centre (upright, centred); that it is not a descendant of the bar (the element with an
    inline `height` style); that its `getBoundingClientRect()` lies inside the figure's content box
    (the figure's rectangle inset by its border and padding, 0.5px tolerance); and that its `top` is
    at or below the `figcaption`'s `bottom`. No figure has a `[data-value-placement="inside"]`
@@ -115,7 +118,8 @@ which column
 - The `Docs` phase label sits on one line, like `Plan`, at 1920 and at 375 wide.
 - Phase values are dollar amounts with two decimals (or `<$0.01`).
 - Every value sits above its bar, never inside it, in regular weight (`font-weight` 400), tilted 45
-  degrees up to the right, inside its card and below the caption; bars are at most 28px wide.
+  degrees up to the right in the model and phase charts and upright, centred over its bar, in the
+  class chart, inside its card and below the caption; bars are at most 28px wide.
 - Model and phase bars are gray without label dots in both schemes; class bars keep their colours
   and dots; the status badge and Work with me button keep their colours. Labels are shown in full.
 - The bars in each chart have equal widths and equally spaced centres (within 1px) at 1920, 1024

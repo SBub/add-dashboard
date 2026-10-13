@@ -63,7 +63,7 @@ export default async function PostPage({ params }: PostPageProps) {
         <PostMetaLine meta={meta} />
         <Content />
       </article>
-      <PostMinimap meta={meta} Content={Content} columnId={POST_COLUMN_ID} />
+      <PostMinimap columnId={POST_COLUMN_ID} />
     </div>
   );
 }

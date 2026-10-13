@@ -42,7 +42,7 @@ So that the pages outside the dashboard never show a pill stuck at `connecting`
 15. Take a screenshot of the project page.
 16. **Verify** the header's `Sections` navigation contains no `Summary` link.
 17. Navigate directly (full page load) to `/projects/log`.
-18. **Verify** the `What an AI developer workflow gets done` heading is present, the `Projects`
+18. **Verify** the `Daily log` heading is present, the `Projects`
     navigation (the sidebar) is present, and an element with role `status` is present and within
     15 seconds reads `live`.
 19. Navigate directly (full page load) to `/summary?days=7`, then to `/watch`. On each, **Verify**

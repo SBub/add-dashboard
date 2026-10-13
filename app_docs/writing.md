@@ -14,7 +14,7 @@ linking to the post, its `DD.MM.YYYY` date, its audience tag and its description
 `/writing/[slug]` (`src/app/writing/[slug]/page.tsx`) renders one post: title, date, tag and the MDX
 body, which ends with the post's own last line (no call to action is added after it). Above the title the post page renders a breadcrumb
 (`src/components/Breadcrumb.tsx`, server only): `Writing`, linking to `/writing`, then the post
-title as the current page, truncated to one line on narrow screens. `/writing` has no breadcrumb. From the `xl` breakpoint the post page also shows a minimap in the right gutter, outside the article: a scaled-down copy of the post with a frame around the part in the viewport (`src/components/PostMinimap.tsx`, see Minimap below). Both sit outside `(dashboard)`: no sidebar, no `Providers`, no
+title as the current page, truncated to one line on narrow screens. `/writing` has no breadcrumb. From the `xl` breakpoint the post page also shows a minimap in the right gutter, outside the article: a narrow strip mapping the whole post's shape (headings, lines of text, images) with a frame around the part in the viewport (`src/components/PostMinimap.tsx`, see Minimap below). Both sit outside `(dashboard)`: no sidebar, no `Providers`, no
 Realtime, no pill. Posts are MDX modules under `src/content/posts/`, compiled by `@next/mdx`
 (`createMDX()` in `next.config.ts`) and styled by `src/mdx-components.tsx` (server only).
 
@@ -69,25 +69,38 @@ From the `xl` breakpoint up (`hidden xl:block`) the post page shows a minimap in
 beside the post column; below `xl` (375x667 included) there is none. It sits outside the
 `article`, as its sibling in `src/app/writing/[slug]/page.tsx`.
 
-`PostMinimap` (a server component) renders a second, server-rendered copy of the post's MDX
-`Content` with the `MINIMAP_COMPONENTS` overrides, which replace links, headings and other
-focusable or landmark elements with plain inert markup. The copy is a `w-[62ch]` column scaled with
-CSS `zoom` at `MINIMAP_SCALE` (0.25, in `src/lib/minimap.ts`); `zoom`, unlike a transform, shrinks
-the layout box too, so the panel's height is the scaled height. The panel is sticky below the
-header (`top-[calc(var(--header-height)+1.5rem)]`) and capped at `60vh`
-(`max-h-[60vh] overflow-hidden`). When the miniature is taller than the panel it slides
-proportionally: as the reader scrolls from the top of the post to its end, the miniature's offset
-moves from 0 to its overflow, so the frame stays inside the panel.
+The minimap is a map of the post's shape, not a copy of its text: the post's content ships once.
+`PostMinimap` (a server component) renders only the strip's wrapper: `w-[120px]`, sticky below
+the header (`top-[calc(var(--header-height)+1.5rem)]`), `aria-hidden="true"`, `inert`,
+`pointer-events-none`, `select-none`. Inside it, `PostMinimapViewport`
+(`src/components/PostMinimapViewport.tsx`), the one client leaf, measures the real article: each
+top-level block from the `h1` on (the breadcrumb is not the post), relative to the `h1`'s top and
+the column's left edge. Headings and text blocks (paragraphs, lists, the meta line) give one rect
+per rendered line, from their text nodes' client rects; a block holding an image gives one rect per
+image with its caption (the span the MDX `img` renders); `pre`, `blockquote`, `table` and `hr` are
+drawn whole.
 
-`PostMinimapViewport` (`src/components/PostMinimapViewport.tsx`) is the one client leaf. It reads
-`window.scrollY`, `innerHeight`, the column's box (from its `h1` to its bottom) and the panel's
-height on scroll, resize and column resize (images loading), and passes them to the pure
-`minimapFrame` in `src/lib/minimap.ts`, which returns the frame's top and height and the slide
-offset (unit-tested in `src/lib/minimap.test.ts`). The frame starts null, so the server markup and
-the first client render match and nothing shifts on hydration.
+The pure functions in `src/lib/minimap.ts` (unit-tested in `src/lib/minimap.test.ts`) turn those
+measurements into the strip: `groupLineRects` merges a line's fragments, `minimapScale` is the
+available height (`MINIMAP_MAX_VIEWPORT_SHARE`, 70% of the viewport, less the strip's border and
+padding) over the article's height, capped at `MINIMAP_MAX_SCALE` (0.25) so a short post stays
+small and the strip shrinks to it, and `minimapLayout` maps every rect: y times that scale, the
+column's width onto the strip's width. The whole article always fits, title to last block; nothing
+slides. Headings draw as darker bars, text as thin light-grey lines (one per rendered line, each
+as wide as its line), images as grey rectangles and the other blocks as light boxes, in the
+neutral palette with dark variants. `minimapFrame` places the frame (translucent fill and a thin
+ring) over the part of the article in the viewport: at the strip's top at scroll 0, ending at the
+last block's bottom at the end of the page.
 
-The minimap is visual only: the panel is `aria-hidden="true"`, `inert`, `pointer-events-none` and
-`select-none`, with no click-to-jump, no drag, no keyboard behaviour and no focus stop.
+The leaf re-measures on window resize, on any size change of the column (`ResizeObserver`: images
+loading, fonts, width) and once the fonts are ready, and moves the frame on scroll, at most once
+per animation frame. Below `xl` the strip is not displayed, so it measures and draws nothing. Its
+layout and frame start null, so the server markup and the first client render are the same empty
+wrapper and nothing shifts on hydration. There is no CSS `zoom` and no `transform: scale` of real
+content.
+
+The minimap is visual only: no text nodes, no click-to-jump, no drag, no keyboard behaviour and no
+focus stop.
 
 ### The LinkedIn companion
 
@@ -196,7 +209,11 @@ shared by the list and the post page (see `app_docs/clock-and-prerender.md`).
 - Every non-draft post must pass `yarn check:og`. Never hardcode a slug list in
   `scripts/check-post-metadata.test.ts` (posts come only from `getPosts()`), and a change to what
   a post's metadata tags contain changes the check in the same commit.
-- The minimap stays outside the `article`, `aria-hidden` and `inert`, with no links, headings or
-  focusable elements (its copy renders through `MINIMAP_COMPONENTS`).
+- The minimap stays outside the `article`, `aria-hidden` and `inert`, with no text, links,
+  headings or focusable elements. It is drawn from measurements of the real article: never render
+  a second copy of the post into it, and never scale real content with CSS `zoom` or
+  `transform: scale`.
+- The minimap always shows the whole post, from the title to the last block: never let it slide or
+  crop.
 - Never add click-to-jump, drag or keyboard stops to the minimap: it is visual only.
 - The minimap appears only on `/writing/[slug]`: never on `/writing` or any other route.

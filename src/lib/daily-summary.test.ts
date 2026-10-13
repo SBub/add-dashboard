@@ -2,7 +2,6 @@ import { describe, expect, it } from "vitest";
 import type { DailyModelSummary, DailyPhaseSummary, DailySummary } from "@/types/adw";
 import { costLabel, secondsLabel } from "./run-view";
 import {
-  barValueInside,
   classColumns,
   classCounts,
   classLabel,
@@ -724,27 +723,6 @@ describe("classSegments", () => {
     const segments = classSegments({ runs: 3, features: 1, bugs: 1, chores: 1, patches: 0 });
     const last = at(segments, segments.length - 1);
     expect(last.offset + last.width).toBe(100);
-  });
-});
-
-describe("barValueInside", () => {
-  // 20px of a 180px plot: the smallest bar that holds its value.
-  const threshold = (20 / 180) * 100;
-
-  it("is inside for a full-height bar", () => {
-    expect(barValueInside(100)).toBe(true);
-  });
-
-  it("is above for a zero-height bar", () => {
-    expect(barValueInside(0)).toBe(false);
-  });
-
-  it("is inside at exactly the threshold", () => {
-    expect(barValueInside(threshold)).toBe(true);
-  });
-
-  it("is above just under the threshold", () => {
-    expect(barValueInside(threshold - 0.01)).toBe(false);
   });
 });
 

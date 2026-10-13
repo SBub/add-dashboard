@@ -4,6 +4,7 @@
 
 - specs/issue-170-adw-d5ef5a75-sdlc_planner-add-mdx-writing-blog.md
 - specs/issue-200-adw-c1f03790-sdlc_planner-add-post-breadcrumb.md
+- specs/issue-203-adw-e2642e8f-sdlc_planner-enforce-post-og-metadata.md
 
 ## Overview
 
@@ -107,6 +108,36 @@ params do not inherit the page's). That call only collects ids, and an empty lis
 under `cacheComponents`, so it returns the one id `og` with the fallback alt "Sviatlana Buben,
 writing". `Image` still answers 404 for a slug that is no post.
 
+### The metadata check
+
+`yarn check:og` (`vitest run --config vitest.og.config.ts`) runs
+`scripts/check-post-metadata.test.ts` after `yarn build`. For every non-draft post it reads the
+prerendered `.next/server/app/writing/<slug>.html`, exactly what production serves, and asserts
+`<title>` and the description equal `meta.title` and `meta.description`; the canonical link and
+`og:url` end in `/writing/<slug>`; `og:title`, `og:description`, `og:type` (`article`) and
+`og:site_name` (`SITE_NAME`); `og:image` points at `/writing/<slug>/opengraph-image/` with
+`og:image:width` 1200, `og:image:height` 630, `og:image:type` `image/png` and a non-empty
+`og:image:alt`; and `twitter:card` is `summary_large_image`. URLs are checked by suffix, so the
+check passes for any host (`SITE_URL` unset in CI gives `http://localhost:3000`). A missing HTML
+file fails with "run yarn build first". It reads local files only: no fetch, no server, no port.
+
+Posts come from `POST_ENTRIES` through `getPosts()`, with drafts skipped (vitest runs with
+`NODE_ENV=test`, where `getPosts()` keeps drafts, so the check filters them itself). A new post is
+covered with no edit to the check, and a first test asserts the count of checked posts equals the
+count of non-draft entries and prints it (`check:og: <n> posts checked`).
+
+The check has its own `vitest.og.config.ts`, with `@mdx-js/rollup` so it can load each post's
+`meta` through the registry and the `@/` alias mirrored from `tsconfig.json`.
+`vitest.config.ts` includes only `src/**/*.test.ts`, so `yarn test` never runs it and stays
+build-free.
+
+It checks the built HTML rather than calling `generateMetadata` because several of the tags are
+produced by Next, not by the function: there is no `twitter` key in `generateMetadata` (the
+twitter tags are Next's fallback from `openGraph`), and the `og:image*` tags come from the
+`opengraph-image.tsx` file convention. A unit test of the function could not assert them.
+
+CI (`.github/workflows/ci.yml`) runs `yarn check:og` right after `yarn build`.
+
 ### Clock and prerendering
 
 Both pages and the image read no clock and nothing at request time. A post's date is its
@@ -134,3 +165,6 @@ shared by the list and the post page (see `app_docs/clock-and-prerender.md`).
 - The breadcrumb on a post page is a server component; its link is `/writing` and its last item is
   `meta.title` with `aria-current="page"`. `/writing` has no breadcrumb, and the `h1` stays the
   post's only `h1`.
+- Every non-draft post must pass `yarn check:og`. Never hardcode a slug list in
+  `scripts/check-post-metadata.test.ts` (posts come only from `getPosts()`), and a change to what
+  a post's metadata tags contain changes the check in the same commit.

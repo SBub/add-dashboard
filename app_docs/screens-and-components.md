@@ -159,12 +159,13 @@ projects. `/`, the landing page, is a static intro (see `app_docs/home.md`).
   `useTransition` the box, the arrows and `HistoryResults` share, `SidebarEntryLink`,
   which reads the pathname to mark the sidebar's Daily log and Changelog entries, and `TodaySummary`, which reads today's
   card from the query cache and refetches it, `SubmitButton`, which reads its
-  form's pending state, and `TurnstileScript`, which renders the Turnstile
-  widget on mount). `HistoryLinks`,
+  form's pending state, `TurnstileScript`, which renders the Turnstile
+  widget on mount, and `PostMinimapViewport`, which reads the window's scroll
+  to frame the visible part of a post's minimap). `HistoryLinks`,
   `RunHistoryList`, `SectionNav`,
   `DailySummaryList`, `SummaryDayCard`, `DayCharts`, `ColumnChart`,
   `ClassColumnChart`, `ModelColumnChart`, `PhaseColumnChart`,
-  `ClassDistributionBar`, `ProjectBreakdownTable`, `Skeleton` and the
+  `ClassDistributionBar`, `ProjectBreakdownTable`, `PostMinimap`, `Skeleton` and the
   skeletons in `LoadingSkeletons.tsx` are components with no
   state; do not put
   `"use client"` on them or give them a filter that needs one.

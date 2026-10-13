@@ -96,7 +96,8 @@ E2E code suite: `none` (no `@playwright/test` specs). `e2e/*.md` holds agent-dri
 `e2e/test_run_row_phase_label.md`, `e2e/test_history_card_fields.md`,
 `e2e/test_history_page_turn.md`, `e2e/test_worker_status_widget.md`, `e2e/test_hire_page.md`,
 `e2e/test_home_page.md`, `e2e/test_writing.md`, `e2e/test_daily_log_sidebar.md`,
-`e2e/test_changelog.md` and `e2e/test_header_login_hidden.md`) that the test
+`e2e/test_changelog.md`, `e2e/test_header_login_hidden.md` and
+`e2e/test_post_minimap.md`) that the test
 phase runs through the Playwright MCP server.
 
 lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every commit and
@@ -158,7 +159,8 @@ lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every c
   `/hire` (heading, the Remote, Lisbon line, LinkedIn link, the form with the offer select, the Turnstile widget, the
   fuchsia Send button; no sidebar, no pill), `/writing` (heading, intro, the first post with its
   audience tag; no sidebar, no pill) and `/writing/my-moat` (title, date, tag, body ending with
-  its Watch me build live link to `/projects`), `/projects/changelog` (the sidebar with Changelog current below Daily log, heading,
+  its Watch me build live link to `/projects`; at 1920x1080 the minimap in the right gutter, none at
+  375x667), `/projects/changelog` (the sidebar with Changelog current below Daily log, heading,
   intro, entries newest first with date, title, stats strip and counts) and one entry such as
   `/projects/changelog/2026-10-09-pr163` (date, title, the stats strip with the PR link, diff,
   commits, files and comments, the description, the Features, Fixes and Chores lists). The fuchsia Work with me button is in the header on every

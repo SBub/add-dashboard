@@ -37,13 +37,11 @@ describe("STATUS_COLORS", () => {
 });
 
 // The connection pill describes the socket, not a run state, so it keeps its
-// own colours, and the radio bar's live dot describes a broadcast. They are
-// the two files allowed a status hue outside the map.
+// own colours. It is the one file allowed a status hue outside the map.
 const EXEMPT = new Set([
   "/src/lib/status-colors.ts",
   "/src/lib/status-colors.test.ts",
   "/src/components/ConnectionIndicator.tsx",
-  "/src/components/RadioBar.tsx",
 ]);
 
 // Every source file under src/, read as text when Vite transforms this test.
@@ -59,7 +57,7 @@ describe("status hue guard", () => {
     expect(SOURCES.map(([path]) => path)).toContain("/src/components/StatusBadge.tsx");
   });
 
-  it("finds no status hue class outside the map, the connection pill and the radio bar", () => {
+  it("finds no status hue class outside the map and the connection pill", () => {
     const found: string[] = [];
     for (const [path, source] of SOURCES) {
       if (EXEMPT.has(path)) continue;

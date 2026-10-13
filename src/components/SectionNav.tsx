@@ -22,11 +22,11 @@ const SECTION_LINK = "hover:text-neutral-900 dark:hover:text-neutral-100";
 const SECTION_LINK_INACTIVE = "text-neutral-500 dark:text-neutral-400";
 const SECTION_LINK_ACTIVE = "text-neutral-900 dark:text-neutral-100";
 const BRAND_LINK = "font-semibold tracking-tight whitespace-nowrap";
-// Below `sm` the button is fixed bottom-right, inside thumb reach and above the
-// safe-area inset. FLOATING_LAYER is applied unprefixed: z-index is inert on
+// Below `sm` the button is fixed bottom-right, 1rem above the radio footer,
+// inside thumb reach and above the safe-area inset. FLOATING_LAYER is applied unprefixed: z-index is inert on
 // the statically positioned link from `sm` up.
 const HIRE_FLOAT =
-  "max-sm:fixed max-sm:right-4 max-sm:bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] max-sm:min-h-11 max-sm:px-4 max-sm:py-3 max-sm:shadow-lg";
+  "max-sm:fixed max-sm:right-4 max-sm:bottom-[calc(var(--radio-bar-height)+1rem+env(safe-area-inset-bottom,0px))] max-sm:min-h-11 max-sm:px-4 max-sm:py-3 max-sm:shadow-lg";
 const HIRE_LINK = `rounded-md px-3 py-1.5 text-sm font-medium whitespace-nowrap ${HIRE_ACCENT} ${FLOATING_LAYER} ${HIRE_FLOAT}`;
 
 export function SectionNav() {

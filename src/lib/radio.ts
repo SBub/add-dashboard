@@ -1,4 +1,4 @@
-// The radio bar above the header plays NTS Radio's Slow Focus infinite
+// The radio footer plays NTS Radio's Slow Focus infinite
 // mixtape. This file holds its URLs, its error text and the state machine
 // every click and media event goes through. It is plain (no React, no
 // posthog-js, no DOM), so every transition is testable in node.

@@ -3,8 +3,9 @@
 Checks that the root header is one row (57px) at every width from 320px, that the single
 `Work with me` link floats in the bottom-right corner below 640px and sits in the header from
 640px, that it is hidden on `/hire` below 640px, that the tagline shows only from 1024px, and that
-no width overflows horizontally, in light and dark. The radio bar above the header is out of scope:
-every check reads `body > header`. The hosted database is read only; this journey never writes.
+no width overflows horizontally, in light and dark. The radio footer itself is checked by
+`e2e/test_radio_bar.md`; this journey only places the floating button relative to it, and every
+header check reads `body > header`. The hosted database is read only; this journey never writes.
 
 ## User Story
 
@@ -24,8 +25,9 @@ So that the header takes less of the screen and the contact entry point is one t
    - **Verify** `header.getBoundingClientRect().height` is 57 within 1.
    - **Verify** `links.length` is 1 and its accessible name is `Work with me`.
    - Below 640 wide: **Verify** the link's computed `position` is `fixed`, its rect is inside the
-     viewport, `innerWidth - rect.right` and `innerHeight - rect.bottom` are each 16 within 2, and
-     `rect.height >= 44`. Then run `window.scrollTo(0, document.documentElement.scrollHeight)` and
+     viewport, `innerWidth - rect.right` is 16 within 2, `innerHeight - rect.bottom` equals the
+     height of the radio region (`[role="region"][aria-label="NTS Slow Focus radio"]`) plus 16
+     within 2 (the link sits 16px above the footer's top), and `rect.height >= 44`. Then run `window.scrollTo(0, document.documentElement.scrollHeight)` and
      **Verify** `document.querySelector('main').lastElementChild.getBoundingClientRect().bottom`
      is at most the link's `getBoundingClientRect().top`.
    - From 640 wide: **Verify** the link's rect is inside the header's rect and its computed
@@ -44,7 +46,7 @@ So that the header takes less of the screen and the contact entry point is one t
 
 - `body > header` is 57px (within 1px) at every tested width, page and color scheme.
 - Exactly one `Work with me` link at every width.
-- Below 640px it is fixed 16px from the right and bottom edges, at least 44px tall, and the end of
+- Below 640px it is fixed 16px from the right edge and 16px above the radio footer, at least 44px tall, and the end of
   `main` clears it when scrolled to the bottom; from 640px it is inside the header and not fixed.
 - On `/hire` it is hidden at 390px and marked `aria-current="page"` in the header at 1024px.
 - The tagline is hidden below 1024px and visible from 1024px.

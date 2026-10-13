@@ -2,6 +2,7 @@
 
 import posthog from "posthog-js";
 import { useReducer, useRef } from "react";
+import { FOOTER_LAYER } from "@/lib/layers";
 import {
   INITIAL_RADIO_STATE,
   RADIO_ERROR_TEXT,
@@ -13,13 +14,15 @@ import {
 } from "@/lib/radio";
 
 /**
- * The NTS Slow Focus bar. The root layout renders it before the header, and
- * client-side navigation never remounts the root layout, so the one `<audio>`
- * keeps playing between pages. Nothing autoplays: `src` is set only by the
- * play click and removed on stop, which drops the connection. The NTS credit
- * link is rendered in every state; on an error only its text changes. The
- * live region is `aria-live` without `role="status"`: the connection pill is
- * the one status element.
+ * The NTS Slow Focus bar. The root layout renders it after `<main>`, as a
+ * footer fixed to the bottom of the viewport on `FOOTER_LAYER`; the body
+ * reserves its height. Client-side navigation never remounts the root layout,
+ * so the one `<audio>` keeps playing between pages. Nothing autoplays: `src`
+ * is set only by the play click and removed on stop, which drops the
+ * connection. The NTS credit link is rendered in every state; on an error only
+ * its text changes. The live region is `aria-live` without `role="status"`:
+ * the connection pill is the one status element, and the bar carries no live
+ * label and no accent colour (the pill owns "live").
  */
 export function RadioBar() {
   const [state, dispatch] = useReducer(radioReducer, INITIAL_RADIO_STATE);
@@ -51,14 +54,10 @@ export function RadioBar() {
     <div
       role="region"
       aria-label="NTS Slow Focus radio"
-      className="border-b border-neutral-200 dark:border-neutral-800"
+      className={`fixed inset-x-0 bottom-0 ${FOOTER_LAYER} border-t border-neutral-200 bg-background pb-[env(safe-area-inset-bottom,0px)] dark:border-neutral-800`}
     >
       <div className="mx-auto flex h-9 max-w-6xl items-center gap-3 px-4 text-[11px] font-medium tracking-wider uppercase">
-        <span className="flex shrink-0 items-center gap-1.5">
-          <span aria-hidden="true" className="size-1.5 rounded-full bg-red-600" />
-          <span className="text-neutral-500 dark:text-neutral-400">LIVE NOW</span>
-        </span>
-        <div className="flex min-w-0 items-center gap-2 border border-neutral-300 px-2 py-0.5 dark:border-neutral-700">
+        <div className="flex min-w-0 items-center gap-2 rounded-md border border-neutral-300 px-2 py-0.5 dark:border-neutral-700">
           <span aria-hidden="true">∞</span>
           <button
             type="button"

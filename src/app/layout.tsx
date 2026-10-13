@@ -28,8 +28,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
-      <body className="min-h-screen antialiased">
-        <RadioBar />
+      <body className="min-h-screen pb-[calc(var(--radio-bar-height)+env(safe-area-inset-bottom,0px))] antialiased">
         <header
           className={`sticky top-0 ${HEADER_LAYER} border-b border-neutral-200 bg-background dark:border-neutral-800`}
         >
@@ -47,7 +46,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             </div>
           </div>
         </header>
-        <main className="max-sm:pb-[calc(5rem+env(safe-area-inset-bottom,0px))]">{children}</main>
+        <main className="max-sm:pb-20">{children}</main>
+        <RadioBar />
       </body>
     </html>
   );

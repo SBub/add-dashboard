@@ -7,15 +7,15 @@ render the not-found page (no redirect).
 
 ## User Story
 
-As a visitor reading the ADW public ledger
+As a visitor reading the ADW daily log
 I want the summary to show every project's finished runs without a form to fill in
 So that the report reads straight through and ignores old filter parameters
 
 ## Test Steps
 
 1. Navigate to `/projects/log` under the `Application URL`.
-2. **Verify** the `What an AI developer workflow gets done` heading (level 1) is present, followed
-   by the intro paragraph starting `ADW is an autonomous pipeline`.
+2. **Verify** the `Daily log` heading (level 1) is present, followed
+   by the intro paragraph `What my AI developer workflow shipped each day, and what it cost.`
 3. **Verify** the text `Times are UTC. Tokens and cost count runs that published metrics.` follows
    the intro paragraph and precedes the first day card.
 4. **Verify** at least one past day card is present (an `article` with a level-2 date heading,
@@ -31,7 +31,7 @@ So that the report reads straight through and ignores old filter parameters
 11. Navigate directly (full page load) to `/summary?days=7`, then to `/watch`.
 12. **Verify** on each that the URL is unchanged (no redirect), the not-found page renders (the
     `Not found` heading and the text `There is nothing at this address.`) and the
-    `What an AI developer workflow gets done` heading is absent.
+    `Daily log` heading (level 1) is absent.
 13. Take a screenshot of the not-found page at `/watch`.
 
 ## Success Criteria

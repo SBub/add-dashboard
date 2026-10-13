@@ -61,9 +61,10 @@ no filters (issue #97).
 
 **Page copy.** `/projects/log` is the summary page (the landing page is the intro at `/`,
 `app_docs/home.md`), and its static shell opens with the
-`h1` "What an AI developer workflow gets done" and an intro paragraph saying
-what ADW is and that the page is the public ledger of finished runs; the
-document title is "Sviatlana Buben: what an AI developer workflow ships".
+`h1` "Daily log" and a one-sentence intro, "What my AI developer workflow
+shipped each day, and what it cost."; the document title is "Daily log" and the
+meta description repeats the intro sentence, matching Changelog's plain title
+plus one-line description.
 Both sit in the page body and `metadata`, outside the report hole. The
 reading notes ("Times are UTC. Tokens and cost count runs that published
 metrics.") are a muted line directly under the intro, also in the shell.
@@ -197,7 +198,7 @@ open daily log updates through Refresh or the next visit.
     One tag per half; never a per-project, per-day or per-window summary tag,
     and never an `expire` under 5 minutes.
 - The `h1` and the intro paragraph of `/projects/log` are static copy in the page body
-  (the shell), and the title comes from `metadata`; none of them reads the
+  (the shell), and the title and description come from `metadata`; none of them reads the
   report. The reading note about UTC and metrics is a `<p>` in the page body
   directly under the intro, also in the shell, outside the `SectionBoundary`.
   `e2e/test_connection_indicator_scope.md` and `e2e/test_landing_no_filters.md`

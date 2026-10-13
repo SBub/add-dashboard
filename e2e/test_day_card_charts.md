@@ -11,7 +11,7 @@ runs, and the class count with its share; and that the per-project table keeps i
 
 ## User Story
 
-As a visitor reading the ADW public ledger on `/projects/log`
+As a visitor reading the ADW daily log on `/projects/log`
 I want each day's class split, model split and cost by pipeline phase shown as three clearly
 separated, consistently ordered charts with the numbers on the bars
 So that I can read a day at a glance and compare days without hunting for which label belongs to

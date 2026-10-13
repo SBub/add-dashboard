@@ -14,9 +14,9 @@ So that the pages outside the dashboard never show a pill stuck at `connecting`
 ## Test Steps
 
 1. Navigate to `/` under the `Application URL` (the intro page).
-2. **Verify** the heading `Sviatlana Buben, product engineer` (level 1) is present, there is no
-   `navigation` named `Projects` (the sidebar) and no element with role `status` in the
-   accessibility snapshot.
+2. **Verify** the heading `Sviatlana Buben` (level 1) and the text `Product Engineer, AI Consultant`
+   are present, there is no `navigation` named `Projects` (the sidebar) and no element with role
+   `status` in the accessibility snapshot.
 3. Take a screenshot of the intro page.
 4. Navigate to `/projects`.
 5. **Verify** the URL is `/projects`, the `Projects` navigation (the sidebar) and the
@@ -28,7 +28,7 @@ So that the pages outside the dashboard never show a pill stuck at `connecting`
 9. **Verify** the URL is `/projects/<owner>/<repo>` (the noted `href`) and the `status` element
    reads `live` (wait up to 15 seconds).
 10. Click the header's brand link `Sviatlana Buben, building in public` (`href="/"`).
-11. **Verify** the URL is `/` and the `Sviatlana Buben, product engineer` heading is present.
+11. **Verify** the URL is `/` and the `Sviatlana Buben` heading (level 1) is present.
 12. **Verify** the accessibility snapshot contains no element with role `status`, and no text
     `connecting`, `live` or `reconnecting`. Judge this from `browser_snapshot` (and the
     screenshot), never from a raw DOM query such as `document.querySelector('[role=status]')`:

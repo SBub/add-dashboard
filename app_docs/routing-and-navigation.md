@@ -21,10 +21,12 @@ tokens (fresh input, cache read, output) and cost (see `app_docs/summary.md`).
 The header's brand, "Sviatlana Buben, building in public" (below `sm` only
 "Sviatlana Buben", the rest in a `hidden sm:inline` span), links to `/`, the
 intro page; its "Watch me build" link goes to `/projects`, and its "Writing"
-link goes to `/writing` and is emphasised on `/writing` and every post below it. At the header's
-right, on every route, the Work with me button
+link goes to `/writing` and is emphasised on `/writing` and every post below it. At the
+header's right, on every route, the Work with me button
 (`HireLink`) is a solid fuchsia button linking to `/hire`; it carries
-`aria-current="page"` only on `/hire`. The link of the current section carries `aria-current="page"`, and
+`aria-current="page"` only on `/hire`. Just before it, a small neutral Login /
+Logout button (`IdentifyButton`) appears only when the `login` PostHog flag is
+on (see `app_docs/analytics.md`); it is absent from the prerendered HTML. The link of the current section carries `aria-current="page"`, and
 "Watch me build" is emphasised on `/projects`, `/projects/log`, `/projects/changelog` and its
 entries, and every project page. On a project
 page added after the deploy (not among the pre-rendered slugs) the shell carries

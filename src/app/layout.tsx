@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { IdentifyButton } from "@/components/IdentifyButton";
 import { BrandLink, HireLink, SectionNav } from "@/components/SectionNav";
 import { HEADER_LAYER } from "@/lib/layers";
 import { SITE_NAME, siteUrl } from "@/lib/site-url";
@@ -39,6 +40,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               <span className="hidden text-xs text-neutral-500 sm:inline dark:text-neutral-400">
                 Built with ADW, my AI developer workflow
               </span>
+              <IdentifyButton />
               <HireLink />
             </div>
           </div>

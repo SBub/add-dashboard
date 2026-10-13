@@ -1,5 +1,9 @@
 # Analytics
 
+**Specifications:**
+
+- specs/issue-195-adw-dd62c7aa-sdlc_planner-login-logout-header-flag.md
+
 ## Overview
 
 PostHog runs in the browser on every page. It is initialised once in

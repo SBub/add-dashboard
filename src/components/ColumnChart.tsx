@@ -4,7 +4,7 @@ import { columnHeights } from "@/lib/daily-summary";
 export interface ChartColumn {
   key: string;
   value: number;
-  /** The value as text, tilted above its bar. */
+  /** The value as text, above its bar. */
   valueLabel: string;
   /** The column's name, under the plot, beside a colour dot when the chart has dots. */
   name: ReactNode;
@@ -29,6 +29,8 @@ interface ColumnChartProps {
   empty?: ReactNode;
   /** A dot of the bar's colour beside each name; off when every bar is the same gray. */
   dots?: boolean;
+  /** Values tilted 45 degrees (the default); upright and centred when false, for short counts. */
+  tiltValues?: boolean;
 }
 
 /** The guide lines, in percent of the plot height from its baseline. */
@@ -45,7 +47,8 @@ function idPart(value: string): string {
  * scaled to the chart's own maximum (columnHeights), with rounded tops and
  * a capped width. Every value sits above its bar, never inside it, in the
  * card's text colour and regular weight, rotated 45 degrees up to the right
- * from the bar's top centre, in a 56px band (`pt-14`) above the plot that
+ * from the bar's top centre (upright and centred over the bar when
+ * `tiltValues` is false, for short counts), in a 56px band (`pt-14`) above the plot that
  * holds the tallest bar's value inside the card; the row keeps 16px of
  * right padding (`pr-4`) so the last column's tilted value stays inside the
  * card too. The rotation is a `transform`, not the `rotate` property. The name sits under the
@@ -69,6 +72,7 @@ export function ColumnChart({
   summary,
   empty,
   dots = true,
+  tiltValues = true,
 }: ColumnChartProps) {
   const heights = columnHeights(columns.map((column) => column.value));
   const gap = columns.length >= 5 ? "gap-1" : "gap-2 sm:gap-4";
@@ -116,7 +120,7 @@ export function ColumnChart({
                     <span className="relative h-0 w-full">
                       <span
                         data-value-placement="above"
-                        className="absolute bottom-1 left-1/2 origin-bottom-left [transform:rotate(-45deg)] text-xs whitespace-nowrap tabular-nums"
+                        className={`absolute bottom-1 left-1/2 text-xs whitespace-nowrap tabular-nums ${tiltValues ? "origin-bottom-left [transform:rotate(-45deg)]" : "-translate-x-1/2"}`}
                       >
                         {column.valueLabel}
                       </span>

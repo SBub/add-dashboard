@@ -12,8 +12,9 @@ interface ClassColumnChartProps {
 /**
  * A day's runs by issue class: /feature, /chore and /bug always, /patch and
  * other when present, in classColumns' fixed order; a zero column is a
- * hairline with 0 above it. Hover or focus shows the count and the share of
- * the day's runs. Nothing when there are no runs.
+ * hairline with 0 above it. Counts are short, so their values stand upright,
+ * centred over the bar. Hover or focus shows the count and the share of the
+ * day's runs. Nothing when there are no runs.
  */
 export function ClassColumnChart({ counts, day }: ClassColumnChartProps) {
   const columns = classColumns(counts);
@@ -25,6 +26,7 @@ export function ClassColumnChart({ counts, day }: ClassColumnChartProps) {
       title="What I worked on"
       subtitle="Runs finished that day"
       idPrefix={`runs-by-class-${day}`}
+      tiltValues={false}
       summary={`What I worked on: ${columns.map(({ key, count }) => `${count} ${classLabel(key)}`).join(", ")}`}
       columns={columns.map(({ key, count }) => ({
         key,

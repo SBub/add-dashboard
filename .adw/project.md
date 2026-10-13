@@ -77,10 +77,13 @@ In the order the test phase runs them, all from the root, unfiltered: lint `yarn
 `yarn typecheck` (`next typegen` then `tsc --noEmit`; `tsconfig.json` excludes `trees` and
 `agents`; it rewrites the gitignored `next-env.d.ts`, never stage it); dead code `yarn knip` (scans `src/**`, see `knip.json`);
 format `yarn format:check` (write `yarn format`); unit `yarn test` (vitest, `src/**/*.test.ts`
-only, see `vitest.config.ts`); build `yarn build`.
+only, see `vitest.config.ts`); build `yarn build`; then the post metadata check `yarn check:og`
+(vitest under `vitest.og.config.ts`, reads the built `.next/server/app/writing/<slug>.html`, so it
+runs only after a build).
 
 The one test layer is `src/**/*.test.ts`: pure reducers in `src/data/`, helpers in `src/lib/` and the
-pinned hydration rule. There is no component test layer and no Playwright suite; a user-visible
+pinned hydration rule. The one exception is `scripts/check-post-metadata.test.ts`, run by
+`yarn check:og` after the build, never by `yarn test`. There is no component test layer and no Playwright suite; a user-visible
 change gets its browser evidence from the review phase's screenshots, not from a test.
 
 E2E code suite: `none` (no `@playwright/test` specs). `e2e/*.md` holds agent-driven journeys

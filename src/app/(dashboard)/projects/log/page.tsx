@@ -130,18 +130,14 @@ async function SummaryContent() {
 }
 
 // The daily log, beside the sidebar the (dashboard) layout renders, which
-// also gives it width and padding. Not async: the heading, the intro and the
-// reading note are the static shell, the today card and the past days are the
-// hole.
+// also gives it width and padding. Not async: the heading and the intro are
+// the static shell, the today card and the past days are the hole.
 export default function SummaryPage() {
   return (
     <div>
       <h1 className="text-2xl font-semibold tracking-tight">Daily log</h1>
       <p className="mt-2 max-w-[70ch] text-base text-neutral-700 dark:text-neutral-300">
         What my AI developer workflow shipped each day, and what it cost.
-      </p>
-      <p className="mt-2 text-xs text-neutral-500 dark:text-neutral-400">
-        Times are UTC. Tokens and cost count runs that published metrics.
       </p>
       <SectionBoundary
         fallback={

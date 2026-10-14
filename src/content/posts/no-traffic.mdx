@@ -1,0 +1,44 @@
+export const meta = {
+  title: "Product engineering outside SaaS: what to measure when there's no traffic yet",
+  description:
+    "How I set a target and measure a new service at my guest house when there's not enough traffic to A/B test.",
+  date: "2026-10-14",
+  audience: "product-engineer",
+  draft: false,
+};
+
+SaaS is a great place to practise product engineering. There are users, events and metrics everywhere, so every change can be measured.
+
+Most businesses don't look like that. I run a guest house. It has a website, a booking flow, a shop and an agent that answers guests. Traffic is small. Product strategies still apply, but the order changes.
+
+There are cheap ways to check if anyone wants a feature before building it. The shop on issebya.com is a fake door: I track who opens the shop, scrolls it and clicks an item, and the conversion is "add to wishlist". The guest agent is a real agent now, but I could have started with Wizard of Oz: answering guests by hand behind the same chat. My newest idea, lock-in, is a landing page: a page describing a focused stay at the house, with a waitlist. No dedicated space is built yet.
+
+Almost every guest comes through booking platforms, and low season is starting. I want a second revenue stream that I own. My hypothesis: offering lock-in stays to women who build their own thing (content, a digital product, a small agency) will bring revenue in autumn and winter. It's the season of introspection: people want focus, comfort and nature, and the house has all three.
+
+The metric is people who join the waitlist; secondary, who opens the page and scrolls through it. The guardrail is that booking keeps working.
+
+For the target I worked backwards from capacity. Two rooms, four lock-ins each: 8 stays. In the first two weeks I want the first lock-in in each room booked, so 2 bookings. If 15% of the waitlist books, I need 14 people on it. If 5% of visitors join, I need 280 visitors. So: 280 visitors and 14 waitlist joins in two weeks, 140 visitors and 7 joins a week. Both rates are guesses. After two weeks I replace them with real numbers and work backwards again from the remaining 6 stays.
+
+![PostHog notebook for the lock-in experiment, Metric and target section: 2 rooms times 4 lock-ins is 8 stays, working backwards from 2 bookings to 14 waitlist joins and 280 visitors by 02.11.2026](/writing/no-traffic/notebook-metric-target.png "PostHog: the Metric and target section of my lock-in experiment notebook.")
+
+At this stage I don't test different versions of the page. Comparing two headlines or two sets of photos only makes sense with enough traffic: a test like that needs hundreds of sign-ups per version before it says anything. With a few hundred visitors, it would run for months and still prove nothing.
+
+So the effort goes into getting traffic, and the analytics are there to steer that effort. I built one dashboard in PostHog with three charts:
+
+1. Visitors by source: is anyone coming, and from where? This shows whether your posts bring people.
+2. Visit to waitlist join (funnel): of those who come, how many join? This shows whether the page convinces them. It's your main experiment metric.
+3. Joins per week: how many joined in total? You compare it with your target to decide whether lock-in is worth building.
+
+Read them in that order:
+
+- No visitors means you work on distribution.
+- Visitors but no joins means you work on the page.
+- Enough joins means the idea is validated.
+
+Instagram gives me one link, in the bio. TikTok is better: people comment a word and get the link in a DM, so every post gets its own tracked link. That's enough to see which posts bring people who join.
+
+If nobody comes, I work on bringing people to the page.
+
+Experiments that improve conversion or retention need traffic. Before you have it, the product engineering work is choosing what the stage can actually test, measuring it from day one, and setting a target to judge it by. The traffic itself is a distribution problem.
+
+I document every experiment the same way, in one PostHog notebook: problem, hypothesis, metric and target, guardrail, how it's measured, dates, result, decision. Next time I can see what I believed and what actually happened.

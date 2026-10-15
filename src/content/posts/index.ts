@@ -15,4 +15,5 @@ export const POST_ENTRIES: PostEntry[] = [
   { slug: "my-moat", load: () => import("./my-moat.mdx") },
   { slug: "feature-flags", load: () => import("./feature-flags.mdx") },
   { slug: "no-traffic", load: () => import("./no-traffic.mdx") },
+  { slug: "experiment", load: () => import("./experiment.mdx") },
 ];

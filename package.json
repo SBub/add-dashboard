@@ -15,7 +15,8 @@
     "format:check": "prettier --check .",
     "knip": "knip",
     "test": "vitest run",
-    "check:og": "vitest run --config vitest.og.config.ts"
+    "check:og": "vitest run --config vitest.og.config.ts",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@mdx-js/loader": "3.1.1",
@@ -33,6 +34,7 @@
   "devDependencies": {
     "@mdx-js/rollup": "3.1.1",
     "@playwright/mcp": "0.0.81",
+    "@playwright/test": "1.64.0",
     "@tailwindcss/postcss": "^4",
     "@types/mdx": "2.0.14",
     "@types/node": "^24",

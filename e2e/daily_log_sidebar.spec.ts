@@ -5,6 +5,7 @@ import {
   expectNotFound,
   sidebarProjectLinks,
   test,
+  waitForWorkerState,
   workerWidget,
   type Locator,
   type Page,
@@ -43,7 +44,9 @@ test.describe("daily log sidebar", () => {
       await expect(link).toHaveAttribute("href", /^\/projects\/[^/]+\/[^/]+$/);
     }
     await expect(dailyLog(page)).toHaveAttribute("href", "/projects/log");
-    await expect(workerWidget(page)).toBeVisible();
+    // The widget swaps its element when it leaves `Checking status...`, which
+    // would detach a handle taken before; wait for the live state first.
+    await waitForWorkerState(page);
     await expectInDocumentOrder([links.last(), dailyLog(page), workerWidget(page)], {
       strictTop: true,
     });
@@ -97,6 +100,9 @@ test.describe("daily log sidebar", () => {
     await page.goto("/projects/log");
     const links = sidebarProjectLinks(page);
     await expect(links.first()).toBeVisible();
+    // The widget swaps its element when it leaves `Checking status...`, which
+    // would detach a handle taken before; wait for the live state first.
+    await waitForWorkerState(page);
     await expectInDocumentOrder([links.last(), dailyLog(page), workerWidget(page)], {
       strictTop: false,
     });

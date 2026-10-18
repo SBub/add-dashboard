@@ -4,6 +4,7 @@ import {
   expectNoHorizontalScroll,
   sidebarProjectLinks,
   test,
+  waitForWorkerState,
   workerWidget,
   type Locator,
   type Page,
@@ -58,7 +59,9 @@ test.describe("changelog", () => {
     const changelog = sidebarEntry(page, "Changelog");
     await expect(sidebarEntry(page, "Daily log")).toHaveAttribute("href", "/projects/log");
     await expect(changelog).toHaveAttribute("href", "/projects/changelog");
-    await expect(workerWidget(page)).toBeVisible();
+    // The widget swaps its element when it leaves `Checking status...`, which
+    // would detach a handle taken before; wait for the live state first.
+    await waitForWorkerState(page);
     await expectInDocumentOrder(
       [links.last(), sidebarEntry(page, "Daily log"), changelog, workerWidget(page)],
       { strictTop: true },

@@ -193,10 +193,13 @@ test.describe("hire page", () => {
 
     const placement = await hire.evaluate((el) => {
       const rect = el.getBoundingClientRect();
+      // clientWidth/clientHeight exclude the scrollbar, which Linux Chromium
+      // draws (15px) and macOS overlays, so the offsets match on both.
+      const root = document.documentElement;
       return {
         position: getComputedStyle(el).position,
-        right: window.innerWidth - rect.right,
-        bottom: window.innerHeight - rect.bottom,
+        right: root.clientWidth - rect.right,
+        bottom: root.clientHeight - rect.bottom,
       };
     });
     const radioHeight = await radio.evaluate((el) => el.getBoundingClientRect().height);

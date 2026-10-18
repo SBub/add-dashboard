@@ -35,3 +35,8 @@ next-env.d.ts
 .playwright-mcp/
 # browser_snapshot dumps saved to the repo root by a test or review journey (s9.yml, s18b.yml)
 /s[0-9]*.yml
+
+# @playwright/test output (yarn test:e2e); never commit it
+playwright-report/
+test-results/
+blob-report/

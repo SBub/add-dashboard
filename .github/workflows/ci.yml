@@ -36,5 +36,5 @@ jobs:
       - run: yarn test
       - run: yarn build
       - run: yarn check:og
-      - run: yarn playwright install --with-deps chromium
+      - run: yarn playwright install --with-deps chromium webkit
       - run: yarn test:e2e

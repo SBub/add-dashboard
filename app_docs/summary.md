@@ -199,7 +199,7 @@ open daily log updates through Refresh or the next visit.
 - The `h1` and the intro paragraph of `/projects/log` are static copy in the page body
   (the shell), and the title and description come from `metadata`; none of them reads the
   report.
-  `e2e/test_connection_indicator_scope.md` and `e2e/test_landing_no_filters.md`
+  `e2e/connection_indicator_scope.spec.ts` and `e2e/landing_no_filters.spec.ts`
   assert the `h1` text, so change them together.
 - `/projects/log` has no filters (issue #97): it always shows every public project over
   `SUMMARY_DEFAULT_DAYS` days and reads no search parameter.

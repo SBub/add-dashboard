@@ -70,6 +70,9 @@ test.describe("landing today refresh", () => {
         : null;
     const today = await todayDate(page);
     const appOrigin = new URL(page.url()).origin;
+    // Let the load's own reads (fonts, the first realtime catch-up) finish
+    // before recording, so the window holds what the click causes.
+    await page.waitForLoadState("networkidle");
 
     const recorded: Request[] = [];
     page.on("request", (request) => recorded.push(request));
@@ -83,12 +86,14 @@ test.describe("landing today refresh", () => {
 
     const urls = recorded.map((request) => ({
       method: request.method(),
+      type: request.resourceType(),
       url: new URL(request.url()),
     }));
     // No document, no _rsc request, no server action POST.
-    expect(urls.filter(({ url }) => url.origin === appOrigin).map(({ url }) => url.href)).toEqual(
-      [],
+    const appRequests = urls.filter(
+      ({ type, url }) => url.origin === appOrigin && ["document", "fetch", "xhr"].includes(type),
     );
+    expect(appRequests.map(({ url }) => url.href)).toEqual([]);
     const firstRest = urls.find(({ url }) => url.pathname.startsWith("/rest/v1/"));
     if (!firstRest) throw new Error("Refresh made no Supabase REST request");
     const supabase = urls.filter(({ url }) => url.origin === firstRest.url.origin);
@@ -104,12 +109,16 @@ test.describe("landing today refresh", () => {
     const projects = rest("projects");
     expect(projects.length).toBeLessThanOrEqual(1);
     for (const read of projects) expect(read.method).toBe("GET");
-    // The worker widget polls adw.workers every 30 s on its own, so a GET to
-    // workers may land in this window; it is not caused by the click.
+    // The worker widget polls adw.workers every 30 s on its own, and a
+    // realtime reconnect re-reads projects, runs and the queue in its catch-up, so
+    // those GETs may land in this window; none is caused by the click.
     const known = new Set([...TODAY_READS, "projects"].map((table) => `/rest/v1/${table}`));
+    const background = ["workers", "project_summaries", "runs", "queue_items"].map(
+      (table) => `GET /rest/v1/${table}`,
+    );
     const others = supabase.filter(({ url }) => !known.has(url.pathname));
     for (const other of others) {
-      expect(`${other.method} ${other.url.pathname}`).toBe("GET /rest/v1/workers");
+      expect(background).toContain(`${other.method} ${other.url.pathname}`);
     }
 
     const url = new URL(page.url());

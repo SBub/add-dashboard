@@ -1,4 +1,4 @@
-import { expect, openFirstProject, test, type Locator } from "./fixtures";
+import { expect, floatingHirePlacement, openFirstProject, test, type Locator } from "./fixtures";
 
 // The header's Work with me link, the /hire shell, its form, the shared accent,
 // browser-side validation and the states read from the URL. It never submits a
@@ -191,18 +191,7 @@ test.describe("hire page", () => {
     const radio = page.getByRole("region", { name: "NTS Slow Focus radio" });
     await expect(radio).toBeVisible();
 
-    const placement = await hire.evaluate((el) => {
-      const rect = el.getBoundingClientRect();
-      // Measured from the root box, not the window: `scrollbar-gutter: stable`
-      // keeps a 15px gutter on Linux Chromium (none on macOS), and the fixed
-      // link sits 16px inside it on both.
-      const root = document.documentElement.getBoundingClientRect();
-      return {
-        position: getComputedStyle(el).position,
-        right: root.width - rect.right,
-        bottom: document.documentElement.clientHeight - rect.bottom,
-      };
-    });
+    const placement = await floatingHirePlacement(hire);
     const radioHeight = await radio.evaluate((el) => el.getBoundingClientRect().height);
     expect(placement.position).toBe("fixed");
     expect(Math.abs(placement.right - 16), JSON.stringify(placement)).toBeLessThanOrEqual(2);

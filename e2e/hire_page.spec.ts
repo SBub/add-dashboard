@@ -193,17 +193,14 @@ test.describe("hire page", () => {
 
     const placement = await hire.evaluate((el) => {
       const rect = el.getBoundingClientRect();
-      // clientWidth/clientHeight exclude the scrollbar, which Linux Chromium
-      // draws (15px) and macOS overlays, so the offsets match on both.
-      const root = document.documentElement;
+      // Measured from the root box, not the window: `scrollbar-gutter: stable`
+      // keeps a 15px gutter on Linux Chromium (none on macOS), and the fixed
+      // link sits 16px inside it on both.
+      const root = document.documentElement.getBoundingClientRect();
       return {
         position: getComputedStyle(el).position,
-        right: root.clientWidth - rect.right,
-        bottom: root.clientHeight - rect.bottom,
-        rectRight: rect.right,
-        clientWidth: root.clientWidth,
-        innerWidth: window.innerWidth,
-        scrollWidth: root.scrollWidth,
+        right: root.width - rect.right,
+        bottom: document.documentElement.clientHeight - rect.bottom,
       };
     });
     const radioHeight = await radio.evaluate((el) => el.getBoundingClientRect().height);

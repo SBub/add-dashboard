@@ -55,12 +55,15 @@ const SECTION_TITLES: SectionTitle[] = ["Building now", "Up next", "Shipped"];
 // A section has no accessible name, so its level-2 heading is the handle. The
 // heading is a role locator, which skips hidden subtrees: after a client
 // navigation the previous route stays in the DOM inside a hidden Activity
-// (cacheComponents), and its sections never match.
+// (cacheComponents), and its sections never match. The (dashboard) layout
+// wraps every page in a `section` of its own, which holds every heading, so
+// only the innermost match (last in document order) is the section itself.
 export function section(page: Page, title: SectionTitle): Locator {
   return page
     .getByRole("main")
     .locator("section")
-    .filter({ has: page.getByRole("heading", { level: 2, name: title, exact: true }) });
+    .filter({ has: page.getByRole("heading", { level: 2, name: title, exact: true }) })
+    .last();
 }
 
 // The visible rows of a section's list: run rows (Active, History) in a `ul`,

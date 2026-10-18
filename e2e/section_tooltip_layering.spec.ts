@@ -92,7 +92,9 @@ test.describe("section tooltip layering", () => {
   });
 
   test("tooltips open on hover and focus", async ({ page }) => {
-    await openFirstProject(page);
+    // A full load: after the client navigation /projects stays in a hidden
+    // Activity whose Building now tooltip carries the same id.
+    await page.goto(await openFirstProject(page));
     for (const { title } of TOOLTIPS) {
       await expect(
         page.getByRole("main").getByRole("heading", { level: 2, name: title, exact: true }),

@@ -1,4 +1,4 @@
-import { test as base, expect, type Page } from "@playwright/test";
+import { test as base, expect, type Locator, type Page } from "@playwright/test";
 
 // The suite's shared `test` and helpers. Every spec imports from here, never
 // from @playwright/test directly, so the /hire guard below is always on.
@@ -45,4 +45,48 @@ export async function openFirstProject(page: Page): Promise<string> {
   await link.click();
   await expect(page).toHaveURL(href);
   return href;
+}
+
+// The two colour schemes the chrome specs emulate.
+export const SCHEMES = ["light", "dark"] as const;
+
+// Scrolls the window to the end of the page and lets one frame paint.
+export async function scrollToBottom(page: Page): Promise<void> {
+  await page.evaluate(async () => {
+    window.scrollTo(0, document.documentElement.scrollHeight);
+    await new Promise((resolve) => requestAnimationFrame(resolve));
+  });
+}
+
+// Nothing scrolls sideways. Measured against the root's client width, not
+// innerWidth, so the Linux scrollbar gutter cannot make it flaky.
+export async function expectNoHorizontalOverflow(page: Page): Promise<void> {
+  const { scrollWidth, clientWidth } = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    clientWidth: document.documentElement.clientWidth,
+  }));
+  expect(scrollWidth, "the page scrolls horizontally").toBeLessThanOrEqual(clientWidth);
+}
+
+// Where the Work with me link sits. Measured from the root box, not the window:
+// `scrollbar-gutter: stable` keeps a 15px gutter on Linux Chromium (none on
+// macOS), and the fixed link sits 16px inside it on both.
+export function floatingHirePlacement(link: Locator): Promise<{
+  position: string;
+  right: number;
+  bottom: number;
+  top: number;
+  height: number;
+}> {
+  return link.evaluate((el) => {
+    const rect = el.getBoundingClientRect();
+    const root = document.documentElement.getBoundingClientRect();
+    return {
+      position: getComputedStyle(el).position,
+      right: root.width - rect.right,
+      bottom: document.documentElement.clientHeight - rect.bottom,
+      top: rect.top,
+      height: rect.height,
+    };
+  });
 }

@@ -36,7 +36,7 @@ npm or npx.
 yarn install   # also installs the git hooks (lefthook) through postinstall
 cp .env.example .env.development && cp .env.example .env.local   # then fill in the real values
 yarn dev       # http://localhost:3000, or PORT=3101 yarn dev
-yarn playwright install chromium   # once per machine, the browser the E2E suite uses
+yarn playwright install chromium webkit   # once per machine, the browsers the E2E suite uses (WebKit only for the minimap spec)
 yarn test:e2e   # Playwright specs in e2e/, against the dev server on PORT (or one it starts)
 ```
 

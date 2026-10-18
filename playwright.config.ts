@@ -22,9 +22,17 @@ export default defineConfig({
     baseURL: BASE_URL,
     viewport: VIEWPORT,
   },
-  // Chromium only; Firefox and WebKit are out of scope. The device preset
-  // brings its own 1280x720 viewport, so the review one is repeated after it.
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"], viewport: VIEWPORT } }],
+  // The suite is Chromium. WebKit runs only the minimap spec, which once broke
+  // only in Safari's engine; Firefox is out of scope. The device presets bring
+  // their own 1280x720 viewport, so the review one is repeated after them.
+  projects: [
+    { name: "chromium", use: { ...devices["Desktop Chrome"], viewport: VIEWPORT } },
+    {
+      name: "webkit",
+      testMatch: /post_minimap\.spec\.ts$/,
+      use: { ...devices["Desktop Safari"], viewport: VIEWPORT },
+    },
+  ],
   webServer: {
     // CI has just run `yarn build`; locally the ADW run's server is usually
     // already up and adopted.

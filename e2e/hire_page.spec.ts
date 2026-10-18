@@ -200,11 +200,15 @@ test.describe("hire page", () => {
         position: getComputedStyle(el).position,
         right: root.clientWidth - rect.right,
         bottom: root.clientHeight - rect.bottom,
+        rectRight: rect.right,
+        clientWidth: root.clientWidth,
+        innerWidth: window.innerWidth,
+        scrollWidth: root.scrollWidth,
       };
     });
     const radioHeight = await radio.evaluate((el) => el.getBoundingClientRect().height);
     expect(placement.position).toBe("fixed");
-    expect(Math.abs(placement.right - 16)).toBeLessThanOrEqual(2);
+    expect(Math.abs(placement.right - 16), JSON.stringify(placement)).toBeLessThanOrEqual(2);
     expect(Math.abs(placement.bottom - (radioHeight + 16))).toBeLessThanOrEqual(2);
   });
 });

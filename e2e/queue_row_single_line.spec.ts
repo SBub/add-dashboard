@@ -41,11 +41,19 @@ test.describe("queue row single line", () => {
       const row = rows.nth(i);
       await expect(row).toContainText(/#\d+/);
       await expect(row.getByText("queued", { exact: true })).toBeVisible();
+      // The forbidden words are row chrome, so the issue title is left out: a
+      // live title can hold them ("awaiting" contains "waiting").
+      const chrome = await row.evaluate((li) => {
+        const clone = li.cloneNode(true) as HTMLElement;
+        const title = clone.querySelector(":scope > div:last-of-type a")?.nextElementSibling;
+        if (title?.tagName === "SPAN" && title.children.length === 0) title.remove();
+        return clone.textContent ?? "";
+      });
       for (const text of ["label:", "waiting", "starts ", "manual", "Removing the label"]) {
-        await expect(row).not.toContainText(text);
+        expect(chrome, chrome).not.toContain(text);
       }
       // The lower-case pill is expected; a capitalised `Queued` is not.
-      await expect(row).not.toContainText(/Queued/);
+      expect(chrome, chrome).not.toMatch(/Queued/);
     }
 
     const g = await rows.first().evaluate((li) => {

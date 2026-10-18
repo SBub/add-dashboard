@@ -50,11 +50,23 @@ export async function openFirstProject(page: Page): Promise<string> {
 // The two colour schemes the chrome specs emulate.
 export const SCHEMES = ["light", "dark"] as const;
 
-// Scrolls the window to the end of the page and lets one frame paint.
+// Scrolls the window to the end of the page once its height has settled.
 export async function scrollToBottom(page: Page): Promise<void> {
+  // Content that loads after the first scroll (the /projects/log feed) grows
+  // the page, so scroll again until the height holds for 20 frames (~300ms),
+  // giving up after 5s so a page that never settles fails on its assertion.
   await page.evaluate(async () => {
-    window.scrollTo(0, document.documentElement.scrollHeight);
-    await new Promise((resolve) => requestAnimationFrame(resolve));
+    const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+    const deadline = performance.now() + 5000;
+    let height = -1;
+    let steady = 0;
+    while (steady < 20 && performance.now() < deadline) {
+      const next = document.documentElement.scrollHeight;
+      window.scrollTo(0, next);
+      await frame();
+      steady = next === height ? steady + 1 : 0;
+      height = next;
+    }
   });
 }
 

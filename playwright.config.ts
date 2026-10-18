@@ -1,3 +1,4 @@
+import { release } from "node:os";
 import { defineConfig, devices } from "@playwright/test";
 
 // The ADW test phase runs the suite as `PORT=<run port> yarn test:e2e` against
@@ -10,6 +11,11 @@ const BASE_URL = `http://localhost:${PORT}`;
 // 375 or 390 call page.setViewportSize themselves.
 const VIEWPORT = { width: 1920, height: 1080 };
 
+// macOS 14 (Darwin 23) only gets a frozen WebKit build that rejects settings
+// current Playwright sends (`Unknown setting: PushAPIEnabled`), so no page
+// opens. The WebKit project is left out there; CI and newer macOS run it.
+const WEBKIT_BROKEN = process.platform === "darwin" && Number(release().split(".")[0]) < 24;
+
 export default defineConfig({
   testDir: "./e2e",
   // e2e/*.md are agent-driven journeys the test phase runs through the MCP;
@@ -18,6 +24,10 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   // A flaky spec should fail, not be retried into green, locally and in CI.
   retries: 0,
+  // Locally the suite runs against `next dev`, which renders on one thread:
+  // the default worker count queues page loads past the 30s test timeout.
+  // Two workers finish faster than four there; CI's `next start` keeps the default.
+  workers: process.env.CI ? undefined : 2,
   use: {
     baseURL: BASE_URL,
     viewport: VIEWPORT,
@@ -27,11 +37,15 @@ export default defineConfig({
   // their own 1280x720 viewport, so the review one is repeated after them.
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"], viewport: VIEWPORT } },
-    {
-      name: "webkit",
-      testMatch: /post_minimap\.spec\.ts$/,
-      use: { ...devices["Desktop Safari"], viewport: VIEWPORT },
-    },
+    ...(WEBKIT_BROKEN
+      ? []
+      : [
+          {
+            name: "webkit",
+            testMatch: /post_minimap\.spec\.ts$/,
+            use: { ...devices["Desktop Safari"], viewport: VIEWPORT },
+          },
+        ]),
   ],
   webServer: {
     // CI has just run `yarn build`; locally the ADW run's server is usually

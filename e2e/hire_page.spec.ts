@@ -121,7 +121,8 @@ test.describe("hire page", () => {
   test("an unknown ?error= shows the plain form without echoing it", async ({ page }) => {
     await page.goto("/hire?error=<script>");
     await expect(page.getByLabel("What brings you here?")).toBeVisible();
-    await expect(page.getByRole("alert")).toHaveCount(0);
+    // Next's route announcer is a role=alert outside main, so scope to main.
+    await expect(page.getByRole("main").getByRole("alert")).toHaveCount(0);
     await expect(page.getByText("We could not verify you are human.")).toHaveCount(0);
     await expect(page.locator("body")).not.toContainText("<script>");
   });

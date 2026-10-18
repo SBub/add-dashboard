@@ -130,3 +130,59 @@ export async function servedHtml(request: APIRequestContext, path: string): Prom
   expect(response.ok()).toBe(true);
   return response.text();
 }
+
+// The two colour schemes the chrome specs emulate.
+export const SCHEMES = ["light", "dark"] as const;
+
+// Scrolls the window to the end of the page once its height has settled.
+export async function scrollToBottom(page: Page): Promise<void> {
+  // Content that loads after the first scroll (the /projects/log feed) grows
+  // the page, so scroll again until the height holds for 20 frames (~300ms),
+  // giving up after 5s so a page that never settles fails on its assertion.
+  await page.evaluate(async () => {
+    const frame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+    const deadline = performance.now() + 5000;
+    let height = -1;
+    let steady = 0;
+    while (steady < 20 && performance.now() < deadline) {
+      const next = document.documentElement.scrollHeight;
+      window.scrollTo(0, next);
+      await frame();
+      steady = next === height ? steady + 1 : 0;
+      height = next;
+    }
+  });
+}
+
+// Nothing scrolls sideways. Measured against the root's client width, not
+// innerWidth, so the Linux scrollbar gutter cannot make it flaky.
+export async function expectNoHorizontalOverflow(page: Page): Promise<void> {
+  const { scrollWidth, clientWidth } = await page.evaluate(() => ({
+    scrollWidth: document.documentElement.scrollWidth,
+    clientWidth: document.documentElement.clientWidth,
+  }));
+  expect(scrollWidth, "the page scrolls horizontally").toBeLessThanOrEqual(clientWidth);
+}
+
+// Where the Work with me link sits. Measured from the root box, not the window:
+// `scrollbar-gutter: stable` keeps a 15px gutter on Linux Chromium (none on
+// macOS), and the fixed link sits 16px inside it on both.
+export function floatingHirePlacement(link: Locator): Promise<{
+  position: string;
+  right: number;
+  bottom: number;
+  top: number;
+  height: number;
+}> {
+  return link.evaluate((el) => {
+    const rect = el.getBoundingClientRect();
+    const root = document.documentElement.getBoundingClientRect();
+    return {
+      position: getComputedStyle(el).position,
+      right: root.width - rect.right,
+      bottom: document.documentElement.clientHeight - rect.bottom,
+      top: rect.top,
+      height: rect.height,
+    };
+  });
+}

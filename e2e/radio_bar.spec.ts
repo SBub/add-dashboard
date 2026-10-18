@@ -61,6 +61,9 @@ function paused(page: Page): Promise<boolean | undefined> {
 }
 
 // The bar is pinned: fixed, flush with the bottom of the root box, full width.
+// Width is measured against the root box, not clientWidth: `scrollbar-gutter:
+// stable` keeps a 15px gutter on Linux Chromium (none on macOS) that the bar
+// does not cover, while clientWidth still reports the whole window.
 async function expectPinned(bar: Locator): Promise<void> {
   const pin = await bar.evaluate((el) => {
     const rect = el.getBoundingClientRect();
@@ -71,14 +74,14 @@ async function expectPinned(bar: Locator): Promise<void> {
       left: rect.left,
       width: rect.width,
       clientHeight: root.clientHeight,
-      clientWidth: root.clientWidth,
+      rootWidth: root.getBoundingClientRect().width,
     };
   });
   const detail = JSON.stringify(pin);
   expect(pin.position, detail).toBe("fixed");
   expect(Math.abs(pin.bottom - pin.clientHeight), detail).toBeLessThanOrEqual(1);
   expect(pin.left, detail).toBe(0);
-  expect(Math.abs(pin.width - pin.clientWidth), detail).toBeLessThanOrEqual(1);
+  expect(Math.abs(pin.width - pin.rootWidth), detail).toBeLessThanOrEqual(1);
 }
 
 test.describe("radio bar", () => {

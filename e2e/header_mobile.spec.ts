@@ -45,6 +45,20 @@ async function expectInside(inner: Locator, outer: Locator): Promise<void> {
   expect(innerBox.y + innerBox.height).toBeLessThanOrEqual(outerBox.y + outerBox.height);
 }
 
+// Linux Chromium keeps a 15px `scrollbar-gutter: stable` gutter (macOS and
+// phones overlay the scrollbar), so a 320px window lays the page out in 305px.
+// Below 640 widen the window by the gutter so the page gets the phone's width,
+// as it does on a phone. Media queries still see a width below 640.
+async function fitPhoneWidth(page: Page, viewport: { width: number; height: number }) {
+  if (viewport.width >= 640) return;
+  const gutter = await page.evaluate(
+    () => window.innerWidth - document.documentElement.getBoundingClientRect().width,
+  );
+  if (gutter > 0) {
+    await page.setViewportSize({ width: viewport.width + gutter, height: viewport.height });
+  }
+}
+
 // Checks every page shares, /hire included.
 async function expectHeaderRow(page: Page, width: number): Promise<void> {
   const height = await header(page).evaluate((el) => el.getBoundingClientRect().height);
@@ -70,6 +84,7 @@ test.describe("header at every width", () => {
         for (const path of PAGES) {
           await test.step(path, async () => {
             await page.goto(path);
+            await fitPhoneWidth(page, viewport);
             const link = hireLink(page);
             await expect(page.locator('a[href="/hire"]')).toHaveCount(1);
             await expect(link).toHaveCount(1);
@@ -125,6 +140,7 @@ test.describe("header at every width", () => {
 
         await test.step("/hire", async () => {
           await page.goto("/hire");
+          await fitPhoneWidth(page, viewport);
           await expectHeaderRow(page, viewport.width);
         });
       });

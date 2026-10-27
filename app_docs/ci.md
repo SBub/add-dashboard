@@ -79,7 +79,7 @@ once.
 
 ### What a hit looks like
 
-The log of `Install Playwright system packages from cache` and of the browser install shows no
+The log of `Install Playwright system packages from cache` and of the browser install has no
 `Fetched ... MB` line from the Ubuntu mirrors and no `Downloading Chrome` or `Downloading WebKit`.
 
 ## Rules

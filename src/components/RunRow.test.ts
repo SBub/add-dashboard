@@ -17,7 +17,6 @@ const completed: Run = {
   pr_number: 143,
   phase: "adw_document_iso",
   status: "completed",
-  state: {},
   toolkit_version: null,
   started_at: "2026-10-01T14:02:11Z",
   updated_at: "2026-10-01T14:49:37Z",

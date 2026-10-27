@@ -107,16 +107,19 @@ client is built once per server instance with `flushAt: 1` and
 
 ### Release markers
 
-`.github/workflows/release-annotation.yml` runs on every push to `master`
-(production) and creates a PostHog annotation in project 302689,
-`adw-dashboard release <short sha>: <commit title>` (the first line of the
-pushed head commit, the merge commit's title), through
+The `Create PostHog annotation` step of `.github/workflows/release.yml` creates a
+PostHog annotation in project 302689 only when that run created the release
+tag (`tag_created`), so once per release. Its text is
+`adw-dashboard release-<YYYY-MM-DD>-pr<N>` and its `date_marker` is the
+production pull request's merge time (`merged_at`), sent through
 `POST https://eu.posthog.com/api/projects/302689/annotations/`. It
 authenticates with a personal API key from the repository secret
 `POSTHOG_PERSONAL_API_KEY` (scope: annotation write). When the secret is not
 set, the step prints a notice and skips; a failed request is a warning. The
-step is `continue-on-error`, so a marker never fails the push, and the key is
-only ever sent as a header, never printed. It uses no third-party action.
+step is `continue-on-error`, so a marker never fails the release, and the key
+is only ever sent as a header, never printed. It uses no third-party action.
+It replaces the earlier workflow that annotated every push to `master`; see
+`app_docs/changelog.md`, Release workflow.
 
 ### Feature flags
 

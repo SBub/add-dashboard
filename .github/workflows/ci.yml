@@ -55,7 +55,9 @@ jobs:
           key: playwright-apt-v1-${{ steps.playwright.outputs.image }}-${{ steps.playwright.outputs.version }}
       - name: Install Playwright system packages from cache
         if: steps.playwright-apt.outputs.cache-hit == 'true'
-        run: sudo apt-get install -y --no-install-recommends --no-download "$HOME"/.cache/playwright-apt/*.deb
+        run: |
+          sudo apt-get install --print-uris -y --no-install-recommends "$HOME"/.cache/playwright-apt/*.deb | grep "^'" || true
+          sudo dpkg -i "$HOME"/.cache/playwright-apt/*.deb
       - name: Download Playwright system packages
         if: steps.playwright-apt.outputs.cache-hit != 'true'
         # apt-get clean first, so the copied set is exactly what install-deps pulled in.

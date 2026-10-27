@@ -11,7 +11,8 @@
 `yarn lint`, `yarn typecheck`, `yarn knip`, `yarn test`, `yarn build`, `yarn check:og`, then the
 Playwright suite `yarn test:e2e` with `CI` set (so the web server is `yarn start`, see
 `playwright.config.ts`). Yarn's package cache is restored by `actions/cache@v4`, keyed on
-`yarn.lock`.
+`yarn.lock`. `.github/workflows/release.yml` runs after a successful `check` on a push to
+`master` and is documented in `app_docs/changelog.md`, Release workflow.
 
 ## How it works
 

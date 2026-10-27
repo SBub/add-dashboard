@@ -22,8 +22,8 @@ miss, saves it right away with `actions/cache/save@v4`, so a later failing step 
 
 | cache          | key                                                               | path                      |
 | -------------- | ----------------------------------------------------------------- | ------------------------- |
-| system library | `playwright-apt-v1-<ImageOS>-<ImageVersion>-<playwright version>` | `~/.cache/playwright-apt` |
-| browsers       | `playwright-browsers-v1-<arch>-<ImageOS>-<playwright version>`    | `~/.cache/ms-playwright`  |
+| system library | `playwright-apt-v2-<ImageOS>-<ImageVersion>-<playwright version>` | `~/.cache/playwright-apt` |
+| browsers       | `playwright-browsers-v2-<arch>-<ImageOS>-<playwright version>`    | `~/.cache/ms-playwright`  |
 
 The apt cache holds the `.deb` files of Chromium's and WebKit's system libraries. The browser cache
 holds both browser builds.
@@ -38,14 +38,17 @@ Where each segment comes from:
   context (`${{ env.ImageOS }}` is empty), so the `Playwright cache keys` step reads them in a
   shell and passes them on as step outputs. It fails the job if any segment is empty.
 - `<arch>`: `runner.arch`.
-- `v1`: the manual bust.
+- `v2`: the manual bust.
 
 On a miss, `Download Playwright system packages` empties `/var/cache/apt/archives`, tells apt to
 keep downloaded packages, runs `yarn playwright install-deps chromium webkit` and copies the
 downloaded `.deb` files into the cache path. If nothing was downloaded the `cp` glob fails, so an
 empty cache is never saved. On a hit, `Install Playwright system packages from cache` runs
-`apt-get install --no-download` on the local files: no `apt-get update`, no mirror, and a loud
-failure instead of a quiet fallback to the network.
+`sudo dpkg -i` on the cached files in one call. dpkg reads only those files and orders them itself:
+no `apt-get update`, no mirror, no package lists, and a missing dependency is a loud failure instead
+of a quiet fallback to the network. It is not `apt-get install --no-download`: apt resolves against
+the fresh runner's own package lists, which differ from the lists the miss run fetched, and asked
+for archives that were not in the cache.
 
 `yarn playwright install chromium webkit` (without `--with-deps`) then runs in both cases; on a
 browser cache hit it finds both browsers already present and downloads nothing.
@@ -55,7 +58,7 @@ browser cache hit it finds both browsers already present and downloads nothing.
 - A Playwright upgrade (`@playwright/test` in `package.json` and `yarn.lock`): both miss.
 - A new runner image (GitHub refreshes `ubuntu-latest` roughly weekly): only the apt cache misses,
   since only it depends on `ImageVersion`. A new Ubuntu release changes `ImageOS` and misses both.
-- A bumped `v1`.
+- A bumped `v2`.
 
 A miss downloads once and saves right away.
 
@@ -69,10 +72,10 @@ unused for 7 days and caps a repository at 10 GB; the two Playwright caches are 
 
 ### How to bust
 
-Bump `v1` to `v2` in both keys in `ci.yml`, or delete the entries with `gh cache list` and
-`gh cache delete <key>`. If a runner image ever refuses to install the cached `.deb` files (for
-example a held package), the hit step fails; the fix is the same bump, which refills from the
-mirror once.
+Bump `v2` to `v3` in both keys in `ci.yml`, or delete the entries with `gh cache list` and
+`gh cache delete <key>`. If a runner image ever refuses the cached `.deb` files (for example a held
+package), the hit step's `dpkg -i` fails; the fix is the same bump, which refills from the mirror
+once.
 
 ### What a hit looks like
 

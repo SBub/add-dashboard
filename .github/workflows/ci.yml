@@ -46,18 +46,16 @@ jobs:
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "os=$ImageOS" >> "$GITHUB_OUTPUT"
           echo "image=$ImageOS-$ImageVersion" >> "$GITHUB_OUTPUT"
-      # No restore-keys: only an exact key hit is a hit. Bump v1 to bust.
+      # No restore-keys: only an exact key hit is a hit. Bump v2 to bust.
       - id: playwright-apt
         name: Restore Playwright system packages
         uses: actions/cache/restore@v4
         with:
           path: ~/.cache/playwright-apt
-          key: playwright-apt-v1-${{ steps.playwright.outputs.image }}-${{ steps.playwright.outputs.version }}
+          key: playwright-apt-v2-${{ steps.playwright.outputs.image }}-${{ steps.playwright.outputs.version }}
       - name: Install Playwright system packages from cache
         if: steps.playwright-apt.outputs.cache-hit == 'true'
-        run: |
-          sudo apt-get install --print-uris -y --no-install-recommends "$HOME"/.cache/playwright-apt/*.deb | grep "^'" || true
-          sudo dpkg -i "$HOME"/.cache/playwright-apt/*.deb
+        run: sudo dpkg -i "$HOME"/.cache/playwright-apt/*.deb
       - name: Download Playwright system packages
         if: steps.playwright-apt.outputs.cache-hit != 'true'
         # apt-get clean first, so the copied set is exactly what install-deps pulled in.
@@ -79,7 +77,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-browsers-v1-${{ runner.arch }}-${{ steps.playwright.outputs.os }}-${{ steps.playwright.outputs.version }}
+          key: playwright-browsers-v2-${{ runner.arch }}-${{ steps.playwright.outputs.os }}-${{ steps.playwright.outputs.version }}
       - run: yarn playwright install chromium webkit
       - name: Save Playwright browsers
         if: steps.playwright-browsers.outputs.cache-hit != 'true'

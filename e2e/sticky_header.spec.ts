@@ -1,9 +1,11 @@
 import {
   expect,
   openFirstProject,
+  scrollToBottom,
   sidebarProjectLinks,
   test,
   waitForLive,
+  waitForSkeletonsGone,
   workerWidget,
   type Locator,
   type Page,
@@ -50,11 +52,6 @@ async function measure(
     });
     return { header: { top, right, bottom, left, height }, scrollY: window.scrollY, hits };
   }, handles);
-}
-
-async function scrollToBottom(page: Page): Promise<void> {
-  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
-  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
 }
 
 // The header pinned at top 0 with every link hit-tested visible.
@@ -129,6 +126,10 @@ test.describe("sticky header", () => {
     if (href === null) throw new Error("the first project link has no href");
     await first.click();
     await expect(page).toHaveURL(href);
+    // The shell's skeleton holds its own copy of the Building now heading
+    // until the Active island streams in and replaces it; hovering that copy
+    // loses the tooltip mid-test ("element has no box").
+    await waitForSkeletonsGone(page);
 
     // Role locators skip the previous route's hidden Activity subtree, so this
     // is the project page's button, not the overview's.
@@ -171,6 +172,13 @@ test.describe("sticky header", () => {
         return hit !== null && el.contains(hit);
       }, point),
     ).toBe(true);
+
+    // Leave the tooltip before scrolling: with the pointer still on it, a
+    // short scroll keeps its bridge under the pointer, so it stays open and,
+    // being the top layer, covers the header links the next check hit-tests.
+    // (0, 0) is the header's empty left padding at 1280px.
+    await page.mouse.move(0, 0);
+    await expect.poll(async () => (await boxOf(tooltip)).w).toBeLessThanOrEqual(1);
 
     await scrollToBottom(page);
     const pinned = await expectPinned(page, desktopLinks);

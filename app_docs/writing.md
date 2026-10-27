@@ -10,13 +10,16 @@
 ## Overview
 
 `/writing` (`src/app/writing/page.tsx`) lists the visible posts newest first: each with its title
-linking to the post, its `DD.MM.YYYY` date, its audience tag and its description.
+linking to the post, its `DD.MM.YYYY` date, its audience tag, its kind badge when it has one, and its description.
 `/writing/[slug]` (`src/app/writing/[slug]/page.tsx`) renders one post: title, date, tag and the MDX
 body, which ends with the post's own last line (no call to action is added after it). Above the title the post page renders a breadcrumb
 (`src/components/Breadcrumb.tsx`, server only): `Writing`, linking to `/writing`, then the post
-title as the current page, truncated to one line on narrow screens. `/writing` has no breadcrumb. From the `xl` breakpoint the post page also shows a minimap in the right gutter, outside the article: a narrow strip mapping the whole post's shape (headings, lines of text, images) with a frame around the part in the viewport (`src/components/PostMinimap.tsx`, see Minimap below). Both sit outside `(dashboard)`: no sidebar, no `Providers`, no
+title as the current page, truncated to one line on narrow screens. `/writing` has no breadcrumb. From the `xl` breakpoint the post page also has a right gutter, outside the article, holding one sticky row: a table of contents linking to the post's sections and sub-sections (`src/components/PostToc.tsx`, see Table of contents below) and, to its right, a minimap: a narrow strip mapping the whole post's shape (headings, lines of text, images) with a frame around the part in the viewport (`src/components/PostMinimap.tsx`, see Minimap below). Both sit outside `(dashboard)`: no sidebar, no `Providers`, no
 Realtime, no pill. Posts are MDX modules under `src/content/posts/`, compiled by `@next/mdx`
 (`createMDX()` in `next.config.ts`) and styled by `src/mdx-components.tsx` (server only).
+`createMDX` runs two plugins, named by string because Turbopack cannot take plugin functions:
+`remark-gfm` (GitHub Flavored Markdown, so tables render) and `rehype-slug` (an `id` on every
+heading, from its text, for the table of contents).
 
 ## How it works
 
@@ -31,9 +34,10 @@ directory's `.mdx` files and the list disagree.
 ### The meta export
 
 A post exports
-`meta = { title, description, date: "YYYY-MM-DD", audience: "product-engineer" | "small-business" | "both", draft: boolean }`.
+`meta = { title, description, date: "YYYY-MM-DD", audience: "product-engineer" | "small-business" | "both", kind?: "use-case", draft: boolean }`.
 `parsePostMeta` (`src/lib/posts.ts`) checks it field by field and throws an error naming the post
-and the field, so a bad post fails `yarn build`. `date` must be a real calendar date: it has to
+and the field, so a bad post fails `yarn build`. `kind` is optional: absent is fine and leaves it
+out of the parsed meta, any value not in `POST_KINDS` (for now only `"use-case"`) is an error. `date` must be a real calendar date: it has to
 round-trip through `Date.parse`, which reads the string, not the clock (`2026-02-30` is rejected).
 
 It is named `meta`, not `metadata`, because `metadata` is the Next.js page export name and a post
@@ -60,8 +64,37 @@ A post's images live under `public/writing/<slug>/` and are written as
 width with a border and generous space above and below, and shows the markdown title as a visible
 caption under it. It uses spans, not `figure`/`figcaption`, because MDX wraps a lone image in a
 `<p>` and a figure inside a paragraph is invalid HTML. The alt says what the image shows; the
-caption names its source (for example "PostHog: ..."). The post column is `max-w-[62ch]` and
+caption names its source (for example "PostHog: ..."). A table renders inside a
+`overflow-x-auto` wrapper (like a code block), so a wide one scrolls inside itself and never the
+page at 375px; cells are `text-sm` with a rule under each row. `h2` and `h3` carry `scroll-mt` of
+the header height plus 1.5rem, so a heading reached through an anchor sits clear of the sticky
+header. The post column is `max-w-[62ch]` and
 paragraphs use `leading-8` with `mt-6`, for long-form reading.
+
+### Table of contents
+
+From `xl` up, the right gutter is one sticky row (`top-[calc(var(--header-height)+1.5rem)]`,
+`flex items-start gap-6`, in `src/app/writing/[slug]/page.tsx`): "On this page" first, the
+minimap to its right, their tops aligned. The table of contents is a `nav` labelled "On this
+page", `w-[232px]`, with one link per `h2` and `h3` of the article, in document order, each
+`href="#<id>"` (the id `rehype-slug` sets). An `h3` entry is indented one step under the `h2`
+before it (`pl-6` against `pl-3`) and set smaller and lighter (`text-xs`, a lighter grey than
+the `h2` entries). `PostToc` is a client leaf: after hydration it reads the article's `h2[id]`
+and `h3[id]` elements and renders the list, so the post's text ships once and the server markup
+and first client render are both empty. A post with fewer than two entries shows no table of
+contents. On scroll and resize (at most once per animation frame) it marks the heading being
+read, the last `h2` or `h3` whose top is at or above 96px from the viewport's top (or the last heading once the page is scrolled to its end), with
+`aria-current="location"` and a darker left rule.
+
+A long list scrolls inside itself: the `nav` is at most the viewport between the sticky top and
+the fixed radio bar less a 1.5rem gap
+(`max-h-[calc(100vh-var(--header-height)-var(--radio-bar-height)-3rem)]`, the bar's height from
+`--radio-bar-height` in `src/app/globals.css`), so its last entry scrolls fully into view above
+the bar, `overflow-y-auto` and
+`overscroll-contain`, so reaching its end does not scroll the page. When the marked entry
+changes, the `nav`'s own `scrollTop` moves just enough to keep that entry in view with 48px of
+room above and below; the page itself is never scrolled (no `scrollIntoView`). The links are
+plain anchors: no scroll script, so they work without JavaScript and keep the browser's history.
 
 ### Minimap
 
@@ -70,20 +103,22 @@ beside the post column; below `xl` (375x667 included) there is none. It sits out
 `article`, as its sibling in `src/app/writing/[slug]/page.tsx`.
 
 The minimap is a map of the post's shape, not a copy of its text: the post's content ships once.
-`PostMinimap` (a server component) renders only the strip's wrapper: `w-[120px]`, sticky below
-the header (`top-[calc(var(--header-height)+1.5rem)]`), `aria-hidden="true"`, `inert`,
+`PostMinimap` (a server component) renders only the strip's wrapper: `w-[120px]`, to the right
+of the table of contents in the gutter's sticky row, `aria-hidden="true"`, `inert`,
 `pointer-events-none`, `select-none`. Inside it, `PostMinimapViewport`
 (`src/components/PostMinimapViewport.tsx`), the one client leaf, measures the real article: each
 top-level block from the `h1` on (the breadcrumb is not the post), relative to the `h1`'s top and
 the column's left edge. Headings and text blocks (paragraphs, lists, the meta line) give one rect
 per rendered line, from their text nodes' client rects; a block holding an image gives one rect per
-image with its caption (the span the MDX `img` renders); `pre`, `blockquote`, `table` and `hr` are
+image with its caption (the span the MDX `img` renders); `pre`, `blockquote`, `table` (or the scrolling wrapper around one) and `hr` are
 drawn whole.
 
 The pure functions in `src/lib/minimap.ts` (unit-tested in `src/lib/minimap.test.ts`) turn those
 measurements into the strip: `groupLineRects` merges a line's fragments, `minimapScale` is the
-available height (`MINIMAP_MAX_VIEWPORT_SHARE`, 70% of the viewport, less the strip's border and
-padding) over the article's height, capped at `MINIMAP_MAX_SCALE` (0.25) so a short post stays
+available height (`MINIMAP_MAX_VIEWPORT_SHARE`, 70% of the viewport, or the viewport height
+left between the sticky row's top and the fixed radio bar (`--radio-bar-height`, resolved to px by
+`PostMinimapViewport`) less a 24px gap, whichever is smaller, less the strip's border
+and padding) over the article's height, capped at `MINIMAP_MAX_SCALE` (0.25) so a short post stays
 small and the strip shrinks to it, and `minimapLayout` maps every rect: y times that scale, the
 column's width onto the strip's width. The whole article always fits, title to last block; nothing
 slides. Headings draw as darker bars, text as thin light-grey lines (one per rendered line, each
@@ -110,7 +145,12 @@ never listed in the registry, imported, routed or rendered; it is copied into Li
 ### Order and tag
 
 `sortPostsNewestFirst` orders by date descending, equal dates by slug. `postAudienceLabel` gives
-"For product teams", "For business owners" or "For everyone". The audience only picks the tag: the
+"For product teams", "For business owners" or "For everyone". A post whose meta sets `kind` also
+gets a second, brighter badge after the audience tag: `postKindLabel` gives "Use case breakdown"
+for `"use-case"`, drawn by `PostMetaLine` as a light pill in the accent hue (fuchsia, the Work
+with me button's, `src/lib/accent.ts`) with dark variants, and carrying
+`data-post-kind="<kind>"` so a later filter on `/writing` can select by it (there is no filter
+yet). A post without `kind` shows no badge. The audience only picks the tag: the
 post page links nowhere after the body, so a post that wants a next step writes it as its own last
 line (`my-moat` ends with `[Watch me build live](/projects)`), or links in context
 (`feature-flags` links "Watch me build" inline).
@@ -190,8 +230,8 @@ shared by the list and the post page (see `app_docs/clock-and-prerender.md`).
 - No `fs` at runtime; only `registry.test.ts` reads the directory.
 - Never set `pageExtensions` for `md` or `mdx`: posts are modules, never routes.
 - No client components, data fetching or env reads in a post; `src/mdx-components.tsx` stays
-  server only (no `"use client"`). The post page's one client component is `PostMinimapViewport`,
-  a leaf outside the `article`.
+  server only (no `"use client"`). The post page's client components are `PostMinimapViewport` and
+  `PostToc`, leaves outside the `article`.
 - No clock reads in `/writing`, a post page, the Open Graph image or `src/lib/posts.ts`.
 - Never import a `.linkedin.md` file from `src/`, and never list one in the registry.
 - `generateStaticParams` in `src/app/writing/[slug]/page.tsx` never returns an empty array (keep
@@ -209,6 +249,11 @@ shared by the list and the post page (see `app_docs/clock-and-prerender.md`).
 - Every non-draft post must pass `yarn check:og`. Never hardcode a slug list in
   `scripts/check-post-metadata.test.ts` (posts come only from `getPosts()`), and a change to what
   a post's metadata tags contain changes the check in the same commit.
+- The table of contents stays outside the `article`, lists only the article's `h2` and `h3`
+  headings (in document order, `h3` indented under its `h2`) and links with plain `#id` anchors;
+  never render a second copy of the post's text into it beyond the heading text.
+- The table of contents scrolls only inside itself: following the marked entry moves the `nav`'s
+  own `scrollTop`, never the page (no `scrollIntoView`).
 - The minimap stays outside the `article`, `aria-hidden` and `inert`, with no text, links,
   headings or focusable elements. It is drawn from measurements of the real article: never render
   a second copy of the post into it, and never scale real content with CSS `zoom` or
@@ -217,3 +262,5 @@ shared by the list and the post page (see `app_docs/clock-and-prerender.md`).
   crop.
 - Never add click-to-jump, drag or keyboard stops to the minimap: it is visual only.
 - The minimap appears only on `/writing/[slug]`: never on `/writing` or any other route.
+- The table of contents and the minimap never end behind the fixed radio bar: their height budgets
+  subtract `--radio-bar-height`, never a copied number.

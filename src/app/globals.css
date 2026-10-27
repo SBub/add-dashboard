@@ -24,7 +24,7 @@
    * top border), without the safe-area padding it adds below. The one source
    * for the body's bottom padding, the floating buttons' bottom offsets and
    * the sidebar's height (which subtracts it so the column ends above the
-   * footer).
+   * footer), and the post gutter's table of contents and minimap heights.
    */
   --radio-bar-height: 2.3125rem;
 }

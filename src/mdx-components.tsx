@@ -9,8 +9,20 @@ const TEXT_LINK = "underline underline-offset-2 hover:text-neutral-900 dark:hove
 
 const components: MDXComponents = {
   h1: (props) => <h1 className="text-2xl font-semibold tracking-tight" {...props} />,
-  h2: (props) => <h2 className="mt-8 text-xl font-semibold tracking-tight" {...props} />,
-  h3: (props) => <h3 className="mt-6 text-lg font-semibold" {...props} />,
+  // scroll-mt keeps a heading reached through the table of contents clear of
+  // the sticky header.
+  h2: (props) => (
+    <h2
+      className="mt-8 scroll-mt-[calc(var(--header-height)+1.5rem)] text-xl font-semibold tracking-tight"
+      {...props}
+    />
+  ),
+  h3: (props) => (
+    <h3
+      className="mt-6 scroll-mt-[calc(var(--header-height)+1.5rem)] text-lg font-semibold"
+      {...props}
+    />
+  ),
   p: (props) => (
     <p className="mt-6 text-base leading-8 text-neutral-700 dark:text-neutral-300" {...props} />
   ),
@@ -62,6 +74,25 @@ const components: MDXComponents = {
   code: (props) => (
     <code
       className="rounded bg-neutral-100 px-1 py-0.5 font-mono text-sm dark:bg-neutral-900"
+      {...props}
+    />
+  ),
+  // A table scrolls inside its own wrapper, like a code block, so a wide one
+  // never scrolls the page at 375px.
+  table: (props) => (
+    <div className="mt-6 overflow-x-auto">
+      <table className="w-full border-collapse text-left text-sm leading-6" {...props} />
+    </div>
+  ),
+  th: (props) => (
+    <th
+      className="border-b border-neutral-300 px-3 py-2 align-bottom font-semibold text-neutral-900 first:pl-0 dark:border-neutral-700 dark:text-neutral-100"
+      {...props}
+    />
+  ),
+  td: (props) => (
+    <td
+      className="border-b border-neutral-200 px-3 py-2 align-top text-neutral-700 first:pl-0 dark:border-neutral-800 dark:text-neutral-300"
       {...props}
     />
   ),

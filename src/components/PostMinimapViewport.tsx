@@ -64,7 +64,11 @@ function measureBlocks(column: HTMLElement, heading: HTMLElement): MinimapBlock[
       blocks.push({ kind: "image", rect, parts });
     } else if (/^H[1-6]$/.test(el.tagName)) {
       blocks.push({ kind: "heading", rect, parts: textLines(el, top, left) });
-    } else if (["PRE", "BLOCKQUOTE", "TABLE", "HR"].includes(el.tagName)) {
+    } else if (
+      ["PRE", "BLOCKQUOTE", "TABLE", "HR"].includes(el.tagName) ||
+      // A table, inside the scrolling wrapper the MDX table renders.
+      el.firstElementChild?.tagName === "TABLE"
+    ) {
       blocks.push({ kind: "block", rect, parts: [] });
     } else {
       const parts = textLines(el, top, left);
@@ -74,6 +78,31 @@ function measureBlocks(column: HTMLElement, heading: HTMLElement): MinimapBlock[
     }
   }
   return blocks;
+}
+
+// Space kept free between the strip and the radio bar when it is stuck, px.
+const BOTTOM_GAP = 24;
+
+// The fixed radio bar's height in px, from --radio-bar-height (rem, in
+// src/app/globals.css), the one source the table of contents' max height reads.
+function radioBarHeight(): number {
+  const root = getComputedStyle(document.documentElement);
+  const value = root.getPropertyValue("--radio-bar-height").trim();
+  const n = parseFloat(value);
+  if (Number.isNaN(n)) return 0;
+  return value.endsWith("rem") ? n * parseFloat(root.fontSize) : n;
+}
+
+// The strip's height budget: the usual share of the viewport, or less when the
+// viewport is too short for it between the sticky top and the radio bar. The
+// offsetParent is the gutter's sticky row; its computed top is where the strip
+// sticks.
+function availableHeight(strip: HTMLElement): number {
+  const share = window.innerHeight * MINIMAP_MAX_VIEWPORT_SHARE;
+  const row = strip.offsetParent;
+  if (!(row instanceof HTMLElement)) return share;
+  const stuckTop = parseFloat(getComputedStyle(row).top) || 0;
+  return Math.min(share, window.innerHeight - stuckTop - radioBarHeight() - BOTTOM_GAP);
 }
 
 // The minimap's one client leaf. It measures the real article (each
@@ -118,7 +147,7 @@ export function PostMinimapViewport({ columnId }: { columnId: string }) {
           blocks,
           columnWidth: column.getBoundingClientRect().width,
           stripWidth: strip.getBoundingClientRect().width - STRIP_CHROME,
-          availableHeight: window.innerHeight * MINIMAP_MAX_VIEWPORT_SHARE - STRIP_CHROME,
+          availableHeight: availableHeight(strip) - STRIP_CHROME,
         });
         contentHeight = minimapContentHeight(blocks);
         scale = next.scale;

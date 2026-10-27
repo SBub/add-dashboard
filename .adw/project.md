@@ -59,7 +59,9 @@ From the worktree root, in order. The main checkout is two directories up from `
    `http://localhost:3000`.
 2. `yarn install --immutable` (`postinstall` runs `lefthook install`). An install that would change
    `yarn.lock` is a finding, not something to paper over with a mutable install.
-3. Verify with `yarn build` (see Build). A build, not a typecheck: only a build loads `.env.local`
+3. `yarn playwright install chromium`, the browser `@playwright/test` needs. Browsers live in the
+   user cache, so this is a no-op once present and never a reason to change `yarn.lock`.
+4. Verify with `yarn build` (see Build). A build, not a typecheck: only a build loads `.env.local`
    and reads the database, so it is the one check that proves step 1 and the network path.
 
 There is no database to start: the app reads the toolkit's hosted Supabase project with a public
@@ -75,33 +77,28 @@ key. Nothing here writes to it. Do not start the dev server during install.
 In the order the test phase runs them, all from the root, unfiltered: lint `yarn lint` (autofix
 `yarn lint:fix`; `eslint.config.mjs` ignores `trees/**` and `agents/**`); typecheck
 `yarn typecheck` (`next typegen` then `tsc --noEmit`; `tsconfig.json` excludes `trees` and
-`agents`; it rewrites the gitignored `next-env.d.ts`, never stage it); dead code `yarn knip` (scans `src/**`, see `knip.json`);
+`agents`; it rewrites the gitignored `next-env.d.ts`, never stage it); dead code `yarn knip` (scans `src/**`, `scripts/**` and `e2e/**`, see `knip.json`);
 format `yarn format:check` (write `yarn format`); unit `yarn test` (vitest, `src/**/*.test.ts`
 only, see `vitest.config.ts`); build `yarn build`; then the post metadata check `yarn check:og`
 (vitest under `vitest.og.config.ts`, reads the built `.next/server/app/writing/<slug>.html`, so it
-runs only after a build).
+runs only after a build); and last the E2E suite `yarn test:e2e`.
 
-The one test layer is `src/**/*.test.ts`: pure reducers in `src/data/`, helpers in `src/lib/` and the
+The unit layer is `src/**/*.test.ts`: pure reducers in `src/data/`, helpers in `src/lib/` and the
 pinned hydration rule. The one exception is `scripts/check-post-metadata.test.ts`, run by
-`yarn check:og` after the build, never by `yarn test`. There is no component test layer and no Playwright suite; a user-visible
-change gets its browser evidence from the review phase's screenshots, not from a test.
+`yarn check:og` after the build, never by `yarn test`. There is no component test layer; the browser
+layer is the Playwright suite below.
 
-E2E code suite: `none` (no `@playwright/test` specs). `e2e/*.md` holds agent-driven journeys
-(currently `e2e/test_connection_indicator_scope.md`, `e2e/test_header_section_active.md`,
-`e2e/test_landing_no_filters.md`, `e2e/test_landing_today_refresh.md`,
-`e2e/test_queue_row_single_line.md`, `e2e/test_section_tooltip_layering.md`,
-`e2e/test_day_card_charts.md`, `e2e/test_active_runs_shared_entry.md`,
-`e2e/test_row_full_title_top_align.md`, `e2e/test_single_background_color.md`,
-`e2e/test_projects_skeleton_fallbacks.md`, `e2e/test_sticky_header.md`,
-`e2e/test_run_row_phase_label.md`, `e2e/test_history_card_fields.md`,
-`e2e/test_history_page_turn.md`, `e2e/test_worker_status_widget.md`, `e2e/test_hire_page.md`,
-`e2e/test_home_page.md`, `e2e/test_writing.md`, `e2e/test_daily_log_sidebar.md`,
-`e2e/test_changelog.md`, `e2e/test_header_login_hidden.md`,
-`e2e/test_post_minimap.md`, `e2e/test_radio_bar.md` and `e2e/test_header_mobile.md`) that the test
-phase runs through the Playwright MCP server.
+E2E code suite: `e2e/*.spec.ts` (`@playwright/test`, chromium, `playwright.config.ts`), run last by
+the test phase as `PORT=<run port> yarn test:e2e`. The `/prepare_app` server must already be up on
+this run's port, which `reuseExistingServer` adopts; never set `CI=1` in a run (it disables reuse
+and switches the server to `yarn start`). Specs import `test` and `expect` from `e2e/fixtures.ts`
+(the `/hire` POST guard, `waitForLive`, `openFirstProject`), read the hosted database through the
+app and never write. A user-visible change adds or extends a spec there. Agent-driven `e2e/*.md`
+journeys are opt-in and normally absent; the remaining ones are being converted to specs.
 
 lefthook runs prettier, `yarn lint`, `yarn typecheck` and `yarn knip` on every commit and
-`yarn test` on every push. Never bypass it.
+`yarn test` on every push. `yarn test:e2e` is in neither hook: it needs a server and the network.
+Never bypass it.
 
 ## Ports
 

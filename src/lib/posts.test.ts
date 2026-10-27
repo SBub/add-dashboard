@@ -3,6 +3,7 @@ import {
   isPostSlug,
   parsePostMeta,
   postAudienceLabel,
+  postKindLabel,
   sortPostsNewestFirst,
   visiblePosts,
 } from "./posts";
@@ -20,6 +21,14 @@ describe("parsePostMeta", () => {
     expect(parsePostMeta("my-moat", { ...VALID, extra: 1 })).toEqual(VALID);
   });
 
+  it("keeps an optional kind, and leaves it out when absent", () => {
+    expect(parsePostMeta("my-moat", { ...VALID, kind: "use-case" })).toEqual({
+      ...VALID,
+      kind: "use-case",
+    });
+    expect(parsePostMeta("my-moat", VALID)).not.toHaveProperty("kind");
+  });
+
   const bad: [string, unknown][] = [
     ["title", { ...VALID, title: undefined }],
     ["description", { ...VALID, description: "" }],
@@ -28,6 +37,8 @@ describe("parsePostMeta", () => {
     ["date", { ...VALID, date: "2026-02-30" }],
     ["date", { ...VALID, date: "12.10.2026" }],
     ["audience", { ...VALID, audience: "everyone" }],
+    ["kind", { ...VALID, kind: "case-study" }],
+    ["kind", { ...VALID, kind: null }],
     ["draft", { ...VALID, draft: "false" }],
     ["draft", { ...VALID, draft: undefined }],
     ["meta", undefined],
@@ -89,5 +100,11 @@ describe("postAudienceLabel", () => {
     expect(postAudienceLabel("product-engineer")).toBe("For product teams");
     expect(postAudienceLabel("small-business")).toBe("For business owners");
     expect(postAudienceLabel("both")).toBe("For everyone");
+  });
+});
+
+describe("postKindLabel", () => {
+  it("labels each kind", () => {
+    expect(postKindLabel("use-case")).toBe("Use case breakdown");
   });
 });

@@ -39,6 +39,14 @@ const nextConfig: NextConfig = {
 
 // Posts under src/content/posts/ are MDX modules the writing pages import
 // (never routed as files, so no pageExtensions); see app_docs/writing.md.
-const withMDX = createMDX();
+// Plugins are named by string: Turbopack cannot take plugin functions.
+// remark-gfm parses tables, rehype-slug gives every heading an id for the
+// table of contents.
+const withMDX = createMDX({
+  options: {
+    remarkPlugins: ["remark-gfm"],
+    rehypePlugins: ["rehype-slug"],
+  },
+});
 
 export default withMDX(nextConfig);

@@ -36,6 +36,8 @@ npm or npx.
 yarn install   # also installs the git hooks (lefthook) through postinstall
 cp .env.example .env.development && cp .env.example .env.local   # then fill in the real values
 yarn dev       # http://localhost:3000, or PORT=3101 yarn dev
+yarn playwright install chromium webkit   # once per machine, the browsers the E2E suite uses (WebKit only for the minimap spec)
+yarn test:e2e   # Playwright specs in e2e/, against the dev server on PORT (or one it starts)
 ```
 
 ## ADW
@@ -85,6 +87,7 @@ mkdir -p .claude && ln -s /path/to/adw-toolkit/commands .claude/commands
 | `yarn format:check` | Prettier, check only                                 |
 | `yarn knip`         | Unused files, exports and dependencies               |
 | `yarn test`         | Unit tests (vitest, `src/**/*.test.ts`)              |
+| `yarn test:e2e`     | Playwright E2E specs (`e2e/*.spec.ts`)               |
 
 ## Git hooks
 

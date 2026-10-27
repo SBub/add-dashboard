@@ -48,7 +48,7 @@ empty cache is never saved. On a hit, `Install Playwright system packages from c
 failure instead of a quiet fallback to the network.
 
 `yarn playwright install chromium webkit` (without `--with-deps`) then runs in both cases; on a
-browser cache hit it finds both browsers present and downloads nothing.
+browser cache hit it finds both browsers already present and downloads nothing.
 
 ### When they miss
 

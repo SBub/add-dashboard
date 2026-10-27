@@ -6,6 +6,7 @@
 - specs/issue-158-adw-a58f07d8-sdlc_planner-worker-status-widget.md
 - specs/issue-169-adw-98e70d08-sdlc_planner-who-you-are-home-page.md
 - specs/issue-170-adw-d5ef5a75-sdlc_planner-add-mdx-writing-blog.md
+- specs/issue-240-adw-94a45897-sdlc_planner-cut-realtime-request-bursts.md
 
 ## Overview
 
@@ -73,6 +74,12 @@ real state. It is the first instance of the shape the Rules prescribe for a
 time-dependent label: a client leaf with a `useSyncExternalStore` store whose
 server snapshot is data-free.
 
+The poll that a page becoming visible triggers is gated by a 10 s
+`createCooldownGate` (`src/lib/request-pacing.ts`), armed at the start of every
+poll, so a burst of `visibilitychange` events starts at most one poll per 10 s.
+The gate is a timer and adds no clock read; the store still has exactly one,
+in `poll`.
+
 ## Rules
 
 - No clock reads outside the cached boundary. There are exactly three
@@ -92,7 +99,11 @@ server snapshot is data-free.
   after `getWorkers()` resolves, never in render or a hook body, fed into the
   pure `nextWorkerSnapshot` (`src/lib/worker-state.ts`). Its
   `getServerSnapshot` is the constant `unknown` state and reads no clock, so
-  the shell and hydration render "Checking status...". Do not add a fourth. A
+  the shell and hydration render "Checking status...". Do not add a fourth.
+  The request pacing helpers in `src/lib/request-pacing.ts`
+  (`createReconnectBackoff`, `createCoalescedRunner`, `createCooldownGate`,
+  `deferWhileVisible`) are timer-based and read no clock; a duration there is
+  a `setTimeout`, never a `Date.now()` difference. A
   future time-dependent label follows the same shape, a
   new client leaf with a `useSyncExternalStore` store whose server snapshot
   does not read the clock (issue #3), never a clock read in `QueueRow`,

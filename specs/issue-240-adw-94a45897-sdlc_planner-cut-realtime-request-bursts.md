@@ -352,3 +352,26 @@ Execute every command to validate the chore is complete with zero regressions.
   outputs (with and without the fix) into the pull request body.
 - Review: a reviewer opening `/projects` should see the pill read `connecting` for about 2 s, then
   `live`; the worker widget unchanged.
+
+## Negative check results
+
+Step 9, run on 2026-10-27 against the `/prepare_app` dev server on this run's port, with
+`PORT=$PORT yarn test:e2e e2e/realtime_request_budget.spec.ts --reporter=list`. The "without fix"
+run put the branch aside in a temporary WIP commit, restored `src/app/providers.tsx`,
+`src/data/realtime.ts`, `src/data/supabase.ts` and `src/components/WorkerStatus.tsx` from
+`9c6455b`, then restored the fix with `git checkout HEAD -- src` and `git reset --soft HEAD~1`.
+
+| Scenario                                           | Assertion that decides it            | With fix | Without fix          |
+| -------------------------------------------------- | ------------------------------------ | -------- | -------------------- |
+| 1. one socket and a few reads in a steady minute   | sockets `1`, `workers` at most 4     | pass     | pass (informational) |
+| 2. a socket that drops every 3 s backs off         | sockets at most 6                    | pass     | fail, received 15    |
+| 3. visibility flips poll the worker table ...      | `workers` at most 5                  | pass     | fail, received 61    |
+| 4. twenty one-second visits open almost no sockets | sockets at most 2                    | pass     | fail, received 21    |
+| 5. the channel still goes live and catches up once | one socket, a catch-up read after it | pass     | pass (informational) |
+
+Scenarios 2, 3 and 4 fail on the old code, as Test Coverage requires. Scenario 3 fails its
+loosened ceiling of 5 by a wide margin (61), so the ceiling stays. Scenario 1 passes on both, as
+expected: its ceilings guard against a regression in the steady state, not the burst.
+
+Raw outputs (gitignored, not committed): `agents/94a45897/negative_check/with-fix.txt` and
+`agents/94a45897/negative_check/without-fix.txt`.

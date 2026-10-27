@@ -23,7 +23,8 @@ import {
 } from "./apply-run-change";
 import { type ActiveRuns, getActiveRuns, getProjects, getQueue } from "./index";
 import { queryKeys } from "./query-keys";
-import { getSupabase } from "./supabase";
+import { createCoalescedRunner } from "@/lib/request-pacing";
+import { getSupabase, realtimeBackoff } from "./supabase";
 
 export interface RealtimeOptions {
   /**
@@ -54,13 +55,16 @@ export interface RealtimeOptions {
  * not in the cache stays absent (setQueryData ignores an undefined result),
  * because seeding one from a single event would create a one-row list that
  * looks complete and is not. The channel's status callback is the one writer
- * of the connection indicator, and the trigger of the catch-up read.
+ * of the connection indicator, the trigger of the catch-up read (through a
+ * coalesced runner) and the up and down signal of the reconnect backoff.
  *
- * Returns the closer: it removes the channel and puts the indicator back to
- * Connecting, so the next start begins from the same state as a fresh page.
+ * Returns the closer: it cancels any pending catch-up, removes the channel and
+ * puts the indicator back to Connecting, so the next start begins from the
+ * same state as a fresh page (its first SUBSCRIBED catches up).
  */
 export function startRealtime(queryClient: QueryClient, options: RealtimeOptions = {}): () => void {
   const supabase = getSupabase();
+  const catchUpRunner = createCoalescedRunner(() => catchUp(queryClient));
 
   const channel: RealtimeChannel = supabase
     .channel("adw")
@@ -84,20 +88,24 @@ export function startRealtime(queryClient: QueryClient, options: RealtimeOptions
       switch (state) {
         case REALTIME_SUBSCRIBE_STATES.SUBSCRIBED:
           setConnectionStatus(ConnectionStatus.Live);
-          void catchUp(queryClient);
+          realtimeBackoff.up();
+          catchUpRunner.request();
           break;
         case REALTIME_SUBSCRIBE_STATES.CHANNEL_ERROR:
         case REALTIME_SUBSCRIBE_STATES.TIMED_OUT:
           setConnectionStatus(ConnectionStatus.Reconnecting);
+          realtimeBackoff.down();
           break;
         case REALTIME_SUBSCRIBE_STATES.CLOSED:
           setConnectionStatus(ConnectionStatus.Connecting);
+          realtimeBackoff.down();
           break;
       }
       options.onStatus?.(state);
     });
 
   return () => {
+    catchUpRunner.cancel();
     void supabase.removeChannel(channel);
     setConnectionStatus(ConnectionStatus.Connecting);
   };
@@ -196,7 +204,11 @@ function cachedSlugs(queryClient: QueryClient, prefix: readonly string[]): strin
 }
 
 /**
- * Refreshes the cached entries from the database, on every SUBSCRIBED.
+ * Refreshes the cached entries from the database. Every SUBSCRIBED requests
+ * it through the coalesced runner in startRealtime (src/lib/request-pacing.ts):
+ * SUBSCRIBED callbacks within 1 s give one catch-up, a catch-up never runs
+ * while another is in flight, and one requested less than 10 s after the
+ * previous one finished is skipped. The first SUBSCRIBED always catches up.
  *
  * Why on every SUBSCRIBED and not only after a drop. Events that happen while
  * the channel is down are never delivered, so a reconnect must re-read. But
@@ -227,9 +239,11 @@ function cachedSlugs(queryClient: QueryClient, prefix: readonly string[]): strin
  * they are cached (one per project page visited this session).
  *
  * Cost: one project_summaries read, one runs read, and one getQueue (two
- * reads) per queue entry in the cache, per (re)connect: a handful of small
- * reads. In development React's strict mode connects twice on mount, so it
- * runs twice there.
+ * reads) per queue entry in the cache, per catch-up: once per page that stays
+ * visible for 2 s (Providers defers the channel), plus at most one per burst
+ * of reconnects, which the backoff in getSupabase() spaces out. Events missed
+ * by a reconnect inside the 10 s skip window are recovered at the next
+ * catch-up or the next event for that row.
  *
  * Failures are logged and swallowed: a failed refresh leaves the cache as it
  * was, which is the state before the refresh, and the next event or

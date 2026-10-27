@@ -295,8 +295,11 @@ live updates (above) go through the query cache, not this store.
   `onHistoryChange` call last, after both `setQueryData` writes. Likewise the
   previous queue membership is read with `queuedIn` BEFORE the queue entry is
   rewritten in `applyQueueEvent`, and passed to `applyQueueChangeToSummaries`.
-- The catch-up read runs on every `SUBSCRIBED` (first connect and every
-  reconnect, one path, no flag) and writes with `setQueryData` through the
+- The catch-up read is requested on every `SUBSCRIBED` (first connect and
+  every reconnect, one path, no flag) through the coalesced runner
+  (`createCoalescedRunner` in `src/lib/request-pacing.ts`); do not call
+  `catchUp` directly from the callback, and do not drop the debounce or the
+  cooldown. It writes with `setQueryData` through the
   boundary functions (`getProjects`, `getActiveRuns`, `getQueue`). It must
   never throw out of the socket callback: failures are `console.warn`ed and
   swallowed. It writes `getActiveRuns()` under `queryKeys.activeRuns`
@@ -311,3 +314,7 @@ live updates (above) go through the query cache, not this store.
   observes; nothing in the channel, the indicator or the catch-up depends on
   it. All three listeners (projects, runs,
   queue_items) live on that channel; do not open a second one or start it from another component.
+- Do not start the channel before the 2 s visibility deferral
+  (`deferWhileVisible` in `Providers`), and do not replace
+  `realtime.reconnectAfterMs` with one that resets on open. The pacing
+  helpers read no clock; durations are timers.

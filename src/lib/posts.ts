@@ -10,11 +10,17 @@ import { POST_ENTRIES, type PostEntry } from "@/content/posts";
 export const POST_AUDIENCES = ["product-engineer", "small-business", "both"] as const;
 export type PostAudience = (typeof POST_AUDIENCES)[number];
 
+// What sort of post it is, beside its audience: optional, and only labelled
+// when set (a use case gets its own accent badge).
+export const POST_KINDS = ["use-case"] as const;
+export type PostKind = (typeof POST_KINDS)[number];
+
 export interface PostMeta {
   title: string;
   description: string;
   date: string;
   audience: PostAudience;
+  kind?: PostKind;
   draft: boolean;
 }
 
@@ -31,6 +37,10 @@ export function isPostSlug(slug: string): boolean {
 
 function isAudience(value: unknown): value is PostAudience {
   return typeof value === "string" && (POST_AUDIENCES as readonly string[]).includes(value);
+}
+
+function isKind(value: unknown): value is PostKind {
+  return typeof value === "string" && (POST_KINDS as readonly string[]).includes(value);
 }
 
 // A real calendar date: "2026-02-30" parses (it rolls over) but does not
@@ -56,13 +66,18 @@ export function parsePostMeta(slug: string, raw: unknown): PostMeta {
   if (typeof raw !== "object" || raw === null || Array.isArray(raw)) {
     return fail("meta", "must be an object (export const meta = {...})");
   }
-  const { title, description, date, audience, draft } = raw as Record<string, unknown>;
+  const { title, description, date, audience, kind, draft } = raw as Record<string, unknown>;
   if (!isNonEmptyString(title)) return fail("title", "must be a non-empty string");
   if (!isNonEmptyString(description)) return fail("description", "must be a non-empty string");
   if (!isCalendarDate(date)) return fail("date", "must be a real date as YYYY-MM-DD");
   if (!isAudience(audience)) return fail("audience", `must be one of ${POST_AUDIENCES.join(", ")}`);
+  if (kind !== undefined && !isKind(kind)) {
+    return fail("kind", `must be absent or one of ${POST_KINDS.join(", ")}`);
+  }
   if (typeof draft !== "boolean") return fail("draft", "must be true or false");
-  return { title, description, date, audience, draft };
+  return kind === undefined
+    ? { title, description, date, audience, draft }
+    : { title, description, date, audience, kind, draft };
 }
 
 /** A copy, newest date first; equal dates by slug, so the order is stable. */
@@ -91,6 +106,14 @@ const AUDIENCE_LABELS: Record<PostAudience, string> = {
 
 export function postAudienceLabel(audience: PostAudience): string {
   return AUDIENCE_LABELS[audience];
+}
+
+const KIND_LABELS: Record<PostKind, string> = {
+  "use-case": "Use case breakdown",
+};
+
+export function postKindLabel(kind: PostKind): string {
+  return KIND_LABELS[kind];
 }
 
 async function loadPost(entry: PostEntry): Promise<Post> {

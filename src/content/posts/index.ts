@@ -16,4 +16,8 @@ export const POST_ENTRIES: PostEntry[] = [
   { slug: "feature-flags", load: () => import("./feature-flags.mdx") },
   { slug: "no-traffic", load: () => import("./no-traffic.mdx") },
   { slug: "experiment", load: () => import("./experiment.mdx") },
+  {
+    slug: "cleaning-automation",
+    load: () => import("./cleaning-automation.mdx"),
+  },
 ];

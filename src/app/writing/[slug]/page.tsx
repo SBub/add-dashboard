@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Breadcrumb } from "@/components/Breadcrumb";
 import { PostMetaLine } from "@/components/PostMetaLine";
 import { PostMinimap } from "@/components/PostMinimap";
+import { PostToc } from "@/components/PostToc";
 import { getPost, getPosts } from "@/lib/posts";
 import { SITE_NAME } from "@/lib/site-url";
 
@@ -63,7 +64,12 @@ export default async function PostPage({ params }: PostPageProps) {
         <PostMetaLine meta={meta} />
         <Content />
       </article>
-      <PostMinimap columnId={POST_COLUMN_ID} />
+      {/* The right gutter, from xl up: the table of contents, then the minimap
+          to its right, sticky below the header as one row. */}
+      <div className="sticky top-[calc(var(--header-height)+1.5rem)] hidden shrink-0 self-start xl:flex xl:items-start xl:gap-6">
+        <PostToc columnId={POST_COLUMN_ID} />
+        <PostMinimap columnId={POST_COLUMN_ID} />
+      </div>
     </div>
   );
 }

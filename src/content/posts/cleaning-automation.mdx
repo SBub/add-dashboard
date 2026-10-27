@@ -1,0 +1,624 @@
+export const meta = {
+  title: "Developing a feature: cleaning automation for short-term rentals",
+  description:
+    "How I would decide whether to build automatic cleaning scheduling, how I would measure it, and the technical decisions behind it.",
+  date: "2026-10-27",
+  audience: "product-engineer",
+  kind: "use-case",
+  draft: false,
+};
+
+## TL;DR
+
+**What this is.** A use case of developing a feature, as a product engineer: a feature taken from a real job posting (Base360.ai, "Cleaning and maintenance automation") and worked through from the problem to a plan for production. The document shows the decisions, and the reasons behind each one.
+
+**The approach, in order:**
+
+1. **Prove the problem before building.** Platform data comes first (reviews, guest messages, refunds, calendar exports to competitor tools), then interviews, a survey and a fake door, all judged against a decision rule written in advance. (Section 2)
+2. **Cut the scope.** The MVP is one cleaning per stay, with a text message that only notifies and a linked page where the cleaner accepts, declines or marks the cleaning as done. Maintenance, an AI agent, a marketplace and a cleaner portal are left out, each for a stated reason. (Section 3)
+3. **Choose the metrics.** One main metric (cleanings confirmed as done before the next check-in), plus adoption, retention, guardrails that catch the feature causing harm, and funnels that show where operators and cleaners get stuck. (Section 4)
+4. **Roll out safely.** One feature flag that is also the kill switch, a beta cohort, and then a percentage rollout with a control group, to show that the feature caused the improvement. (Section 4)
+5. **Plan the technical work.** Each decision comes with its trade-off: a modular monolith with a separate notification service, an outbox for events, safe handling of repeated or out-of-order changes, timezones, deadlines, delivery tracking, and a secure link that needs no login. (Section 5)
+6. **Instrument it from day one.** The database is the source of truth for business metrics, PostHog handles the flag, the interface events and the experiment, and system health goes to monitoring. (Block A in section 5)
+7. **Handle the edge cases.** Last-minute bookings, changes after the cleaner accepted, windows that are too short, double-booked cleaners, and daylight saving changes. (Block E in section 5)
+8. **Prepare for scale.** What breaks at each stage, the signal that shows it, and the change to make at that point and not before. (Section 6)
+9. **Break the plan into tracer bullets.** Thin slices that work end to end, each small enough to become one issue for ADW, the AI developer workflow I built, which implements an issue from plan to pull request. You can [watch ADW build](/projects) in public. (Section 7)
+
+**Context.** This use case is based on the Base360.ai Product Engineer posting, which lists "Cleaning and maintenance automation" among the operational problems the platform should solve and describes it as "scheduling cleaning after a booking". I run a guest house myself, so part of the problem description comes from my own experience as an operator. The point of the document is to show how I would decide whether to build the feature, how I would measure it, and which technical decisions I would make, and why.
+
+## 1. Problem
+
+Operators who work with external cleaners coordinate every cleaning by hand and outside the platform, usually through WhatsApp messages and phone calls. Nothing connects that coordination to the reservation itself. When a booking changes, gets cancelled, or a new booking arrives at the last minute, the cleaner only finds out if the operator remembers to tell them. As a result, cleanings are sometimes missed or done late, and guests arrive at a property that is not ready.
+
+The cost of this shows up in three places: the operator's time spent coordinating every turnover, refunds or compensation paid to guests, and bad reviews that hurt future bookings. The problem grows with the size of the portfolio. An operator with one property barely feels it, while an operator with twenty units and three cleaners deals with it every day.
+
+**Target segment.** Operators with 5 to 100 units who use external cleaners. This is the group the feature is designed for, and the group whose behaviour we measure.
+
+## 2. Signal to build
+
+### Hypothesis
+
+Operators in the target segment spend at least two hours a week coordinating cleaning, and they have at least one cleaning incident (a missed, late or poorly communicated cleaning) every month.
+
+This hypothesis contains two conditions on purpose. Incidents alone are not enough to justify building the feature, because if cleaning is rarely a problem and takes little time, operators have no strong reason to change how they work. Time spent alone is not enough either, because a process can be slow but reliable. We need both the pain and the cost.
+
+### Evidence, from cheapest to most expensive
+
+We start with data the platform already has, because it costs nothing to collect, and only then move to research that takes time from us and from customers.
+
+**1. Data already on the platform.** Base360 already handles guest communication, reviews and payments, so the problem leaves traces we can look for:
+
+- **Reviews.** Airbnb has a separate cleanliness score, and review text often mentions words such as "dirty", "not ready" or "hair".
+- **Guest messages.** In the unified inbox, messages such as "the room isn't ready", "there are no towels" or "can we check in yet?" point to cleaning problems.
+- **Refunds and compensation** issued close to the check-in date.
+- **Support tickets** that mention cleaning.
+- **Calendar export requests from competitor tools.** If Base360 offers a calendar export (iCal), the server logs show which outside services fetch it. Requests from Turno or Breezeway mean the customer already pays for a cleaning tool, which proves both the pain and the willingness to pay.
+
+**2. Interviews.** We interview 6 to 8 operators from the target segment. Interviews come before surveys because interviews discover problems, while surveys only measure how common a problem is. A survey cannot find a problem nobody thought to ask about.
+
+The questions follow the rules of _The Mom Test_: ask about what people actually did in the past, ask for specifics, and never pitch the idea. Questions such as "would you use this?" are avoided because people answer them politely rather than truthfully.
+
+**3. Survey.** Once the interviews show what the common answers are, we turn them into a short survey with closed questions and send it to the target segment. This tells us how widespread each answer is.
+
+- How many units do you manage?
+- Who cleans your properties: you, your own staff, freelance cleaners, or a cleaning company?
+- How do you arrange cleaning: WhatsApp, phone calls, Turno or Breezeway, a spreadsheet, or something else?
+- How many hours a week do you spend arranging cleaning: 0 to 1, 1 to 3, 3 to 5, or more than 5?
+- How many cleaning incidents did you have last month: none, 1, 2 to 3, or 4 or more?
+- What is the most common problem? (The options come from the interviews.)
+
+**4. Fake door.** A fake door is an entry point for a feature that does not exist yet, used to measure real interest. We add a "Cleaning" entry on the property and reservation pages, shown only to operators in the target segment. Clicking the entry shows a message saying that cleaning scheduling is being built and asking them to help shape it with three questions taken from the survey. At the end, we ask whether they want to try it first. The operators who say yes form the early-access group, which later becomes the beta cohort.
+
+The fake door measures three things: how many operators click the entry (compared with the click rate of other entries in the same app, rather than an absolute number), how many complete the questions, and how many opt in to early access.
+
+### Decision rule
+
+The rule is written down before any evidence is collected, so that the evidence makes the decision rather than our mood after seeing it. The thresholds themselves are assumptions, and they should be based on the baseline we find in the platform data.
+
+We build the feature if all three are true:
+
+- at least 5 of 8 interviewees report a cleaning incident every month **and** spend at least two hours a week coordinating cleaning;
+- the fake door's click rate is at least twice that of a comparable menu entry;
+- at least 20 operators opt in to early access.
+
+If the pain is real but rare, or it costs operators little time, we do not build it now and revisit the question later.
+
+### Options considered
+
+There are three ways to solve this problem, and we chose one.
+
+- **Build the feature ourselves (chosen).** The real value is the connection between the reservation and the cleaning, and only the platform that holds the reservations can provide it.
+- **Integrate with an existing cleaning tool such as Turno (not now).** This would be faster, but the coordination would still happen outside our product, and the reservation link would depend on another company. We revisit this option if the calendar export logs show that many customers already depend on Turno.
+- **Offer a marketplace of cleaners (deferred).** This would create a new revenue stream, but it brings three serious risks. We would need cleaners before we have operators to serve, and operators before cleaners would join. We would be responsible when a cleaning goes badly. And we would move from being a software company towards being a services marketplace, away from our target segment. If we want to test this later, the cheapest ways are a concierge pilot (matching cleaners to a few operators by hand in one city) and a fake door that shows a price, because clicks on a priced offer are a much stronger signal than clicks on a free one.
+
+## 3. Decision and scope: the MVP
+
+The MVP covers one thing: **one cleaning for every stay, completed before the next guest checks in.** Maintenance is left out because it is irregular and needs its own research. Exactly when in the available window the cleaning should happen (right after the previous checkout, or just before the next check-in) is something the interviews will tell us.
+
+**What the operator can do:**
+
+- For each property, set a default cleaner (name and phone number), the time a cleaning takes, and cleaning notes such as where the supplies are kept, how to get the keys, and any house rules.
+- Turn automatic cleaning on or off for each property.
+- See the cleaning status on every reservation: sent, accepted, declined, done or late.
+- Reassign or edit a cleaning by hand.
+- Receive an alert when a cleaner declines, when nobody answers in time, or when the window between two stays is shorter than the cleaning takes.
+
+**What the cleaner can do (without an app or an account):**
+
+- Receive an SMS for every new, changed or cancelled cleaning. The text only notifies: it says there is a cleaning and when, and contains a link. The address, the notes and any access codes are shown only on the linked page.
+- On the linked page, accept the cleaning, decline it with a reason, or propose a change (a different time within the window) with a reason. The operator is notified of every decline and proposed change.
+- Mark the cleaning as done, with an optional note if something is wrong (for example, a broken shower).
+
+All communication happens on the linked page. The SMS is only a notification and never a conversation.
+
+**What the system does:** it creates, updates or cancels the cleaning whenever a reservation is created, changed or cancelled.
+
+**Why the MVP is designed to collect data.** The cleaner's link is more than a button. Every message records whether it was delivered, every response records whether the cleaner accepted and how long it took, every "done" records the completion time, and every decline, proposed change and "something is wrong" note is stored with its reason. The reasons are the material we need to design an AI agent for cleaner communication later, and the "something is wrong" notes are the start of the maintenance research.
+
+**Not in the MVP, and why:**
+
+- **Maintenance**, because it is irregular and needs separate research.
+- **An AI agent that talks to cleaners**, because we do not yet know what operators and cleaners actually say to each other, and a missed cleaning is expensive. The MVP collects those conversations first.
+- **The cleaner marketplace**, for the reasons above.
+- **Payments to cleaners, photo checklists, cleanings during a stay, and rosters with several cleaners.**
+- **A cleaner portal with a login, profile and calendar.** This is planned for v1. It raises a real design question: one cleaner often works for several operators, so we need to decide whether a cleaner is one person across the whole platform or a separate record for each operator.
+
+## 4. Success metrics and rollout
+
+### Metrics
+
+| Type            | Metric                                                                                                                          | How it is measured                                               |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Adoption        | The share of eligible operators who turned the feature on for at least one property, per month                                  | The event recorded when the feature is turned on                 |
+| Depth           | The share of their reservations that have a scheduled cleaning                                                                  | Cleanings divided by reservations                                |
+| **Main metric** | The share of cleanings confirmed as done before the next check-in                                                               | The time of the cleaner's "done" compared with the check-in time |
+| Speed           | How often cleaners accept, and how long they take to answer                                                                     | Accept and decline times in the status history                   |
+| Retention       | The share of operators who keep using the feature after four weeks and have not turned it off                                   | Active cleanings, and no event for turning it off                |
+| Guardrails      | Missed or late cleanings, failed message deliveries, cleanliness complaints and review scores, cleaning-related support tickets | State changes the system records (see below)                     |
+
+**Why the main metric changed.** An earlier version measured cleanings done "without the operator stepping in". This cannot be measured, because when something goes wrong the operator fixes it on WhatsApp, not in the system. The main metric now relies only on what the platform can see. Its weak spot is that it depends on cleaners tapping "done", so we check it against guest complaints and cleanliness scores.
+
+**What guardrails are.** A guardrail is a number that must not get worse while we improve the main metric. It catches the feature causing harm. For example, the main metric could look healthy while 10% of text messages fail silently, which means those cleaners were never told about the cleaning. Without a guardrail on failed deliveries, we would never connect the missed cleanings to the cause.
+
+**State changes the system must record.** We can only measure what the code records, so the system records a state change at every important moment. These are rows in the cleaning's status history in the database, not events sent to an analytics tool (see block A in section 5):
+
+| Moment                                      | Recorded as                                                                   |
+| ------------------------------------------- | ----------------------------------------------------------------------------- |
+| A cleaning is created, changed or cancelled | `cleaning_created`, `cleaning_updated`, `cleaning_cancelled`                  |
+| A message is sent to the cleaner            | `cleaner_message_sent`, `cleaner_message_delivered`, `cleaner_message_failed` |
+| The cleaner responds                        | `cleaning_accepted`, `cleaning_declined`, `cleaning_change_proposed`          |
+| Nobody answers in time                      | `cleaning_no_response`                                                        |
+| The cleaning is done                        | `cleaning_done` (with the time, and whether an issue was reported)            |
+| The cleaning is not done by check-in        | `cleaning_late`                                                               |
+| The feature is turned on or off             | `cleaning_enabled`, `cleaning_disabled`                                       |
+
+Complaints and reviews arrive as text rather than as events. In the MVP, we tag messages and reviews that mention cleanliness with a simple keyword match, and replace it with AI classification later.
+
+### Funnels: where people get stuck
+
+The metrics above say whether the feature works. When one of them is bad, they do not say where it breaks. A funnel does: it follows people through the steps of a journey and shows the step where most of them drop out. The feature has three journeys, so it has three funnels.
+
+**Funnel 1: an operator sets up the feature.** This is the activation funnel. It is counted per operator, not per employee, so a business with several staff accounts counts once, and an operator has 14 days to get from the first step to the last.
+
+1. Sees the "Cleaning" entry.
+2. Opens the cleaning settings.
+3. Adds a cleaner.
+4. Saves the cleaning duration and notes.
+5. Turns the feature on for a property.
+6. The first cleaning is created.
+7. The first cleaning is confirmed as done.
+
+The time from step 5 to step 7 is the _time to value_: how long an operator waits before the feature does something useful for them. A large drop at step 3 means the cleaner form asks for too much. An operator who turns the feature on but never gets a cleaning either has no upcoming bookings or hit a failed backfill (rule 6 in block E), and the two are easy to tell apart in the data.
+
+**Funnel 2: a cleaner handles a cleaning.** This funnel is counted per cleaning.
+
+1. The text is sent.
+2. The text is delivered.
+3. The cleaner opens the link.
+4. The cleaner accepts.
+5. The cleaner marks the cleaning as done before check-in.
+
+Each drop points to a different cause. A drop between sent and delivered is a number or carrier problem (decision C3). A drop between delivered and opened means the text is not clear enough to tap. A drop between opened and accepted means the page is confusing or the timing does not work, and the decline reasons say which. A drop between accepted and done usually means cleaners clean but do not tap "done", which rule 9 in block E measures directly.
+
+**Funnel 3: an operator handles a problem.**
+
+1. An alert is sent (a decline, no answer, an unreachable cleaner or a proposed change).
+2. The operator opens the "needs attention" list.
+3. The operator acts: reassigns the cleaning, edits it, or approves the proposed change.
+4. The problem is resolved before the deadline.
+
+The time from the alert to the action matters as much as the conversion. Alerts that are never opened, or opened but not acted on, mean the alerts are noise or unclear, and an operator who learns to ignore alerts is likely to turn the feature off.
+
+**Why people drop out, not only where.** A funnel shows the step where people stop, but not the reason. For the beta cohort, we also record sessions on the setup screens (with every input masked), and watch a handful of recordings at the step with the biggest drop. All three funnels are also split by rollout stage, because the volunteers in the beta move through faster than the ordinary operators who come later.
+
+### Rollout
+
+The same feature flag is used throughout the rollout, and it doubles as the **kill switch**: if a bug starts sending wrong times to cleaners, turning the flag off stops all new messages within seconds, without a deploy. This matters here because a text message cannot be unsent.
+
+1. **Engineers**, on test properties, to check that the feature works end to end.
+2. **Base360's internal team**, on test accounts, to check the health of the feature: errors, message delivery and alerts. If possible, The Flex joins at this stage as the first real operator. The posting promises direct access to its operations, which makes it the natural first customer.
+3. **Beta cohort.** The operators from the target segment who opted in to early access through the fake door, plus some moderately active operators. Volunteers tend to be enthusiasts, so adding moderately active operators means we also hear from people who use the product in an ordinary way. To find them, we rank operators by activity (for example, days active in the app per month, or bookings managed) and take the middle band rather than the top 20%.
+4. **Percentage rollout** to all eligible operators, while keeping a **control group** of eligible operators who do not get the feature yet. Comparing cleanliness scores, readiness complaints and refunds between the two groups is how we show that the feature caused the improvement, rather than something else such as the season.
+
+At every stage, we check the guardrails and then decide to roll out further, fix problems first, or stop.
+
+Two terms that are easy to confuse: the **target segment** is the profile of operators we aim at, while the **control group** is the group that deliberately does not get the feature so we can compare against it. A **canary release** is something else again: a technical practice in which each new version of the code first reaches a small share of traffic so that errors surface early. It applies to every deploy and is not a product rollout stage.
+
+## 5. Technical decisions
+
+### The feature, broken into parts
+
+| Block                       | What it contains                                                                                                                                                                                                                                              | In the MVP |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| **A. Measurement**          | The fake door and survey, the status history, PostHog (feature flag, interface events, experiment), system monitoring, and the rollout controls (eligibility, early-access group, control group, kill switch)                                                 | Yes        |
+| **B. Cleaning core**        | Cleaners, property cleaning settings, scheduling, the history of changes, and the deadline rules                                                                                                                                                              | Yes        |
+| **C. Notification service** | Sending text messages, handling opt-outs, delivering alerts to operators, tracking delivery, retrying, and escalating failures                                                                                                                                | Yes        |
+| **D. Interfaces**           | The cleaner's task page (a link, no login) and the cleaning status on each reservation for the operator                                                                                                                                                       | Yes        |
+|                             | The cleaner portal (login, profile, calendar, cleaners who work for several operators)                                                                                                                                                                        | v1         |
+| **E. Edge cases**           | Last-minute bookings, same-day turnovers, bookings changed or cancelled after the cleaner accepted, windows shorter than the cleaning takes, a cleaner booked twice, the property's timezone and daylight saving changes, and a cleaner who cannot be reached | Yes        |
+
+### Decision 0: where the code lives
+
+Throughout this document, "the cleaning module" means the code that owns cleanings: block B. Before making any other technical decision, we decide where that code lives and where the notification code lives, because several later decisions depend on whether a piece of code can read the reservations database directly. The choice is the following split:
+
+- **The cleaning module lives inside the main application**, next to reservations, and shares its database. This setup is called a _modular monolith_: one application and one database, divided into modules that only talk to each other through clear boundaries such as events. Cleaning needs reservations, properties and the operator's access rules all the time, so splitting it out would add network calls and data copies without a clear benefit at Base360's size.
+- **The notification service is a separate service.** It depends on outside providers such as Twilio, it needs its own retries and delivery tracking, and many features will use it (cleaning first, then guest messages and owner reports). It never needs to read reservations: it only receives instructions such as "send this message to this phone number".
+
+Block A defines which events to record, and blocks B and C record them. Block B decides when something needs to happen (for example, "nobody answered 12 hours before check-in, so the operator must be alerted"), and block C only delivers the message. Keeping that split means the notification service stays generic, so guest messages and owner reports can use it later too.
+
+### What produces the events
+
+```
+ Airbnb / Booking webhook ─┐
+ Hostaway / iCal sync ─────┤
+ Operator edits in the app ┼──► reservations module: ONE save function
+ Guest buys late checkout ─┤          │
+   (Stripe payment)        │          ▼
+ Direct booking website ───┘   ┌─ one DB transaction ──────────────┐
+                               │ reservations row (updated)        │
+                               │ outbox row: reservation.changed   │
+                               └───────────────────────────────────┘
+                                          │
+                                   outbox relay (reads new outbox rows)
+                                          │
+                                          ▼
+                               queue: reservation.changed
+                                          │
+                     ┌────────────────────┼─────────────────────┐
+                     ▼                    ▼                     ▼
+               cleaning (B)      lock codes (later)    guest messages (later)
+                     │
+          produces cleaning.scheduled / .changed / .cancelled
+                     │
+                     ▼
+         notification service (C) ──► Twilio SMS
+```
+
+Reservations change from many places: channel webhooks from Airbnb or Booking.com, calendar syncs, the operator editing a booking in the app, a guest buying a late checkout, and the direct booking website. Three ideas make this diagram work.
+
+First, **a webhook from Airbnb is input, not our event.** The sync code translates "Airbnb says booking X changed" into our own event, `reservation.changed`. Each channel has its own format, but inside the platform there is only one.
+
+Second, **the producer is the single save function in the reservations module.** Every change to a reservation must go through it. If a script ever updates the reservations table directly, no event is produced and the cleaning silently goes out of date. This is also one of the reasons for the nightly reconciliation job described in decision 3.
+
+Third, **consumers become producers.** The cleaning module consumes `reservation.changed` and produces its own `cleaning.*` events, which the notification service consumes in turn. That chain is what makes the system event-driven.
+
+### Decision 1: how the cleaning module finds out about reservation changes
+
+**The question.** When a reservation is created, changed or cancelled, how does the cleaning module learn about it?
+
+**The options.**
+
+- _A direct call_, where the code that saves a reservation also calls the code that creates the cleaning. This is the simplest option, but it ties the two together. If creating the cleaning fails, it is unclear whether saving the reservation should fail too. And every future feature that reacts to reservations (lock codes, guest messages, owner reports) gets added to the same place, until nobody dares to change it.
+- _A database trigger_, where Postgres itself reacts when a reservation row changes. It never misses a change, but the logic is hidden in the database, hard to test, and a trigger cannot send a text message or call other services.
+- _An event_, where the reservations code announces that a reservation changed and the cleaning module listens for that announcement.
+
+**The choice: an event-driven design using publish/subscribe and a transactional outbox.**
+
+**Why.** The reservations code should not know that cleaning exists. Many operations features react to the same reservation changes, so a single event that any feature can listen to scales well, while direct calls do not. The queue also retries automatically if the cleaning module fails, and the posting asks for experience with event-driven architecture explicitly.
+
+**What we give up.** There are more moving parts to run, and events can arrive twice or in the wrong order, which decision 4 deals with.
+
+**How the outbox works.** Saving a reservation and sending an event are two separate actions, and either can fail on its own. If the reservation is saved and the server crashes before the event is sent, the cleaning never hears about the change. If the event is sent and the save then fails, the cleaning reacts to a change that never happened. The outbox solves this by not sending the event directly. Instead, the event is written as a row in an `outbox` table in the same database transaction as the reservation. A transaction is all or nothing, so either both rows are saved or neither is. A separate small process, the relay, reads new outbox rows, puts them on the queue and marks them as sent. If the relay crashes, the rows wait in the table and it continues where it stopped, so no event is lost.
+
+```
+BEGIN
+  UPDATE reservations SET check_in = 'Tue 15:00' WHERE id = 'ben'
+  INSERT INTO outbox (type, reservation_id, version)
+         VALUES ('reservation.changed', 'ben', 8)
+COMMIT            -- both saved, or neither
+```
+
+**At scale.** Change data capture (CDC) can replace the relay. CDC reads the database's own log of changes and turns them into events. Used on all tables it has three problems: consumers become tied to the table structure, so renaming a column breaks them; it records that a row changed but not why (whether a guest or the operator cancelled, for example); and it produces events for purely technical updates. The better pattern is to let CDC read only the outbox table. The code still writes meaningful events, CDC publishes them without a custom relay, and every module in the platform can use the same mechanism.
+
+### Decision 2: what a cleaning is, and what it belongs to
+
+**The question.** A cleaning sits between two stays: one guest leaves and the next one arrives. Which of the two reservations should the cleaning belong to?
+
+**The options.**
+
+- _The arriving guest's reservation._ This matches the first way I described the feature ("a cleaning for each check-in"), but it breaks in an important case. If the next guest cancels, their cleaning is cancelled too, even though the departing guest still left the property dirty. If someone else books for the following day, nobody has cleaned. And a property with no next booking would have no cleaning at all.
+- _The departing guest's reservation._
+- _Both reservations_, stored as a "turnover" record. This shows the whole picture, but it creates two links that can each change, and the edge cases multiply (the first booking ever, gaps between stays).
+
+**The choice: the cleaning belongs to the departing guest's stay.**
+
+**Why.** It matches what happens in reality: the checkout creates the work, and the next check-in only sets the deadline. If the next guest cancels, the cleaning remains and only its deadline disappears. If a last-minute booking arrives, the deadline moves earlier. Each stay produces exactly one cleaning, which gives us a natural unique key.
+
+**What we give up.** Every reservation change has to recalculate the deadline of the cleaning that comes before it.
+
+**What it looks like in the database (a sketch, not the final schema):**
+
+```
+cleanings
+  id
+  operator_id            -- whose data it is
+  property_id
+  after_reservation_id   -- UNIQUE: one cleaning per departing stay
+  cleaner_id
+  available_from         -- the checkout time
+  deadline               -- the next check-in; empty if there is no next booking
+  status                 -- scheduled → sent → accepted / declined → done | late | cancelled
+  created_at, updated_at
+
+cleaning_history         -- who changed what, and when
+```
+
+Three details in this sketch matter. The `operator_id` on every row is what makes the system **multi-tenant**: Postgres row-level security in Supabase guarantees that one operator never sees another operator's cleanings. The unique constraint on `after_reservation_id` means the database itself refuses a second cleaning for the same stay, which solves half of decision 4 for free. And `status` is a **state machine**: only certain changes are allowed (a cleaning that is done cannot go back to sent), and each change records one of the tracking events from section 4.
+
+### Decision 3: working out the time window
+
+**Example used below.** Guest Anna checks out of a flat in Lisbon on Tuesday, and guest Ben checks in the same day. The cleaner needs to know the earliest time they can start and the latest time they must finish.
+
+**Where the times come from.** Channels such as Airbnb mostly send dates, not hours: "Anna stays from the 24th to the 28th, Ben from the 28th to the 30th." The hours come from the property's settings, for example checkout at 11:00 and check-in at 15:00, which gives the cleaner a window from 11:00 to 15:00. A single reservation can override those hours. If Anna buys a late checkout until 13:00, the window shrinks to two hours. **The rule is to use the reservation's own hours when it has them, and the property's hours otherwise.** This also connects to the upsell use case: selling a late checkout shortens the cleaning window, so the sale has to trigger a recalculation, which the event design from decision 1 handles without extra work.
+
+**Why this matters so much.** The deadline is the one number that, if it is wrong, causes a missed cleaning. It also changes for reasons that have nothing to do with cleaning: a late checkout, the next guest changing dates or cancelling, or a new last-minute booking. Each of these must update the cleaning.
+
+**How times are stored.** Storing a fixed offset such as `15:00+01:00` breaks twice a year. Europe changed its clocks on 25 October 2026, so a check-in booked in summer and saved with a `+01:00` offset is now an hour wrong. Instead, we store the property's timezone by name (`Europe/Lisbon`) and save every time as an exact moment in UTC, calculated from the local time. The timezone name carries the daylight saving rules, so conversions are always correct, and comparisons and queries stay simple because everything is in UTC. Times are shown to cleaners and operators in the property's local time, which is what they expect. **The rule is to store moments in UTC, store the timezone name, show local time, and never store an offset.**
+
+**Where the deadline is kept.** There are two ways to know the current deadline after any of these changes. The first is to save nothing and work it out from the two reservations every time someone needs it, which is like checking the train timetable every time instead of writing the departure time down. The second is to save the deadline on the cleaning and rewrite it whenever a reservation change arrives, which is like writing the time in a calendar and correcting it whenever you are told about a change.
+
+**The choice: save the deadline on the cleaning, and run a nightly reconciliation job.**
+
+**Why.** Decision 5 needs to ask "which cleanings have a deadline in the next 12 hours?" With a saved deadline that is one quick query. Without it, the system would have to recalculate every cleaning every few minutes. For an MVP, calculating every time would work fine, and saving the deadline only starts to matter with thousands of properties, but the deadline alerts need fast lookups, so it is worth doing from the start.
+
+**What we give up.** If an update ever gets lost, the saved deadline is wrong and nobody notices. That is why a reconciliation job runs every night: it recalculates every upcoming deadline from the reservations and corrects any that differ. This is a standard safety net in event-driven systems.
+
+**Where the logic lives.** One pure function, with no database access and no network calls, takes the departing stay, the next stay and the property, and returns the earliest start, the deadline, and whether the window is too short for the cleaning. Because it is pure, every edge case becomes a cheap unit test: a same-day turnover, no next booking, a late checkout bought as an upsell, a check-in on the day the clocks change, and a window shorter than the cleaning takes.
+
+### Decision 4: the same change arriving twice, or in the wrong order
+
+**The question.** Queues guarantee that every message arrives at least once, which means it sometimes arrives twice. They also do not always keep messages in order. What happens then?
+
+**Duplicates.** If "Anna's reservation was created" arrives twice and nothing protects against it, the system creates two cleanings and the cleaner receives two text messages. Decision 2 already prevents the first problem: the unique key on the departing stay means the database refuses a second cleaning, so the code always does an _upsert_, which creates the cleaning or updates it if it already exists. For the second problem, the notification service only sends a message when something the cleaner cares about has actually changed, such as the time or a cancellation. The same message arriving twice changes nothing, so nothing is sent.
+
+**Wrong order.** Suppose Ben moves his check-in to Wednesday and then quickly back to Tuesday, but the queue delivers "back to Tuesday" first and "to Wednesday" second. Without protection, the system ends up on Wednesday while Ben arrives on Tuesday, and the cleaner comes a day late.
+
+**The options for ordering.**
+
+- _Version numbers._ Every change to a reservation gets a number that only goes up, and the consumer ignores any event older than the last one it handled. This is precise, but every producer must number changes correctly and every consumer must remember the last number it saw.
+- _Treat the event as a doorbell rather than a letter._ The event only says "something changed on Ben's reservation". The consumer then reads the current reservation from the database and recalculates using the pure function from decision 3.
+
+**The choice: the doorbell approach**, also called thin events or event notification.
+
+**Why.** Order stops mattering, because whichever event arrives, the consumer always reads the current state, which says Tuesday. Duplicates also become harmless, because recalculating twice gives the same result. A process that gives the same result whether it runs once or five times is called **idempotent**. This approach works because of the outbox from decision 1: the event is only published after the reservation is saved, so the database already holds the new state when the doorbell rings.
+
+**What we give up.** One extra database read per event, which is trivial.
+
+**When this does not apply.** The doorbell approach only works when the consumer can read the source database. Inside one application with one database (a _modular monolith_, which is the likely setup at Base360's size), the cleaning module can. A separate service with its own database cannot. In that case, the event has to carry the full data (_event-carried state transfer_), the service stores the identifiers of events it has already handled so it can skip repeats (the _inbox pattern_), and it uses version numbers rather than timestamps to decide the order. Timestamps are unreliable for ordering because different servers' clocks differ slightly and two changes can carry the same timestamp. This is exactly the situation of the notification service in block C: it never sees reservations, only instructions from the cleaning module, and it handles duplicates with idempotency keys.
+
+**The summary for this decision:** duplicates and reordering are normal with queues that deliver at least once. Instead of trying to prevent them, the design makes them harmless.
+
+### Decision 5: noticing deadlines
+
+**The question.** When a deadline approaches, nothing happens on its own. At three in the morning, twelve hours before Ben's check-in, no guest clicks anything and no webhook arrives. The passing of time is not an event, so something has to wake up and check.
+
+**The rules (product decisions, fixed for the MVP):**
+
+| When                                                              | What happens                                                              |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| The cleaner has not answered two hours after the message was sent | A reminder message is sent to the cleaner                                 |
+| The cleaner has not answered twelve hours before the deadline     | The operator is alerted                                                   |
+| A last-minute booking leaves less than twelve hours               | The operator is alerted immediately, in addition to the cleaner's message |
+| The cleaning is not marked as done by the deadline                | The status becomes `late` and the operator is alerted                     |
+
+**The options.**
+
+- _A regular sweep._ Every five minutes, one query finds the cleanings that have not been accepted, whose deadline is less than twelve hours away, and that have not triggered an alert yet.
+- _A timer for each cleaning._ When a cleaning is created, a job is scheduled for the exact moment to check it (for example, with AWS EventBridge Scheduler). This is precise to the minute, but deadlines move. Every change to a reservation means cancelling the old timer and setting a new one, a timer that was not moved fires at the wrong moment, and with thousands of timers a lost one goes unnoticed.
+- _A durable workflow for each cleaning_ (with Temporal, Inngest or AWS Step Functions), where each cleaning is a small program that sleeps until the deadline or until the cleaner accepts. This is the most expressive option, but it is heavy infrastructure for an MVP.
+
+**The choice: a sweep every five minutes.**
+
+**Why.** It is simple, and it heals itself: if one run fails, the next run finds the same cleanings. It is also cheap, because the deadline is saved on the cleaning (decision 3), so the sweep is a single indexed query. The same job can also carry out the reconciliation check from decision 3, so there is one scheduled job rather than two.
+
+**What we give up.** Alerts can be up to five minutes late, which does not matter for cleaning. The sweep must also never alert twice, so the cleaning records when an alert was sent (for example, `no_response_alerted_at`), and the sweep only alerts when that field is empty.
+
+**At scale.** When precision to the minute or a very large volume matters, the sweep can be replaced by per-cleaning timers or durable workflows.
+
+### Block B summary
+
+| Decision                                         | Choice                                                                                                                                 | The reason in one sentence                                                                              |
+| ------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| 1. How cleaning learns about reservation changes | Events with publish/subscribe and a transactional outbox                                                                               | Many features react to the same reservation changes, and the outbox guarantees no event is lost.        |
+| 2. What a cleaning belongs to                    | The departing guest's stay, with the next check-in as the deadline                                                                     | The checkout creates the work, so the cleaning survives when the next guest cancels.                    |
+| 3. The time window                               | Reservation hours override property hours; times in UTC with the timezone name; the deadline saved on the cleaning and checked nightly | The deadline is the number that causes missed cleanings when it is wrong, and it must be fast to query. |
+| 4. Duplicates and order                          | Doorbell events that re-read the current reservation, and upserts with a unique key                                                    | Instead of preventing duplicates and reordering, the design makes them harmless.                        |
+| 5. Deadlines                                     | A sweep every five minutes that records each alert                                                                                     | Time passing is not an event, and a sweep is simple and heals itself.                                   |
+
+### Block C: the notification service
+
+The notification service has one job: when the cleaning module says "tell this cleaner", the cleaner really finds out, and if they cannot be reached, the operator learns about it quickly. No channel guarantees delivery. Text messages fail because of wrong numbers, carrier filtering or phones that are switched off. So this block is mostly about noticing failures and escalating them. It covers four decisions: how a message is sent, how we confirm it arrived, what happens when it did not, and what happens when the cleaner replies to the text or opts out.
+
+The MVP uses SMS rather than WhatsApp, because not every cleaner uses WhatsApp, while every phone receives text messages. WhatsApp can be added later as a second channel.
+
+### Decision C1: how a message gets sent
+
+**The question.** The cleaning module decides that Maria, the cleaner, must be told about the cleaning after Anna's checkout. Sending the text means calling Twilio over the internet, and that call can fail, be slow, or time out without telling us whether the message went out. How do we make sure the message is neither lost nor sent twice?
+
+**The options.**
+
+- _The cleaning module calls Twilio directly_ when it creates the cleaning. This is the simplest approach, but if Twilio is unavailable for a minute, the message is lost unless the cleaning module also learns how to retry. It also ties the cleaning module to one text message provider, so adding WhatsApp or email later means changing the cleaning module again.
+- _The cleaning module creates a message request, and the notification service sends it._ The cleaning module only records an instruction, "send this cleaner this message about this cleaning", through the same outbox mechanism as decision 1, so the instruction cannot be lost. The notification service saves the instruction in its own `messages` table with the status `pending`, and a worker sends pending messages to Twilio.
+
+**The choice: the cleaning module creates a message request, and the notification service sends it.**
+
+**Why.** The cleaning module does not need to know how messages are delivered. Retries live in one place. And when guest messages and owner reports are built later, they reuse the same service instead of each learning how to talk to Twilio.
+
+**How duplicates are prevented.** Every instruction carries an _idempotency key_, built from the cleaning's identifier and the version of the message content (for example, "cleaning 42, version 3"). If the same instruction arrives twice, the second one finds the key already stored and is skipped. This is the inbox pattern from decision 4, used here because the notification service has its own database and cannot re-read reservations.
+
+**What we give up.** One case cannot be fully solved. If the call to Twilio times out, we do not know whether the message went out, so we must choose between retrying, and risking that Maria receives the message twice, or not retrying, and risking that she never receives it. For cleaning, a duplicate text is a small annoyance, while a missed cleaning costs a refund and a bad review, so we retry and accept the rare duplicate. Twilio also accepts an idempotency key on its side, which removes most of these duplicates. In system design terms, this is choosing _at-least-once_ delivery over _at-most-once_ delivery, and the choice depends on which failure costs the business more.
+
+### Decision C2: knowing whether the message arrived
+
+**The question.** When Twilio accepts a message, that only means Twilio has taken it, not that it reached Maria's phone. How do we find out what actually happened?
+
+**The options.**
+
+- _Trust Twilio's answer to the send request._ If Twilio accepts the message, we treat it as delivered. This costs nothing, but it misses most real failures: a wrong number, a phone network blocking the message, or a phone that has been switched off for two days all look like success.
+- _Delivery status callbacks._ When we send a message, we give Twilio a web address on our side, and Twilio calls it every time the message's status changes: queued, sent (handed to the phone network), delivered (the network confirms the message reached the phone), or undelivered and failed (with an error code that explains why). We store every status on the message's row.
+- _The cleaner's response._ Even a delivered text can go unread. What we really care about is that Maria knows about the cleaning, and the only proof of that is her opening the link or, better, accepting the cleaning.
+
+**The choice: delivery status callbacks, with the cleaner's response as the final confirmation.**
+
+**Why.** The callbacks catch technical failures quickly. If a message fails within a minute, we know the cleaner cannot be reached and can escalate straight away instead of waiting hours for an answer that will never come. The cleaner's acceptance then confirms that the person, not only the phone, has the information. Decision C3 uses both signals: a failed message means acting immediately, while a delivered message with no answer means reminding the cleaner and then alerting the operator.
+
+**Three details that make callbacks safe to rely on.** First, the callbacks come from outside our system, so we check Twilio's signature on every call; otherwise anyone could tell us that a message was delivered. Second, callbacks can arrive twice or in the wrong order, which is the same lesson as decision 4, so a message's status only ever moves forward: once "delivered" is recorded, a late "sent" changes nothing. Third, not every phone network reports delivery. In some countries the last status we ever receive is "sent", so a missing "delivered" is not proof of failure. Only "undelivered" or "failed" is.
+
+**What we give up.** We need a public endpoint for the callbacks and a little more data per message, which is a small cost for knowing about failures within minutes rather than at check-in time.
+
+### Decision C3: retries and escalation
+
+**The question.** A message can go wrong in two very different ways: it can fail to reach the phone, or it can reach the phone and get no answer. In each case, what does the system do, and which part of the system decides?
+
+**Retrying failed messages.** Failures come in two kinds, and they need opposite treatment. Temporary failures, such as Twilio being briefly unavailable, Twilio asking us to slow down, or a network timeout, usually succeed when tried again a little later. Permanent failures, such as a number that does not exist, a landline that cannot receive texts, or a cleaner who replied STOP, will never succeed, and every retry only delays the moment a person fixes the problem.
+
+One option is to retry every failure a fixed number of times. It is simple, but with a wrong phone number the system would spend half an hour retrying before anyone is told, and on a same-day turnover that half hour matters. **The choice is to sort failures by their error code.** Temporary failures are retried with growing gaps, for example after 30 seconds, then 2 minutes, then 10 minutes. This is called _exponential backoff_, and a little randomness is added to each gap (_jitter_) so that thousands of messages do not all retry in the same second. Permanent failures stop at once and are reported immediately. A message that has used up all its retries is moved to a separate holding list, a _dead letter queue_, which engineers can inspect and whose size becomes one of the guardrail metrics. The point of retrying is to recover from short glitches, not to hide problems that need a person.
+
+**Who decides what happens next.** When a message finally fails, something has to decide whether to alert the operator, try another channel or try another cleaner. If the notification service decided this itself, it would need to know about cleanings, deadlines and operators, and it would stop being a generic service. **The choice is that the notification service reports and the cleaning module decides.** The notification service only publishes the outcome, for example "the message for cleaning 42 failed permanently because the number opted out". The cleaning module receives that event, applies its rules, marks the cleaner as unreachable and asks the notification service to alert the operator. This keeps the split from Decision 0: block B decides, and block C delivers.
+
+**The escalation ladder.** Combining delivery failures with the deadline rules from decision 5, one cleaning follows this ladder:
+
+| What happens                                                             | What the system does                                                                                              |
+| ------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- |
+| The message fails permanently (a wrong number, or the cleaner opted out) | The operator is alerted immediately, and the cleaner is marked unreachable until the operator fixes their details |
+| The message fails temporarily                                            | It is retried with backoff, and if every retry fails, the operator is alerted                                     |
+| The message is delivered, but there is no answer after 2 hours           | A reminder is sent to the cleaner                                                                                 |
+| There is still no answer 12 hours before the deadline                    | The operator is alerted                                                                                           |
+| The cleaner declines                                                     | The operator is alerted immediately, so they can find someone else                                                |
+
+**How the operator is alerted.** Operators receive urgent alerts by SMS, in addition to an in-app notification and an email. As an operator myself, I am often away from the internet, and an alert about a cleaning that will not happen is exactly the message I cannot afford to miss. A text message reaches a phone without a data connection, while the app and email do not. Because every text has a cost, SMS is reserved for alerts that need action (a permanent failure, a decline, no answer close to the deadline, and a late cleaning), while routine updates such as "the cleaner accepted" stay in the app. The operator's alerts go through the same notification service, with the same retries and delivery tracking, so an alert that fails to reach the operator is itself visible. Sending the cleaning to a backup cleaner automatically is left for v1, because the MVP has only one default cleaner per property.
+
+**What we give up.** Sorting error codes means maintaining a list of which Twilio errors are temporary and which are permanent, and texting operators adds a small cost per alert. Both are small compared with a cleaning that nobody knew was at risk.
+
+### Decision C4: replies and opt-outs
+
+**The question.** Cleaners will sometimes text back ("I'll be 30 minutes late", "OK"), and some will reply STOP. Where do these messages go?
+
+**The options.** One option is to treat the SMS as a conversation: save every reply, work out which cleaning it is about, and show it to the operator. This sounds helpful, but it is complex. A text message has no thread, so if a cleaner has three cleanings today, "I'll be late" could be about any of them, and matching replies reliably needs tricks such as a separate sending number for each operator. The other option is to treat the SMS as a notification only, and keep all communication on the cleaner's page.
+
+**The choice: the SMS only notifies, and all communication happens on the cleaner's page.** The cleaner accepts, declines or proposes a change on the page, where every action already belongs to one specific cleaning, so there is nothing to match.
+
+**Why.** The page gives structured answers (accepted, declined with a reason, a proposed new time), while text replies are unstructured and ambiguous. Keeping one place for communication also keeps the notification service simple, since it only has to send, and never has to understand what comes back.
+
+**What still has to be handled.** Cleaners can reply to a text whether we want them to or not, so two cases remain. First, any reply receives an automatic answer, such as "This number does not receive messages. Please use the link to accept, decline or change the cleaning." Second, a cleaner can always reply STOP, and phone networks and Twilio enforce this by law in many countries: Twilio stops sending to that number and tells us about it. We do not fight opt-outs, we make them visible. The notification service publishes "this number opted out", the cleaning module marks the cleaner as unreachable, and the escalation ladder from C3 alerts the operator by SMS. If the cleaner later sends START, they become reachable again.
+
+**A security rule that follows from this.** Cleaning notes often contain a key box code or a door code. A text message is not private: it shows on a locked screen, stays on old phones and passes through phone networks. So the text never contains the address, the notes or any code. It only says that there is a cleaning and when, with the link. This makes the link the sensitive part, which is the first decision of block D.
+
+**What we give up.** Cleaners who prefer texting have to open a page instead, and the operator does not see anything they write in a reply. The automatic answer points them to the page, and the decline and change reasons on the page give the operator the same information in a structured form.
+
+### Block D: the interfaces
+
+Block D covers the two screens people actually use: the cleaner's page, opened from the link in the text message, and the operator's view of cleanings.
+
+### Decision D1: making the cleaner's link safe without a login
+
+**The question.** The link opens a page with the address, the cleaning notes and possibly a key box code, and the cleaner has no account or password. How do we make sure that only the right cleaner can open the cleaning, and only for as long as they need it?
+
+**The options.**
+
+- _Put the cleaning's number in the link_, such as `/cleaning/42`. This must never be done: anyone who changes 42 to 43 sees another operator's property and door code. The mistake is common enough to have its own name, _insecure direct object reference_.
+- _A long random token for each cleaning and cleaner._ The link contains about 30 random characters, which are impossible to guess.
+- _The token plus a one-time code._ When the link is opened on a new phone, the page asks for a six-digit code sent by SMS. This is stronger, but it adds friction for every cleaner and an extra text for every new device.
+- _A full login with a password._ This is the cleaner portal planned for v1, and too much friction for the MVP.
+
+**The choice: a long random token, with one link per cleaning.**
+
+**Why.** It is safe without asking the cleaner to remember anything, as long as four rules hold. First, we store only a hash of the token, in the same way passwords are stored, so even someone who reads our database cannot rebuild the links. Second, the link expires, for example one day after the cleaning's deadline. Third, the link is revoked when the operator reassigns the cleaning, so the previous cleaner's link stops working the moment someone else takes over. Fourth, access codes are shown only on the day of the cleaning, so a link opened a week early or forwarded to someone else does not reveal them, and every opening of the page is recorded, so the operator can see who looked and when.
+
+**Why a stored token rather than a signed one.** A common alternative is a signed token, such as a JWT, which the server can check without looking anything up in the database. The problem is that a signed token cannot easily be cancelled before it expires, and here cancelling a link when a cleaning is reassigned is essential. A random token stored in the database can be revoked at any moment.
+
+**Why one link per cleaning.** Each text message carries the link to its own cleaning, so a page never shows more than one property. A single link per cleaner listing all their cleanings would be convenient, but it is much closer to the cleaner portal planned for v1, and a leaked link would reveal every property the cleaner works at.
+
+**What we give up.** Anyone who gets hold of a valid link before it expires can open the page. The expiry, the day-of-cleaning rule for codes and the page-view log limit that risk. If the log ever shows links opened by people other than the cleaner, adding the one-time code is a small change.
+
+### Decision D2: the operator's view of cleanings
+
+**The question.** The operator needs to know how cleanings are going and to act when something goes wrong: a decline, no answer, an unreachable cleaner, a proposed change or a late cleaning. What should they see, and how does the view stay up to date?
+
+**What the operator sees first.** One option is a calendar of all cleanings. It is complete, but an operator with 40 units sees around 40 cleanings a week, almost all of them fine, and has to search for the few that are not. **The choice is to show what needs attention first.** The view opens with a short list of cleanings that need action, each with its reason and a single button to act on it, such as reassigning the cleaning or approving a proposed change. Everything that is going well appears as a coloured status label on each reservation, and the full list is one click away. This approach is called _management by exception_: the operator spends attention only where something is wrong, which is the whole point of a feature meant to save their time.
+
+**Approving a proposed change.** When a cleaner proposes a different time, the operator approves or rejects it with one tap. If the operator approves, the cleaning's time is updated and the cleaner receives a text with the link. If the operator rejects, the cleaner receives a text asking them to accept the original time or decline. Before the operator can approve, the system checks that the new time still fits the window, using the same pure function as decision 3.
+
+**How the view stays up to date.** One option is live updates, where the operator's open screen changes the moment a cleaner accepts. Supabase supports this through Realtime: the browser subscribes to changes in the cleanings table, limited to the operator's own rows by the row-level security from decision 2. **The choice for the MVP is simpler: the view loads fresh data whenever it is opened or the browser tab comes back into focus.** Anything urgent already reaches the operator by SMS (decision C3), so nobody needs to watch the screen to catch it, and there is nothing extra to run or debug. Live updates are a good improvement for v1, once operators use the screen heavily.
+
+**What we give up.** An operator who leaves the view open will not see a new acceptance until they return to the tab, which matters little because urgent events arrive by text.
+
+### Block E: edge cases
+
+An edge case is a situation that is rare on any given day but certain to happen at scale. Most of the edge cases in this feature are already handled by earlier decisions, so this block first checks that, and then adds rules where nothing covered the case yet.
+
+**Already handled by earlier decisions.**
+
+| Edge case                                                       | What happens                                                                                                                               | Covered by          |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ | ------------------- |
+| The next guest cancels                                          | The cleaning remains, because the departing guest still left the property dirty, and only the deadline disappears.                         | Decision 2          |
+| The departing guest cancels before arriving                     | There is no stay and no checkout, so the cleaning is cancelled and the cleaner receives a text with the link.                              | Decisions 2 and 4   |
+| A guest extends their stay or buys a late checkout              | The checkout moves later, so the start of the cleaning window moves with it, and the cleaner is notified.                                  | Decisions 3 and 4   |
+| A check-in on the day the clocks change                         | Times are stored in UTC with the property's timezone name, so the deadline stays correct. This is a unit test of the pure window function. | Decision 3          |
+| The cleaner cannot be reached (a wrong number, or a STOP reply) | The operator receives an SMS, and the cleaner is marked as unreachable.                                                                    | Decisions C3 and C4 |
+| The same change arrives twice or in the wrong order             | It is harmless, because the cleaning module re-reads the current reservation.                                                              | Decision 4          |
+
+**New rules.**
+
+1. **The booking changes after the cleaner accepted.** Not every change matters equally. A change that shortens the window or moves it to another day sends the cleaning back to "waiting for acceptance", and the cleaner receives a text asking them to confirm again. A change that only gives the cleaner more time keeps the acceptance, and the cleaner is simply notified.
+2. **A last-minute booking.** When someone books tonight's stay in the afternoon, the deadline of the cleaning before it moves earlier straight away (rule 1 applies if the cleaner had already accepted), and the operator receives an SMS immediately rather than waiting for the twelve-hour rule from decision 5.
+3. **The window is shorter than the cleaning takes.** For example, checkout is at 13:00, check-in at 15:00, and the cleaning takes three hours. The cleaning is still sent to the cleaner, because they may work faster or bring help, but it appears in the operator's "needs attention" list as too tight, so the operator can ask the guest for a later check-in or add a second cleaner.
+4. **The cleaner is booked twice at the same time.** When two of a cleaner's cleanings overlap, the operator is warned but the cleanings are not blocked, because the operator may know that one of them is a quick refresh. In the MVP, overlaps are only visible within one operator, because each operator keeps their own cleaner records. Overlaps across operators belong to the v1 question of cleaners who work for several operators.
+5. **No next booking.** Without a deadline, no deadline alerts are sent and the cleaning can never be late. When a booking arrives, rules 1 and 2 apply.
+6. **Turning the feature on for a property with existing bookings.** Reservations created before the feature was turned on would otherwise never get a cleaning, because no event will arrive for them. So turning the feature on creates cleanings for every stay that checks out in the next 30 days. This is called a _backfill_.
+7. **Turning the feature off.** Cleanings that have not been sent yet are cancelled quietly. Cleanings that a cleaner has already accepted are cancelled, and the cleaner receives a text with the link, so nobody arrives to clean for nothing.
+8. **The operator changes a property's default cleaner.** The change applies to future cleanings and to cleanings that have not been accepted yet. Cleanings that a cleaner has already accepted stay with that cleaner unless the operator reassigns them one by one.
+9. **The cleaner cleaned but never marked the cleaning as done.** The operator can mark it as done by hand. This is recorded as "marked done by the operator" and kept out of the main metric, so the main metric only counts cleanings that cleaners confirmed themselves. How often operators need to do this is a useful number in its own right, because it shows whether cleaners actually use the page.
+10. **Days the owner blocks for their own use.** These appear in the calendar without a reservation, and it is not yet clear whether a cleaning should follow them. This is not decided here: it is a question for the interviews.
+
+### Block A: instrumentation
+
+Section 4 says what to measure. This block decides how the numbers are actually recorded. It has to be in place from the first release, because a metric that was not recorded at the time cannot be calculated later: the history is simply missing.
+
+**Decision A1: the database is the source of truth for business metrics.** Everything the metrics need already lives in tables the feature uses to work: the cleaning (its state, deadline and cleaner) and the messages (their delivery status from the Twilio callbacks). We add one more table, the status history, with one row for every change of a cleaning's state, the time it happened, who made it (the cleaner, the operator or the system) and the reason when there is one. With it, "confirmed as done before check-in", "time to accept" and "declined, and why" are all SQL queries. The alternative was to send every state change to PostHog as an analytics event. We rejected it because it creates a second copy of the same facts, and that copy can drift from the first: a retried event counts twice, and a new code path that forgets to send the event leaves a gap.
+
+**Decision A2: PostHog covers what the database cannot see.** It is used for three things:
+
+- **The feature flag, evaluated per operator.** The operator is a group in PostHog (this is called _group analytics_), because the customer is the business, not one of its employees. If the flag were evaluated per person, two employees of the same operator could see different versions, and the control group would leak.
+- **Interface events, recorded in the browser.** These are clicks on the fake door and the answers to its questions, opening the "needs attention" list, approving a proposed change, the steps of the setup funnel (opening the settings, adding a cleaner, saving the duration and notes), and how often operators reload the page (the signal for live updates in section 6). None of these change any data, so the database never sees them. Session recordings of the setup screens, for the beta cohort only, are also kept here.
+- **The experiment.** PostHog knows which operators are in the beta cohort, the percentage rollout and the control group.
+
+To compare those groups on the business metrics, the cleaning tables are connected to PostHog as a _data warehouse source_, which copies them into PostHog on a schedule. An hourly sync is enough for metrics that move over days. A single query can then join cleanings with the flag groups, so the dashboards for the main metric, the guardrails and the experiment all live in one place. Unlike separate analytics events, this copy is managed: it is always a copy of the real tables, so it cannot drift from them.
+
+**Decision A3: system health goes to monitoring, not to product analytics.** The size of the dead letter queue, the outbox relay lag, the sweep duration and the delivery SLO answer a different question (is the system working right now?) for a different audience (the engineer on call), and they need alerts within minutes. They go to the monitoring and alerting tool, for example CloudWatch on AWS. Stage 1 in section 6 describes them.
+
+**The cleaner's page carries no analytics.** Cleaners are not Base360's users and never agreed to be tracked, so the cleaner's funnel is built only from the database: the message's delivery status, the link's view log (decision D1) and the status history. This gives every step of that funnel without putting a tracking script on a page that strangers open from a text message.
+
+**Decision A4: no personal data in analytics.** PostHog receives identifiers and measurements only: operator, property and cleaning ids, the length of the window, how far ahead a booking was made, the time taken to accept, and the category of a decline reason. It never receives phone numbers, addresses, cleaning notes or access codes. The warehouse sync follows the same rule, because only the columns the metrics need are synced.
+
+## 6. At scale
+
+This section answers one question: what breaks as Base360 grows, and what would we change? For each stage, it describes what goes wrong, the signal that shows we have reached that point, and the change we would make. The signal matters most, because a system should not be rebuilt for scale in advance. It should be rebuilt when the numbers say so.
+
+### Stage 1: 10 to 100 operators, up to about 1,000 properties
+
+Nothing breaks at this size. The MVP design, with one database, an outbox relay, a sweep every five minutes and text messages sent through one Twilio number, handles it easily, and rebuilding anything for scale here would be waste.
+
+What we set up at this stage is the monitoring that tells us when the next stage is coming: the size of the dead letter queue, how long each sweep takes, how far behind the outbox relay is (measured by its oldest unsent row), and the share of text messages delivered within five minutes. The last one is worth turning into a promise, for example "99% of cleaning texts are delivered within five minutes". A promise like this is called a _service level objective_ (SLO).
+
+### Stage 2: about 1,000 operators and 10,000 properties
+
+**The morning rush of text messages.** Most checkouts happen between 10:00 and 11:00 local time, so thousands of messages are created at once, and phone networks limit how fast a single number can send. In the United States, an ordinary number sends about one text per second. The signal is the delivery time during the morning rising above the SLO. The change is to send through a pool of numbers, managed by Twilio's Messaging Services, and to add a priority lane so that urgent operator alerts never wait behind routine cleaning notices. Each country's sender registration also has to be completed: numbers in the United States need A2P 10DLC registration, while much of Europe allows a sender name instead of a number.
+
+**One large operator crowds out everyone else.** An operator with 3,000 units syncing their calendar can flood the queue, so smaller operators' changes wait behind theirs. This is the _noisy neighbour_ problem of multi-tenant systems. The signal is a large difference in queue waiting times between operators. The change is _per-tenant fairness_: the queue takes work from each operator in turn, or the largest operators get their own lanes.
+
+**Cleaners who work for several operators.** Decision C4 avoided matching replies in the MVP, but once cleaners work for several operators (the v1 portal), one phone number belongs to several operators' records, and the opt-out and automatic reply handling no longer knows which operator to inform. The change is to give each cleaner one identity across the platform, with separate consent and settings for each operator they work for, and to send from a separate number per operator or per region, so every text clearly comes from one sender. This is the largest data model change in the whole feature, which is why it was kept out of the MVP.
+
+**The operator's view feels out of date.** The signal is operators reloading the page often, which the product analytics show. The change is live updates through Supabase Realtime, as planned in decision D2.
+
+### Stage 3: 100,000 properties and more
+
+**The outbox relay and the sweep become bottlenecks.** A single relay process reading the outbox, and a single sweep scanning all upcoming cleanings every five minutes, both slow down as the tables grow. Change data capture reading the outbox table replaces the relay and becomes one event pipeline for the whole platform (decision 1). The sweep is split by operator or region so that several workers share the work, and where precision matters, per-cleaning timers or durable workflows replace it (decision 5). The nightly reconciliation becomes incremental: it checks only the properties whose reservations changed, instead of every property.
+
+**The tables grow without end.** Cleanings, messages and especially the history of changes grow every day, and most rows are never read again. An index on status and deadline keeps the queries that matter fast, finished cleanings older than a few months move to cheaper storage, and the tables are partitioned by month so that old months can be archived or removed as whole pieces.
+
+**Text messages become a real cost.** With several texts per cleaning across 100,000 properties, the bill is significant, while in many countries WhatsApp is much cheaper and more cleaners use it. The change is to choose the channel for each country and each cleaner: WhatsApp where it is cheaper and the cleaner uses it, and SMS everywhere else, while urgent operator alerts stay on SMS. Because the notification service is generic (decision C1), this change happens inside one service and nothing else is affected.
+
+**The AI agent becomes worth building.** Nothing breaks here, but by this stage the platform holds hundreds of thousands of decline reasons, proposed changes and "something is wrong" notes. That is exactly the data an agent needs, for example to suggest a replacement cleaner when someone declines, or to turn a note about a broken shower into a maintenance task. This makes the agent the natural next use case, built from real data rather than guessed at in the MVP.
+
+## 7. From plan to implementation: tracer bullets
+
+A _tracer bullet_ (the term comes from _The Pragmatic Programmer_) is a thin slice of the feature that works from start to finish, crudely at first, instead of one layer being finished at a time. The first slice proves that all the pieces connect, and every later slice makes that same path thicker. Each slice below is small enough to become one issue for ADW, the AI developer workflow I built, which plans, implements, tests and reviews one issue at a time. You can [watch ADW build](/projects) on real issues.
+
+1. **The skeleton.** Behind the feature flag, a reservation change is written to the outbox, the cleaning module creates a cleaning for the stay and writes its first row to the status history, and the notification service only logs "would send a text". There is no Twilio yet. (Decisions 0, 1 and 2, and A1)
+2. **The real window.** The pure window function, with tests for timezones and daylight saving changes, and safe handling of repeated and out-of-order changes by re-reading the reservation. (Decisions 3 and 4)
+3. **Real text messages.** Sending through Twilio with idempotency keys, the delivery status callbacks, retries, and the dead letter queue. (Decisions C1 to C3)
+4. **The cleaner's page.** The secure link, with accept, decline with a reason, propose a change, and done with an optional note. (Decisions C4 and D1)
+5. **Deadlines.** The five-minute sweep, the reminders, and the SMS alert ladder for the operator. (Decisions 5 and C3)
+6. **The operator's view.** The cleaning status on each reservation, the "needs attention" list, and one-tap approval of proposed changes. (Decision D2)
+7. **Edge cases.** Rules 1 to 5, 8 and 9 from block E, one slice per rule, each with its own tests.
+8. **Measurement.** Operator groups and interface events in PostHog, the warehouse sync, the dashboards for the main metric, the guardrails and the experiment, the three funnels, session recordings of the setup screens for the beta cohort, and the system health alerts. (Decisions A2 to A4)
+9. **Rollout controls.** The backfill when the feature is turned on, the cancellations when it is turned off, and the control group. (Rules 6 and 7 from block E, and the rollout in section 4)
+
+## Open questions
+
+- Are the decision rule thresholds right: 5 of 8 interviewees, two hours a week, twice the click rate of a comparable entry, and 20 early-access opt-ins?
+- Should the cleaning happen right after checkout or just before check-in?
+- What exactly do cleaners need to know before they arrive?
+- Does a cleaning follow days the owner blocks for their own use?
+- Is The Flex able to act as the first real operator, and how does it handle cleaning today?

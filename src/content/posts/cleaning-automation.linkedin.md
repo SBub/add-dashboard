@@ -1,4 +1,4 @@
-Product engineered a feature from the @Base360.ai Product Engineer posting: cleaning and maintenance automation for short-term rentals.
+Product engineered a feature from @Base360.ai: cleaning and maintenance automation for short-term rentals.
 
 Full breakdown of:
 

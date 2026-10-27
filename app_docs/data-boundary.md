@@ -6,6 +6,7 @@
 - specs/issue-158-adw-a58f07d8-sdlc_planner-worker-status-widget.md
 - specs/issue-164-adw-cf1087b2-sdlc_planner-hire-me-page-contact-form.md
 - specs/issue-169-adw-98e70d08-sdlc_planner-who-you-are-home-page.md
+- specs/issue-240-adw-94a45897-sdlc_planner-cut-realtime-request-bursts.md
 
 ## Overview
 
@@ -290,6 +291,19 @@ and returns that instance afterwards, so a page holds one websocket. It throws
 if either variable is missing rather than connecting to nowhere. The same
 client serves the server-side read of `project_summaries` in `getProjects()`;
 on the server no channel is ever subscribed, so no socket is opened there.
+
+`createClient` is called with
+`realtime: { reconnectAfterMs: () => realtimeBackoff.next() }`.
+`realtimeBackoff` (exported from the same file, built by
+`createReconnectBackoff` in `src/lib/request-pacing.ts`) replaces realtime-js's
+default reconnect delay (1, 2, 5, 10 s), whose `tries` counter restarts after
+every successful open, so a socket that opened then dropped reconnected every
+few seconds forever. The replacement keeps its own counter (2, 4, 8, 16, 30 s,
+each up to 25% longer, never above 30 s), reset only after the channel has
+stayed `SUBSCRIBED` for 60 s, signalled from `src/data/realtime.ts`. Only the
+socket delay is replaced; the channel's own rejoin timer keeps its default and
+rejoins when the socket reopens. On the server no channel subscribes, so the
+option is inert there. It is still the one `createClient` call.
 
 ## Rules
 

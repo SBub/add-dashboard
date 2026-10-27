@@ -2,11 +2,20 @@
 
 import { QueryClientProvider } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 import { type ReactNode, useEffect, useState } from "react";
 import { makeQueryClient } from "@/data/query-client";
 import { startRealtime } from "@/data/realtime";
+import { createRealtimeTracker, readAnalyticsContext } from "@/lib/analytics";
 import { isProjectPath } from "@/lib/project-route";
 import { revalidateHistory } from "./actions/revalidate-history";
+
+// The Realtime connection events (realtime_connected, realtime_disconnected).
+// Built once per document at module scope, so its first-or-reconnect count
+// spans every Providers mount in this page; on the server, and wherever
+// analytics is off, it is a callback that sends nothing.
+const { env, browser } = readAnalyticsContext();
+const trackRealtime = createRealtimeTracker(env, browser, posthog);
 
 /**
  * Holds the browser's one QueryClient for the whole session. It comes from the
@@ -63,6 +72,7 @@ export function Providers({ children }: { children: ReactNode }) {
             })
             .catch(() => {});
         },
+        onStatus: trackRealtime,
       }),
     [queryClient, router],
   );

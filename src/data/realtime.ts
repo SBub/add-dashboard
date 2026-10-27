@@ -35,6 +35,13 @@ export interface RealtimeOptions {
    * Called after the cache writes for the event.
    */
   onHistoryChange?: (slug: string) => void;
+  /**
+   * Called with every channel state after the indicator is set, so Providers
+   * can send the Realtime connection events (createRealtimeTracker in
+   * src/lib/analytics.ts). It only observes: nothing here depends on it, and
+   * it must not throw.
+   */
+  onStatus?: (state: `${REALTIME_SUBSCRIBE_STATES}`) => void;
 }
 
 /**
@@ -87,6 +94,7 @@ export function startRealtime(queryClient: QueryClient, options: RealtimeOptions
           setConnectionStatus(ConnectionStatus.Connecting);
           break;
       }
+      options.onStatus?.(state);
     });
 
   return () => {

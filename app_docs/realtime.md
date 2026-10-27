@@ -35,7 +35,11 @@ dropping `history:<slug>` followed by a route refresh (see "The move" in `app_do
 
 `src/data/realtime.ts` exports `startRealtime(queryClient, options)`, where
 `options.onHistoryChange?: (slug) => void` is the hook `Providers` uses to
-start the move (`app_docs/history-revalidation.md`). It opens one channel named `adw` with three
+start the move (`app_docs/history-revalidation.md`), and
+`options.onStatus?: (state) => void` is called with every channel state after
+the indicator is set; `Providers` passes the Realtime connection tracker
+there (`realtime_connected`, `realtime_disconnected`, see
+`app_docs/analytics.md`). It only observes. It opens one channel named `adw` with three
 `postgres_changes` listeners, every event on `adw.projects`, `adw.runs` and
 `adw.queue_items`. A projects event goes through
 `applyProjectChange` (next section) and the result is written under
@@ -302,6 +306,8 @@ live updates (above) go through the query cache, not this store.
   `query-keys.ts`, not an inline `["queue"]`. It never reads
   history.
 - One channel, named `adw`, opened by `startRealtime` and started only from
-  `Providers`, which is also the only place the `onHistoryChange` option is
-  wired (it needs `useRouter`). All three listeners (projects, runs,
+  `Providers`, which is also the only place the `onHistoryChange` and
+  `onStatus` options are wired (the first needs `useRouter`). `onStatus` only
+  observes; nothing in the channel, the indicator or the catch-up depends on
+  it. All three listeners (projects, runs,
   queue_items) live on that channel; do not open a second one or start it from another component.

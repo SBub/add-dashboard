@@ -52,7 +52,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ~/.cache/playwright-apt
-          key: playwright-apt-v2-${{ steps.playwright.outputs.image }}-${{ steps.playwright.outputs.version }}-probe
+          key: playwright-apt-v2-${{ steps.playwright.outputs.image }}-${{ steps.playwright.outputs.version }}
       - name: Install Playwright system packages from cache
         if: steps.playwright-apt.outputs.cache-hit == 'true'
         run: sudo dpkg -i "$HOME"/.cache/playwright-apt/*.deb
@@ -77,7 +77,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-browsers-v2-${{ runner.arch }}-${{ steps.playwright.outputs.os }}-${{ steps.playwright.outputs.version }}-probe
+          key: playwright-browsers-v2-${{ runner.arch }}-${{ steps.playwright.outputs.os }}-${{ steps.playwright.outputs.version }}
       - run: yarn playwright install chromium webkit
       - name: Save Playwright browsers
         if: steps.playwright-browsers.outputs.cache-hit != 'true'

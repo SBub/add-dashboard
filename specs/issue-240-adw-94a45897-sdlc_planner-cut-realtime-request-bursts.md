@@ -237,7 +237,7 @@ calls `test.setTimeout(...)` to fit its duration plus 60 s. Use `page.waitForTim
 observation windows (this spec measures over time by design; comment why).
 
 1. Steady: `goto("/projects")`, `waitForLive`, wait until 60 s since `goto`; expect 1 socket,
-   `project_summaries <= 2`, `runs <= 2`, `workers <= 3`, pill still `live`.
+   `project_summaries <= 2`, `runs <= 2`, `workers <= 4` (strict mode polls twice on mount under `next dev`), pill still `live`.
 2. Drops: before `goto`, `page.routeWebSocket(/\/realtime\//, ws => { const server = ws.connectToServer(); setTimeout(() => ws.close(), 3_000); })`
    (forward messages both ways is the default once `connectToServer` is called; confirm against the
    installed `@playwright/test` docs); `goto("/projects")`, wait 60 s; expect sockets `<= 6` and

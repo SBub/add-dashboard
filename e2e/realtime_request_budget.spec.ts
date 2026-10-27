@@ -50,7 +50,9 @@ test("one socket and a few reads in a steady minute", async ({ page }) => {
   expect(counts.sockets).toBe(1);
   expect(counts.rest.project_summaries).toBeLessThanOrEqual(2);
   expect(counts.rest.runs).toBeLessThanOrEqual(2);
-  expect(counts.rest.workers).toBeLessThanOrEqual(3);
+  // The mount poll, the 30 s and 60 s ticks, plus one: under `next dev`,
+  // strict mode subscribes twice and the second mount polls again.
+  expect(counts.rest.workers).toBeLessThanOrEqual(4);
   await expect(pill(page)).toHaveText("live");
 });
 

@@ -36,8 +36,10 @@ a `useSyncExternalStore` hook with a data-derived server snapshot, and the
 first version of that re-rendered the whole pane on every tick. Issue #3
 describes the leaf-level replacement.
 
-`fetched_at` itself is `new Date().toISOString()` taken inside
-`getActiveRuns`, which on the server only ever runs inside
+`fetched_at` itself comes from `activeReadClock()` in `src/data/index.ts`,
+one `Date.now()` that also yields the failed-run window's cutoff
+(`failedRunCutoff`), shared by `getActiveRuns` and `getChangedRuns`.
+`getActiveRuns` on the server only ever runs inside
 `getActiveRunsState`, after `await connection()`: at request time, never in a
 prerender pass, where the same read would fail the build. Nothing in the UI
 reads `fetched_at` today; it stays in `ActiveRuns`
@@ -85,11 +87,13 @@ in `poll`.
 - No clock reads outside the cached boundary. There are exactly three
   argument-less `new Date()` / `Date.now()` sites in the codebase
   (`new Date(ms)` on a parsed input, as in `formatTimestamp`, is not a clock
-  read): `getActiveRuns`'s `fetched_at` stamp, which
-  on the server only ever executes inside `getActiveRunsState`, directly
+  read): `activeReadClock()` in `src/data/index.ts`, the Active reads'
+  `fetched_at` stamp and failed-run cutoff, shared by `getActiveRuns` and
+  `getChangedRuns`, which on the server only ever executes inside
+  `getActiveRunsState` (through `getActiveRuns`), directly
   after its `await connection()`, so only at request time (in
   the browser it runs as a `queryFn` on a cache miss and in the realtime
-  catch-up, where a clock read is fine), and `utcDay(Date.now())` in the
+  catch-up, where a clock read is fine; `getChangedRuns` is browser only), and `utcDay(Date.now())` in the
   summary page's `requestToday` (`src/app/(dashboard)/projects/log/page.tsx`, a plain function, not a
   component body, which `react-hooks/purity` forbids), directly after its
   `await connection()`, so only at request time, never in a prerender pass and

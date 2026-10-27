@@ -57,7 +57,7 @@ browser cache hit it finds both browsers present and downloads nothing.
   since only it depends on `ImageVersion`. A new Ubuntu release changes `ImageOS` and misses both.
 - A bumped `v1`.
 
-A miss downloads once and saves immediately.
+A miss downloads once and saves right away.
 
 ### Cache scope
 

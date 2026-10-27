@@ -112,9 +112,18 @@ async function openProject(page: Page, href: string): Promise<void> {
     await expect(main.getByRole("heading", { level: 2, name: title, exact: true })).toBeVisible();
   }
   await waitForLive(page);
-  await expect(main.locator('[aria-busy="true"]').filter({ visible: true })).toHaveCount(0, {
-    timeout: 30_000,
-  });
+  await waitForSkeletonsGone(page);
+}
+
+// Waits until no visible skeleton is left in the main pane. A project page's
+// static shell carries the Active island's fallback, which renders its own
+// copy of the Building now and Up next headings (info buttons and tooltips
+// included); when the island streams in, that copy is removed. Until then a
+// locator can resolve to the fallback's node and lose it mid-test.
+export async function waitForSkeletonsGone(page: Page): Promise<void> {
+  await expect(
+    page.getByRole("main").locator('[aria-busy="true"]').filter({ visible: true }),
+  ).toHaveCount(0, { timeout: 30_000 });
 }
 
 // The one walk over the sidebar's projects: opens each (a `prefer` href first
